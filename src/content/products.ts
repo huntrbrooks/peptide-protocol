@@ -47,6 +47,17 @@ export const products: Product[] = [
       "Use only within controlled research settings and according to your organisation’s solvent handling SOPs. This product is a research reagent, not a consumer or clinical preparation.",
     ],
     researchNotice: RESEARCH_NOTICE,
+    whatItsFor: {
+      intro:
+        "Bacteriostatic water is a multi-dose sterile diluent. In laboratory and compounding workflows it is used for the following purposes:",
+      uses: [
+        "Reconstituting lyophilised research peptides and other powdered reagents into solution",
+        "Diluting concentrated research compounds for assay preparation and protocol work",
+        "Multi-draw vial workflows where a bacteriostatic preservative helps limit microbial growth after first puncture",
+        "Standard solvent control in reconstitution SOPs as an alternative to single-use sterile water",
+        "Inventory pairing with lyophilised catalogue materials that require aqueous reconstitution before use",
+      ],
+    },
     specs: [
       { label: "Composition", value: "Sterile water with 0.9% benzyl alcohol" },
       { label: "Volume", value: "10mL per vial" },
@@ -94,6 +105,19 @@ export const products: Product[] = [
       "Each batch is prepared for research inventory use, with purity assessed by RP-HPLC and a Certificate of Analysis available for verified lots.",
     ],
     researchNotice: RESEARCH_NOTICE,
+    whatItsFor: {
+      intro:
+        "BPC-157 is studied and sought for tissue-protection and recovery pathways. Research interest and commonly discussed applications include:",
+      uses: [
+        "Tendon, ligament, and soft-tissue injury models (healing, angiogenesis, and extracellular-matrix signalling)",
+        "Muscle strain and sports-medicine recovery research",
+        "Gut lining and gastrointestinal mucosal protection studies",
+        "Wound healing and vascular regeneration pathway work",
+        "Inflammation and nitric-oxide pathway modulation research",
+        "Joint, connective-tissue, and chronic pain model exploration",
+        "Neuroprotective and central-nervous-system injury models in preclinical literature",
+      ],
+    },
     specs: [
       { label: "Synonyms", value: "Body Protection Compound-157, Bepecin (research literature)" },
       { label: "CAS number", value: "137525-51-0" },
@@ -146,6 +170,18 @@ export const products: Product[] = [
       "Identity and purity are assessed by RP-HPLC, with Certificates of Analysis available for verified lots so intake records stay complete.",
     ],
     researchNotice: RESEARCH_NOTICE,
+    whatItsFor: {
+      intro:
+        "CJC-1295 with DAC is a long-acting GHRH analogue. It is studied and sought for sustained growth-hormone pathway effects, including:",
+      uses: [
+        "Sustained GH and IGF-1 elevation research (albumin-binding DAC extends half-life for days)",
+        "Adult growth-hormone deficiency and GH-axis pharmacodynamic studies",
+        "Body-composition, lean-mass, and recovery-related GH secretagogue research",
+        "Sleep and overnight GH-pulse interaction models",
+        "Anti-ageing and metabolic endocrine pathway investigation",
+        "Comparison studies against shorter-acting GHRH fragments (no-DAC / Mod GRF)",
+      ],
+    },
     specs: [
       { label: "Synonyms", value: "CJC-1295 DAC, CJC-1295 with Drug Affinity Complex" },
       { label: "CAS number", value: "863288-34-0 (family reference; confirm on batch COA)" },
@@ -195,6 +231,18 @@ export const products: Product[] = [
       "Each batch is prepared for research inventory use, with purity assessed by RP-HPLC and a Certificate of Analysis available for verified lots.",
     ],
     researchNotice: RESEARCH_NOTICE,
+    whatItsFor: {
+      intro:
+        "CJC-1295 without DAC (Modified GRF 1-29) is a short-acting GHRH analogue. Common research and interest areas include:",
+      uses: [
+        "Pulsatile growth-hormone release studies that preserve natural GH pulse patterns",
+        "Short-half-life GHRH receptor activation models (~30-minute activity window)",
+        "Stacked GH-secretagogue research with ghrelin mimetics such as Ipamorelin",
+        "Body-composition, recovery, and performance-related GH-axis work",
+        "Sleep-associated GH pulse and IGF-1 response investigation",
+        "Head-to-head comparison with long-acting DAC-modified CJC-1295",
+      ],
+    },
     specs: [
       { label: "Synonyms", value: "Mod GRF (1-29), tetrasubstituted GRF (1-29)" },
       { label: "CAS number", value: "863288-34-0" },
@@ -248,6 +296,18 @@ export const products: Product[] = [
       "Batch purity is assessed by RP-HPLC, with documentation available so research teams can file identity and assay records.",
     ],
     researchNotice: RESEARCH_NOTICE,
+    whatItsFor: {
+      intro:
+        "DSIP is a nonapeptide examined in sleep and stress-related neurobiology. Humans and researchers have historically explored it for:",
+      uses: [
+        "Insomnia and sleep-architecture research (sleep latency, total sleep time, sleep efficiency)",
+        "Delta-wave and deep-sleep related neurological models",
+        "Circadian rhythm and sleep–wake regulation studies",
+        "Stress, anxiety, and HPA-axis modulation research",
+        "Chronic pain and withdrawal-related sleep disturbance models in older literature",
+        "Neuroendocrine and opioid-system interaction studies",
+      ],
+    },
     specs: [
       { label: "Synonyms", value: "Delta sleep-inducing peptide" },
       { label: "CAS number", value: "62568-57-4" },
@@ -298,6 +358,18 @@ export const products: Product[] = [
       "Lots are assessed for purity and identity, with Certificates of Analysis available for verified batches.",
     ],
     researchNotice: RESEARCH_NOTICE,
+    whatItsFor: {
+      intro:
+        "Epitalon is a synthetic pineal tetrapeptide studied in ageing biology. Research interest and commonly discussed applications include:",
+      uses: [
+        "Telomere length and telomerase activity research in cellular ageing models",
+        "Pineal gland and melatonin rhythm / circadian biomarker studies",
+        "Longevity, geroprotection, and age-related decline pathway work",
+        "Sleep quality and chronobiology-related investigation",
+        "Antioxidant and cellular stress-resistance research",
+        "Gene-expression and clock-gene regulation studies in human biomarker trials",
+      ],
+    },
     specs: [
       { label: "Synonyms", value: "Epithalon, Ala-Glu-Asp-Gly" },
       { label: "CAS number", value: "307297-39-8" },
@@ -348,6 +420,18 @@ export const products: Product[] = [
       "Purity and identity documentation are available for verified lots so laboratory intake remains auditable.",
     ],
     researchNotice: RESEARCH_NOTICE,
+    whatItsFor: {
+      intro:
+        "GHK-Cu is an endogenous copper–tripeptide complex. It is studied and sought for skin, tissue, and cellular-repair pathways, including:",
+      uses: [
+        "Skin remodelling, collagen synthesis, and wrinkle / photoageing cosmetic research",
+        "Wound healing and tissue-repair signalling studies",
+        "Hair follicle and hair-density related research",
+        "Extracellular-matrix gene expression and anti-inflammatory pathway work",
+        "Copper delivery and antioxidant / anti-glycation cellular models",
+        "Scar quality, dermal regeneration, and cosmetic formulation research",
+      ],
+    },
     specs: [
       { label: "Synonyms", value: "Copper tripeptide-1, GHK copper complex" },
       { label: "CAS number", value: "89030-95-5 (confirm on batch COA)" },
@@ -398,6 +482,19 @@ export const products: Product[] = [
       "Batch documentation is available for verified lots. Confirm potency units and handling notes on the Certificate of Analysis before use in protocols.",
     ],
     researchNotice: RESEARCH_NOTICE,
+    whatItsFor: {
+      intro:
+        "HCG is a glycoprotein hormone with established endocrine roles. Clinical, research, and commonly discussed applications include:",
+      uses: [
+        "Female fertility protocols — ovulation induction and assisted-reproduction trigger research",
+        "Male hypogonadotropic hypogonadism and endogenous testosterone support studies",
+        "Spermatogenesis and testicular function research",
+        "Prepubertal cryptorchidism (selected pediatric endocrine contexts in approved settings)",
+        "Post-cycle hormonal recovery models in performance-related literature",
+        "Pregnancy-related biomarker and immunoassay calibration work",
+        "Off-label metabolic / weight-loss interest historically (not supported as an approved indication)",
+      ],
+    },
     specs: [
       { label: "Synonyms", value: "Human chorionic gonadotropin, hCG" },
       { label: "Form", value: "Lyophilised powder" },
@@ -445,6 +542,19 @@ export const products: Product[] = [
       "Each verified lot includes access to purity documentation so research teams can maintain complete inventory records.",
     ],
     researchNotice: RESEARCH_NOTICE,
+    whatItsFor: {
+      intro:
+        "Ipamorelin is a selective ghrelin-mimetic GH secretagogue. Research interest and commonly discussed applications include:",
+      uses: [
+        "Selective growth-hormone release with minimal cortisol / ACTH spillover in PK/PD studies",
+        "Body-composition, recovery, and lean-mass related GH-axis research",
+        "Stacked secretagogue protocols with GHRH analogues (e.g. CJC-1295 / Mod GRF)",
+        "Sleep-associated GH pulse and overnight recovery models",
+        "Appetite and ghrelin-receptor signalling research",
+        "Postoperative ileus and GI-motility investigation (discontinued Phase II program)",
+        "Anti-ageing and metabolic endocrine pathway exploration",
+      ],
+    },
     specs: [
       { label: "Synonyms", value: "NNC 26-0161 (literature reference)" },
       { label: "CAS number", value: "170851-70-4" },
@@ -496,6 +606,18 @@ export const products: Product[] = [
       "This catalogue listing is for research inventory only. It is not offered as a tanning, cosmetic, or consumer product.",
     ],
     researchNotice: RESEARCH_NOTICE,
+    whatItsFor: {
+      intro:
+        "Melanotan II is a non-selective melanocortin receptor agonist. Laboratory and literature interest has focused on:",
+      uses: [
+        "Melanocortin receptor signalling and pigmentation pathway research (MC1R-related)",
+        "Sunless tanning / cutaneous melanogenesis studies in early human trials",
+        "Male erectile function and sexual-desire research (melanocortin CNS pathways)",
+        "Appetite suppression and energy-balance models via MC3R / MC4R activity",
+        "Comparative work alongside related analogues (afamelanotide / bremelanotide lineage)",
+        "Photoprotection and UV-response melanocyte biology research",
+      ],
+    },
     specs: [
       { label: "Synonyms", value: "MT-II, Melanotan 2" },
       { label: "CAS number", value: "121062-08-6" },
@@ -545,6 +667,18 @@ export const products: Product[] = [
       "Verified lots include purity assessment by RP-HPLC and Certificate of Analysis access for research record-keeping.",
     ],
     researchNotice: RESEARCH_NOTICE,
+    whatItsFor: {
+      intro:
+        "MOTS-c is a mitochondrial-derived peptide studied in metabolic and exercise biology. Research interest and commonly discussed applications include:",
+      uses: [
+        "Insulin sensitivity and glucose homeostasis research (skeletal-muscle AMPK pathways)",
+        "Obesity, prediabetes, and diet-induced metabolic dysfunction models",
+        "Exercise physiology and “exercise-mimetic” mitochondrial signalling studies",
+        "Age-related metabolic decline and longevity pathway work",
+        "Cardiometabolic risk marker and inflammation research",
+        "Nuclear–mitochondrial stress-response and gene-expression studies",
+      ],
+    },
     specs: [
       { label: "Synonyms", value: "Mitochondrial open reading frame of the 12S rRNA type-c" },
       { label: "CAS number", value: "1627580-64-6 (confirm on batch COA)" },
@@ -595,6 +729,18 @@ export const products: Product[] = [
       "Identity and purity are documented on Certificates of Analysis for verified lots. Confirm exact molecular parameters on your batch COA before protocol use.",
     ],
     researchNotice: RESEARCH_NOTICE,
+    whatItsFor: {
+      intro:
+        "Retatrutide is an investigational triple agonist (GLP-1 / GIP / glucagon). Clinical and research interest focuses on:",
+      uses: [
+        "Obesity and chronic weight-management clinical development",
+        "Type 2 diabetes and glycemic-control research",
+        "Metabolic dysfunction–associated steatotic liver disease (MASLD / MASH) trials",
+        "Appetite regulation, energy expenditure, and body-composition studies",
+        "Cardiometabolic risk-factor improvement research",
+        "Head-to-head comparison with dual agonists such as tirzepatide in metabolic literature",
+      ],
+    },
     specs: [
       { label: "Synonyms", value: "LY3437943 (literature reference)" },
       { label: "CAS number", value: "2381089-83-2 (confirm on batch COA)" },
@@ -644,6 +790,19 @@ export const products: Product[] = [
       "Batch purity is assessed with RP-HPLC, and Certificates of Analysis are available for verified lots.",
     ],
     researchNotice: RESEARCH_NOTICE,
+    whatItsFor: {
+      intro:
+        "Semax is an ACTH (4-10) analogue used clinically in some regions and studied widely for cognition. Research interest and commonly discussed applications include:",
+      uses: [
+        "Cognitive performance, focus, and nootropic research",
+        "Ischemic stroke and cerebrovascular recovery models",
+        "Neuroprotection, BDNF upregulation, and neurotrophic signalling studies",
+        "Memory, learning, and attention-related neurological work",
+        "Optic-nerve and visual-pathway disorder research (regional clinical use)",
+        "Stress resilience and monoaminergic pathway modulation studies",
+        "Post-traumatic and neurodegenerative cognitive-decline exploration",
+      ],
+    },
     specs: [
       { label: "Synonyms", value: "Met-Glu-His-Phe-Pro-Gly-Pro" },
       { label: "CAS number", value: "80714-61-0" },
@@ -694,6 +853,18 @@ export const products: Product[] = [
       "Purity and identity are documented for verified lots so research teams can maintain complete material records.",
     ],
     researchNotice: RESEARCH_NOTICE,
+    whatItsFor: {
+      intro:
+        "Sermorelin is a GHRH (1-29) amide fragment historically used in GH diagnostics and therapy. Research interest and commonly discussed applications include:",
+      uses: [
+        "Pediatric growth-hormone deficiency pathway research (historically approved as Geref)",
+        "Adult GH-axis stimulation and IGF-1 response studies",
+        "Body-composition, recovery, and sleep-related GH pulse research",
+        "Anti-ageing / age-related GH decline investigation in compounded clinical settings",
+        "Diagnostic GH-stimulation testing lineage work",
+        "Comparison with longer-acting GHRH analogues (tesamorelin, CJC-1295)",
+      ],
+    },
     specs: [
       { label: "Synonyms", value: "GHRH (1-29) amide, GRF 1-29" },
       { label: "CAS number", value: "86168-78-7" },
@@ -744,6 +915,19 @@ export const products: Product[] = [
       "Confirm exact sequence and molecular details on your batch Certificate of Analysis before incorporating the material into protocols.",
     ],
     researchNotice: RESEARCH_NOTICE,
+    whatItsFor: {
+      intro:
+        "TB-500 refers to research material related to the active region of thymosin beta-4. It is studied and sought for:",
+      uses: [
+        "Tissue repair, wound healing, and cell-migration research",
+        "Actin cytoskeleton organisation and cellular motility models",
+        "Muscle, tendon, and soft-tissue recovery pathway work",
+        "Cardiac repair and angiogenesis-related preclinical studies",
+        "Inflammation modulation and regenerative-biology research",
+        "Combined tissue-recovery protocols alongside BPC-157 in laboratory literature",
+        "Flexibility, fibrosis, and scar-remodelling exploratory models",
+      ],
+    },
     specs: [
       { label: "Synonyms", value: "Thymosin Beta-4 fragment research material, TB500" },
       { label: "CAS number", value: "As per batch COA (thymosin β4 family references vary)" },
@@ -792,6 +976,18 @@ export const products: Product[] = [
       "Verified lots include purity documentation. Always cross-check molecular parameters against the batch COA.",
     ],
     researchNotice: RESEARCH_NOTICE,
+    whatItsFor: {
+      intro:
+        "Tesamorelin is a stabilised GHRH analogue with an approved clinical indication in some markets. Research interest and commonly discussed applications include:",
+      uses: [
+        "Reduction of excess visceral adipose tissue in HIV-associated lipodystrophy (approved indication: Egrifta)",
+        "Central / abdominal fat and body-composition research",
+        "GH and IGF-1 axis pharmacodynamic studies",
+        "Metabolic risk-marker and lipid-profile investigation in visceral-adiposity models",
+        "Cognitive and neurocognitive exploratory work in HIV-related literature",
+        "Broader anti-ageing / visceral-fat interest outside the approved indication (research and off-label discussion)",
+      ],
+    },
     specs: [
       { label: "Synonyms", value: "TH9507 (literature reference)" },
       { label: "CAS number", value: "218949-48-5" },
@@ -841,6 +1037,18 @@ export const products: Product[] = [
       "This material is not a medicine or consumer product. Confirm molecular and purity details on the batch Certificate of Analysis before protocol use.",
     ],
     researchNotice: RESEARCH_NOTICE,
+    whatItsFor: {
+      intro:
+        "Tirzepatide is a dual GIP/GLP-1 receptor agonist peptide. Clinical and research interest focuses on:",
+      uses: [
+        "Type 2 diabetes glycemic control (approved brand: Mounjaro in clinical settings)",
+        "Chronic weight management and obesity treatment (approved brand: Zepbound in clinical settings)",
+        "Obstructive sleep apnea in adults with obesity (approved Zepbound indication)",
+        "Appetite regulation, calorie intake reduction, and body-composition research",
+        "Insulin sensitivity, HbA1c, and cardiometabolic risk-factor studies",
+        "Comparative metabolic research against other incretin-pathway agonists",
+      ],
+    },
     specs: [
       { label: "Synonyms", value: "LY3298176 (literature reference)" },
       { label: "CAS number", value: "2023788-19-2" },

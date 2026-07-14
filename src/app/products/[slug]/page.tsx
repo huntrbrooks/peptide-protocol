@@ -67,6 +67,23 @@ export default async function ProductPage({ params }: Props) {
       </div>
 
       <section className="mt-16">
+        <h2 className="font-display text-3xl text-ink">What it&apos;s for</h2>
+        <p className="mt-4 max-w-3xl text-sm leading-relaxed text-muted">
+          {product.whatItsFor.intro}
+        </p>
+        <ul className="mt-6 grid gap-3 sm:grid-cols-2">
+          {product.whatItsFor.uses.map((use) => (
+            <li
+              key={use}
+              className="border border-line bg-mist/30 px-4 py-3 text-sm leading-relaxed text-ink"
+            >
+              {use}
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="mt-16">
         <h2 className="font-display text-3xl text-ink">Specifications</h2>
         <div className="mt-6 overflow-x-auto border border-line">
           <table className="min-w-full text-left text-sm">

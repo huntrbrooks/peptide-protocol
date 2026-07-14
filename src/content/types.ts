@@ -8,6 +8,11 @@ export type FaqItem = {
   answer: string;
 };
 
+export type WhatItsFor = {
+  intro: string;
+  uses: string[];
+};
+
 export type Product = {
   slug: string;
   name: string;
@@ -22,6 +27,7 @@ export type Product = {
   headline: string;
   body: string[];
   researchNotice: string;
+  whatItsFor: WhatItsFor;
   specs: SpecRow[];
   storage: string[];
   included: string[];
