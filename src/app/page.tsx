@@ -29,17 +29,15 @@ export default function HomePage() {
           <div className="absolute inset-0 bg-gradient-to-r from-ink/88 via-ink/70 to-ink/35" />
         </div>
         <div className="relative mx-auto flex min-h-[88vh] max-w-6xl flex-col justify-end gap-10 px-4 pb-16 pt-24 sm:px-6 sm:pb-20 lg:flex-row lg:items-end lg:justify-between lg:gap-12">
-          <div className="hero-logo-wrap animate-logo-enter order-first mx-auto w-full max-w-[220px] shrink-0 sm:max-w-[280px] lg:order-last lg:mx-0 lg:mb-2 lg:max-w-[340px]">
-            <div className="rounded-sm bg-paper/92 p-5 shadow-[0_20px_60px_rgba(11,31,42,0.35)] backdrop-blur-sm sm:p-7">
-              <Image
-                src="/images/logo.png"
-                alt="Peptide Protocol"
-                width={512}
-                height={951}
-                priority
-                className="hero-logo-float h-auto w-full"
-              />
-            </div>
+          <div className="order-first mx-auto w-full max-w-[220px] shrink-0 sm:max-w-[280px] lg:order-last lg:mx-0 lg:mb-2 lg:max-w-[340px]">
+            <Image
+              src="/images/logo.png"
+              alt="Peptide Protocol"
+              width={512}
+              height={951}
+              priority
+              className="logo-loop hero-logo-on-dark h-auto w-full bg-transparent"
+            />
           </div>
 
           <div className="min-w-0 flex-1">
