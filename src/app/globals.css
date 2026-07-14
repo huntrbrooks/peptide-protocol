@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+:root {
+  --paper: #f4f7f8;
+  --ink: #0b1f2a;
+  --mist: #d9e6ea;
+  --line: #c5d5db;
+  --muted: #5a717c;
+  --accent: #1a6b7a;
+  --teal-soft: #9ec9d1;
+  --sand: #e8efe8;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-mist: var(--mist);
+  --color-line: var(--line);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-teal-soft: var(--teal-soft);
+  --color-sand: var(--sand);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(158, 201, 209, 0.35), transparent 55%),
+    radial-gradient(900px 500px at 100% 0%, rgba(232, 239, 232, 0.7), transparent 50%),
+    linear-gradient(180deg, #eef3f5 0%, var(--paper) 28%, #eef2f3 100%);
+  color: var(--ink);
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+}
+
+.font-display {
+  font-family: var(--font-display), ui-serif, Georgia, serif;
+}
+
+::selection {
+  background: rgba(26, 107, 122, 0.2);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes drift {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-rise {
+  animation: rise 0.7s ease-out both;
+}
+
+.animate-rise-delay {
+  animation: rise 0.8s ease-out 0.12s both;
+}
+
+.animate-drift {
+  animation: drift 5s ease-in-out infinite alternate;
+}

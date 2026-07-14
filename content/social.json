@@ -1,0 +1,26 @@
+{
+  "handle": "@peptideprotocolau",
+  "bio": "Research peptides for Australian laboratories. Documented purity. Express dispatch. Research use only. Not for human consumption.\npeptideprotocolau.io",
+  "linkInBio": [
+    {
+      "label": "Shop all research materials",
+      "href": "https://peptideprotocolau.io/shop"
+    },
+    {
+      "label": "Quality & testing / COA requests",
+      "href": "https://peptideprotocolau.io/quality"
+    },
+    {
+      "label": "Shipping information",
+      "href": "https://peptideprotocolau.io/shipping"
+    },
+    {
+      "label": "Contact support",
+      "href": "https://peptideprotocolau.io/contact"
+    },
+    {
+      "label": "Research use disclaimer",
+      "href": "https://peptideprotocolau.io/disclaimer"
+    }
+  ]
+}
