@@ -29,15 +29,15 @@ export default function HomePage() {
           <div className="absolute inset-0 bg-gradient-to-r from-ink/88 via-ink/70 to-ink/35" />
         </div>
         <div className="relative mx-auto flex min-h-[88vh] max-w-6xl flex-col items-center justify-center gap-10 px-4 py-16 sm:px-6 sm:py-20 lg:flex-row lg:items-center lg:justify-between lg:gap-12">
-          {/* Was max-w 220/280/340 → 50% = 110/140/170 */}
-          <div className="order-first mx-auto w-full max-w-[110px] shrink-0 sm:max-w-[140px] lg:order-last lg:mx-0 lg:max-w-[170px]">
+          {/* Animated vector mark; 130% of the previous 110/140/170 sizing */}
+          <div className="order-first mx-auto w-full max-w-[143px] shrink-0 sm:max-w-[182px] lg:order-last lg:mx-0 lg:max-w-[221px]">
             <Image
-              src="/images/logo.png"
+              src="/images/logo-animated.svg"
               alt="Peptide Protocol"
-              width={512}
-              height={951}
+              width={1045}
+              height={1595}
               priority
-              className="logo-loop h-auto w-full bg-transparent"
+              className="h-auto w-full bg-transparent"
             />
           </div>
 
