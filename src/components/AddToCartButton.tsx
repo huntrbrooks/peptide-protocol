@@ -15,7 +15,7 @@ export function AddToCartButton({ product }: { product: Product }) {
           setAdded(true);
           window.setTimeout(() => setAdded(false), 2500);
         }}
-        className="rounded-sm bg-ink px-6 py-3 text-sm text-paper transition hover:bg-accent"
+        className="btn-primary rounded-sm bg-ink px-6 py-3 text-sm text-paper hover:bg-accent"
       >
         {added ? "Added to enquiry list" : `Add to cart · ${formatPrice(product.priceAud)}`}
       </button>

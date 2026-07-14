@@ -8,17 +8,20 @@ export function Footer() {
       <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
         <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
-            <Link href="/" aria-label="Peptide Protocol home" className="inline-block">
+            <Link
+              href="/"
+              aria-label="Peptide Protocol home"
+              className="inline-block transition-opacity duration-300 hover:opacity-85"
+            >
               <Image
-                src="/images/logo-mark.png"
+                src="/images/logo-footer.png"
                 alt="Peptide Protocol"
-                width={48}
-                height={48}
-                className="h-12 w-12 rounded-sm bg-paper p-1.5"
+                width={120}
+                height={160}
+                className="h-20 w-auto"
               />
             </Link>
-            <p className="mt-4 font-display text-2xl tracking-tight">Peptide Protocol</p>
-            <p className="mt-3 max-w-sm text-sm leading-relaxed text-paper/70">
+            <p className="mt-4 max-w-sm text-sm leading-relaxed text-paper/70">
               Research-grade peptides for Australian laboratories. Documented
               purity. Clear research-only terms.
             </p>
@@ -48,11 +51,17 @@ export function Footer() {
         <div className="mt-12 border-t border-paper/10 pt-6">
           <p className="max-w-4xl text-xs leading-relaxed text-paper/55">
             {site.researchDisclaimer} Purchase confirms acceptance of the{" "}
-            <Link href="/disclaimer" className="underline underline-offset-2">
+            <Link
+              href="/disclaimer"
+              className="underline underline-offset-2 transition hover:text-teal-soft"
+            >
               Research Use Disclaimer
             </Link>{" "}
             and{" "}
-            <Link href="/terms" className="underline underline-offset-2">
+            <Link
+              href="/terms"
+              className="underline underline-offset-2 transition hover:text-teal-soft"
+            >
               Terms of Sale
             </Link>
             .

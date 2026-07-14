@@ -38,13 +38,13 @@ export default function HomePage() {
           <p className="animate-rise-delay mt-4 max-w-2xl font-display text-2xl leading-snug text-paper/90 sm:text-3xl">
             {home.headline}
           </p>
-          <p className="mt-5 max-w-xl text-base leading-relaxed text-paper/75">
+          <p className="animate-rise-delay-2 mt-5 max-w-xl text-base leading-relaxed text-paper/75">
             {home.subheadline}
           </p>
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="animate-rise-delay-2 mt-8 flex flex-wrap gap-3">
             <Link
               href={home.primaryCta.href}
-              className="rounded-sm bg-paper px-5 py-3 text-sm font-medium text-ink transition hover:bg-teal-soft"
+              className="btn-primary rounded-sm bg-paper px-5 py-3 text-sm font-medium text-ink hover:bg-teal-soft"
             >
               {home.primaryCta.label}
             </Link>
@@ -69,7 +69,7 @@ export default function HomePage() {
       </section>
 
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        <div className="max-w-2xl">
+        <div className="reveal max-w-2xl">
           <h2 className="font-display text-3xl tracking-tight text-ink sm:text-4xl">
             Built for research workflows
           </h2>
@@ -79,7 +79,10 @@ export default function HomePage() {
         </div>
         <div className="mt-10 grid gap-6 md:grid-cols-2">
           {home.valueProps.map((item) => (
-            <div key={item.title} className="border border-line bg-paper/80 p-6">
+            <div
+              key={item.title}
+              className="card-lift border border-line bg-paper/80 p-6"
+            >
               <h3 className="font-display text-xl text-ink">{item.title}</h3>
               <p className="mt-3 text-sm leading-relaxed text-muted">{item.body}</p>
             </div>
@@ -98,7 +101,7 @@ export default function HomePage() {
                 Browse by research focus. Every listing remains laboratory use only.
               </p>
             </div>
-            <Link href="/shop" className="hidden text-sm text-teal-soft sm:inline">
+            <Link href="/shop" className="hidden text-sm text-teal-soft transition hover:text-paper sm:inline">
               View all
             </Link>
           </div>
@@ -107,7 +110,7 @@ export default function HomePage() {
               <Link
                 key={category.slug}
                 href={`/shop/${category.slug}`}
-                className="group relative min-h-44 overflow-hidden border border-paper/10"
+                className="group relative min-h-44 overflow-hidden border border-paper/10 transition duration-300 hover:border-teal-soft/40"
               >
                 <Image
                   src={category.image}
@@ -137,7 +140,7 @@ export default function HomePage() {
             </h2>
             <p className="mt-3 text-muted">Selected catalogue items with documented purity targets.</p>
           </div>
-          <Link href="/shop" className="text-sm text-accent">
+          <Link href="/shop" className="text-sm text-accent transition hover:text-ink">
             Full catalogue
           </Link>
         </div>
@@ -173,7 +176,7 @@ export default function HomePage() {
           <div className="mt-8 flex flex-wrap items-center gap-4">
             <Link
               href={home.finalCta.href}
-              className="rounded-sm bg-ink px-5 py-3 text-sm text-paper transition hover:bg-accent"
+              className="btn-primary rounded-sm bg-ink px-5 py-3 text-sm text-paper hover:bg-accent"
             >
               {home.finalCta.label}
             </Link>

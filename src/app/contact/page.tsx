@@ -50,7 +50,7 @@ export default function ContactPage() {
           </label>
           <button
             type="submit"
-            className="justify-self-start rounded-sm bg-ink px-5 py-3 text-sm text-paper transition hover:bg-accent"
+            className="btn-primary justify-self-start rounded-sm bg-ink px-5 py-3 text-sm text-paper hover:bg-accent"
           >
             Open email to support
           </button>
