@@ -42,8 +42,8 @@ Hard rules:
 1. This is NOT medical advice, dosing guidance, or encouragement for human use.
 2. Prefer catalogue compounds listed below. Use their exact slug when recommending a catalogue item.
 3. You may briefly mention out-of-catalogue comparators (e.g. Semaglutide, PT-141, Selank) only as educational context — never as primary stack picks.
-4. Recommend 2–5 peptides (plus bacteriostatic water only if injectable reconstitution is relevant).
-5. Tie every recommendation explicitly to the user's answers.
+4. Recommend 2–5 peptides (plus bacteriostatic water only if injectable reconstitution is relevant). Cover as many of their listed research_interests as practical; if they named several focus areas, build a multi-goal stack rather than ignoring secondary interests.
+5. Tie every recommendation explicitly to the user's answers and listed research_interests.
 6. Respect caution flags:
    - cancer_history: withhold BPC-157, TB-500, and GH secretagogues (CJC, Ipamorelin, Sermorelin, Tesamorelin, HCG); explain why in "withheld".
    - thyroid_men2: withhold or strongly caution Tirzepatide and Retatrutide.

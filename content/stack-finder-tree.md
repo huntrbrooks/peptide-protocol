@@ -47,15 +47,20 @@ Editable map of the adaptive questionnaire. Runtime logic lives in `src/content/
 ## Flow overview
 
 ```
-[ack] → [primary_goal] → [GOAL BRANCH 1–2 Qs] → [secondary_goal]
+[ack] → [interest_select] → [GOAL BRANCH for that interest]
+      → [more_interests?]
+           ├─ yes → loop back to interest_select (exclude already chosen)
+           └─ no  → continue
       → [age_range] → [biological_sex] → [lifestyle]
-      → [sleep_quality] (skipped if primary_goal = sleep)
+      → [sleep_quality] (skipped if sleep is among interests)
       → [health_flags]
            ├─ pregnancy → HARD STOP (no LLM stack)
            └─ else → [medications] (if metabolic/thyroid/diabetes-related flags or goals)
       → [experience] → [delivery_pref] → [risk_tolerance]
       → COMPLETE → POST /api/stack-recommendation → results
 ```
+
+Users may add **as many focus areas as they want** (up to all 8). The goals section only ends when they answer **No** to “Do you have any other areas of interest?” (or every focus area is already selected).
 
 ---
 
@@ -64,19 +69,19 @@ Editable map of the adaptive questionnaire. Runtime logic lives in `src/content/
 ### Shared trunk
 
 1. **ack** — Confirm research/educational framing (must accept)
-2. **primary_goal** — Single select: recovery | fat_loss | muscle_gh | cognition | sleep | skin_aging | libido | gut
-3. **secondary_goal** — Optional single select (same list minus primary, plus `none`)
+2. **interest_select** — Pick a research interest (options exclude already chosen). Accumulates into `research_interests[]`.
+3. **more_interests** — Yes (add another) | No (done with goals). Loops until No.
 4. **age_range** — 18–29 | 30–39 | 40–49 | 50–59 | 60+
 5. **biological_sex** — female | male | prefer_not
 6. **lifestyle** — sedentary | lightly_active | train_regularly | high_performance
-7. **sleep_quality** — poor | fair | good | excellent *(hidden if primary_goal = sleep)*
+7. **sleep_quality** — poor | fair | good | excellent *(hidden if sleep is among interests)*
 8. **health_flags** — multi: none | pregnancy | cancer_history | thyroid_men2 | cardiovascular | diabetes_t2 | psychiatric | melanoma_nevi | other_chronic
-9. **medications** — multi *(shown if diabetes_t2, thyroid_men2, or primary/secondary is fat_loss)*: none | insulin_secretagogue | glp1_current | thyroid_meds | ssri_snri | blood_thinners | other_rx
+9. **medications** — multi *(shown if diabetes_t2, thyroid_men2, or interests include fat_loss / muscle_gh)*: none | insulin_secretagogue | glp1_current | thyroid_meds | ssri_snri | blood_thinners | other_rx
 10. **experience** — none | researched_only | prior_research_use | advanced
 11. **delivery_pref** — injectable_ok | prefer_non_injectable | no_preference
 12. **risk_tolerance** — conservative | balanced | exploratory
 
-### Goal branches (inserted after primary_goal)
+### Goal branches (shown for each selected interest)
 
 #### recovery
 - **recovery_tissue** — tendon_ligament | muscle | joint | gut_overlap | general_soft_tissue | post_procedure_model

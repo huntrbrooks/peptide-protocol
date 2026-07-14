@@ -26,12 +26,20 @@ const has = (answers: Answers, key: string, value: string): boolean => {
   return v === value;
 };
 
-const primary = (answers: Answers): string | undefined => {
-  const v = answers.primary_goal;
-  return typeof v === "string" ? v : undefined;
-};
+/** Accumulated research focus areas (supports more than two). */
+export function getResearchInterests(answers: Answers): string[] {
+  const raw = answers.research_interests;
+  if (Array.isArray(raw)) {
+    return raw.filter((id) => typeof id === "string");
+  }
+  return [];
+}
 
-const GOAL_OPTIONS: QuestionOption[] = [
+export function hasInterest(answers: Answers, goalId: string): boolean {
+  return getResearchInterests(answers).includes(goalId);
+}
+
+export const GOAL_OPTIONS: QuestionOption[] = [
   {
     id: "recovery",
     label: "Tissue recovery & injury models",
@@ -95,21 +103,23 @@ export const stackFinderQuestions: QuestionDef[] = [
     ],
   },
   {
-    id: "primary_goal",
+    id: "interest_select",
     section: "Goals",
-    prompt: "What is your primary research interest?",
-    description: "We’ll deepen the next questions based on this choice.",
+    prompt: "What research interest do you want to explore?",
+    description:
+      "You can add as many focus areas as you need. After each one we’ll ask if you have another.",
     type: "single",
     options: GOAL_OPTIONS,
+    showIf: (a) => getResearchInterests(a).length < GOAL_OPTIONS.length,
   },
 
-  // —— Goal branches ——
+  // —— Goal branches (shown for every selected interest) ——
   {
     id: "recovery_tissue",
     section: "Recovery focus",
     prompt: "Which tissue or model is the main focus?",
     type: "single",
-    showIf: (a) => primary(a) === "recovery",
+    showIf: (a) => hasInterest(a, "recovery"),
     options: [
       { id: "tendon_ligament", label: "Tendon / ligament" },
       { id: "muscle", label: "Muscle strain / soft tissue" },
@@ -124,7 +134,7 @@ export const stackFinderQuestions: QuestionDef[] = [
     section: "Recovery focus",
     prompt: "How would you describe the timeline of the research model?",
     type: "single",
-    showIf: (a) => primary(a) === "recovery",
+    showIf: (a) => hasInterest(a, "recovery"),
     options: [
       { id: "acute_recent", label: "Acute / recent onset" },
       { id: "subacute", label: "Subacute (weeks)" },
@@ -136,7 +146,7 @@ export const stackFinderQuestions: QuestionDef[] = [
     section: "Metabolic focus",
     prompt: "Which metabolic research angle matters most?",
     type: "single",
-    showIf: (a) => primary(a) === "fat_loss",
+    showIf: (a) => hasInterest(a, "fat_loss"),
     options: [
       { id: "appetite_weight", label: "Appetite & overall weight pathways" },
       { id: "visceral_central", label: "Central / visceral adiposity" },
@@ -149,7 +159,7 @@ export const stackFinderQuestions: QuestionDef[] = [
     section: "Metabolic focus",
     prompt: "What is the current context for metabolic research?",
     type: "single",
-    showIf: (a) => primary(a) === "fat_loss",
+    showIf: (a) => hasInterest(a, "fat_loss"),
     options: [
       {
         id: "already_on_incretin",
@@ -164,7 +174,7 @@ export const stackFinderQuestions: QuestionDef[] = [
     section: "GH-axis focus",
     prompt: "What is the main GH-axis research priority?",
     type: "single",
-    showIf: (a) => primary(a) === "muscle_gh",
+    showIf: (a) => hasInterest(a, "muscle_gh"),
     options: [
       { id: "lean_mass", label: "Lean-mass / body-composition models" },
       { id: "recovery_between_sessions", label: "Training recovery between sessions" },
@@ -177,7 +187,7 @@ export const stackFinderQuestions: QuestionDef[] = [
     section: "GH-axis focus",
     prompt: "Preferred GH release profile for the research design?",
     type: "single",
-    showIf: (a) => primary(a) === "muscle_gh",
+    showIf: (a) => hasInterest(a, "muscle_gh"),
     options: [
       {
         id: "prefer_pulsatile",
@@ -195,7 +205,7 @@ export const stackFinderQuestions: QuestionDef[] = [
     section: "Cognitive focus",
     prompt: "Which cognitive / neurological angle is primary?",
     type: "single",
-    showIf: (a) => primary(a) === "cognition",
+    showIf: (a) => hasInterest(a, "cognition"),
     options: [
       { id: "focus_attention", label: "Focus & attention" },
       { id: "memory_learning", label: "Memory & learning" },
@@ -208,7 +218,7 @@ export const stackFinderQuestions: QuestionDef[] = [
     section: "Sleep focus",
     prompt: "What sleep problem is the research model targeting?",
     type: "single",
-    showIf: (a) => primary(a) === "sleep",
+    showIf: (a) => hasInterest(a, "sleep"),
     options: [
       { id: "latency", label: "Difficulty falling asleep" },
       { id: "fragmented", label: "Fragmented / interrupted sleep" },
@@ -222,7 +232,7 @@ export const stackFinderQuestions: QuestionDef[] = [
     section: "Skin & ageing focus",
     prompt: "Which skin / ageing research angle is primary?",
     type: "single",
-    showIf: (a) => primary(a) === "skin_aging",
+    showIf: (a) => hasInterest(a, "skin_aging"),
     options: [
       { id: "collagen_wrinkles", label: "Collagen / wrinkle / photoageing models" },
       { id: "hair_scalp", label: "Hair / scalp models" },
@@ -235,7 +245,7 @@ export const stackFinderQuestions: QuestionDef[] = [
     section: "Melanocortin focus",
     prompt: "Which melanocortin research angle is primary?",
     type: "single",
-    showIf: (a) => primary(a) === "libido",
+    showIf: (a) => hasInterest(a, "libido"),
     options: [
       { id: "desire", label: "Sexual desire pathways" },
       { id: "erectile_model", label: "Erectile function models" },
@@ -254,7 +264,7 @@ export const stackFinderQuestions: QuestionDef[] = [
     section: "Gut focus",
     prompt: "Which gut research angle is primary?",
     type: "single",
-    showIf: (a) => primary(a) === "gut",
+    showIf: (a) => hasInterest(a, "gut"),
     options: [
       { id: "mucosal_barrier", label: "Mucosal barrier protection" },
       { id: "post_irritation_model", label: "Post-irritation / healing models" },
@@ -265,19 +275,33 @@ export const stackFinderQuestions: QuestionDef[] = [
     ],
   },
 
-  // —— Shared trunk resumes ——
+  // —— Loop until user says no more interests ——
   {
-    id: "secondary_goal",
+    id: "more_interests",
     section: "Goals",
-    prompt: "Any secondary research interest?",
-    description: "Optional — helps shape synergies in the suggested stack.",
+    prompt: "Do you have any other areas of interest?",
+    description:
+      "Say yes to add another research focus. Only choose no when you’ve covered every area you want to explore.",
     type: "single",
+    showIf: (a) => {
+      const interests = getResearchInterests(a);
+      return interests.length > 0 && interests.length < GOAL_OPTIONS.length;
+    },
     options: [
-      { id: "none", label: "No secondary goal" },
-      ...GOAL_OPTIONS,
+      {
+        id: "yes",
+        label: "Yes — add another focus area",
+        description: "We’ll ask which area next, then deepen that path",
+      },
+      {
+        id: "no",
+        label: "No — I’m done adding focus areas",
+        description: "Continue to profile and preference questions",
+      },
     ],
-    showIf: (a) => Boolean(primary(a)),
   },
+
+  // —— Shared trunk resumes ——
   {
     id: "age_range",
     section: "Profile",
@@ -320,7 +344,7 @@ export const stackFinderQuestions: QuestionDef[] = [
     section: "Lifestyle",
     prompt: "How is sleep quality lately?",
     type: "single",
-    showIf: (a) => primary(a) !== "sleep",
+    showIf: (a) => !hasInterest(a, "sleep"),
     options: [
       { id: "poor", label: "Poor" },
       { id: "fair", label: "Fair" },
@@ -377,9 +401,7 @@ export const stackFinderQuestions: QuestionDef[] = [
           ["diabetes_t2", "thyroid_men2", "psychiatric", "cardiovascular"].includes(f),
         );
       const goalHit =
-        primary(a) === "fat_loss" ||
-        has(a, "secondary_goal", "fat_loss") ||
-        primary(a) === "muscle_gh";
+        hasInterest(a, "fat_loss") || hasInterest(a, "muscle_gh");
       return flagHit || goalHit;
     },
     options: [
@@ -563,7 +585,24 @@ export function labelForAnswer(questionId: string, value: string): string {
 
 export function formatAnswersForPrompt(answers: Answers): string {
   const lines: string[] = [];
+  const interests = getResearchInterests(answers);
+  if (interests.length > 0) {
+    lines.push(
+      `- research_interests: ${interests
+        .map((id) => GOAL_OPTIONS.find((o) => o.id === id)?.label ?? id)
+        .join("; ")}`,
+    );
+  }
   for (const q of stackFinderQuestions) {
+    if (q.id === "interest_select" || q.id === "more_interests") {
+      // Covered by research_interests / loop; still include more_interests outcome
+      if (q.id === "more_interests" && answers.more_interests !== undefined) {
+        lines.push(
+          `- more_interests: ${labelForAnswer("more_interests", String(answers.more_interests))}`,
+        );
+      }
+      continue;
+    }
     const raw = answers[q.id];
     if (raw === undefined) continue;
     if (Array.isArray(raw)) {

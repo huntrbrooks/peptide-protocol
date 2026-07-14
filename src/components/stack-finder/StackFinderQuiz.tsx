@@ -1,14 +1,19 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { Answers } from "@/content/stackFinder";
+import {
+  getResearchInterests,
+  type Answers,
+} from "@/content/stackFinder";
 import {
   getCurrentQuestion,
   getProgress,
   getVisibleQuestions,
+  interestLabels,
   isComplete,
   normalizeMultiSelect,
   optionsForQuestion,
+  rebuildCommittedState,
 } from "@/lib/stackFinder/engine";
 import type {
   StackRecommendation,
@@ -24,25 +29,6 @@ type HardStopResult = {
   message: string;
   disclaimer: string;
 };
-
-function rebuildCommittedState(
-  answersWithCommit: Answers,
-  committedId: string,
-): { answers: Answers; history: string[] } {
-  const visible = getVisibleQuestions(answersWithCommit);
-  const commitIdx = visible.findIndex((q) => q.id === committedId);
-  const prefix = commitIdx >= 0 ? visible.slice(0, commitIdx + 1) : visible;
-
-  const nextAnswers: Answers = {};
-  const nextHistory: string[] = [];
-  for (const q of prefix) {
-    if (answersWithCommit[q.id] !== undefined) {
-      nextAnswers[q.id] = answersWithCommit[q.id];
-      nextHistory.push(q.id);
-    }
-  }
-  return { answers: nextAnswers, history: nextHistory };
-}
 
 export function StackFinderQuiz() {
   const [answers, setAnswers] = useState<Answers>({});
@@ -66,6 +52,10 @@ export function StackFinderQuiz() {
     () => (question ? optionsForQuestion(question, answers) : []),
     [question, answers],
   );
+  const selectedInterestLabels = useMemo(
+    () => interestLabels(answers),
+    [answers],
+  );
 
   function restart() {
     setAnswers({});
@@ -79,28 +69,75 @@ export function StackFinderQuiz() {
   function goBack() {
     const prevId = history[history.length - 1];
     if (!prevId) return;
-    const without: Answers = { ...answers };
-    delete without[prevId];
-    // Also drop any answers after prev in the previous path
-    const visibleBefore = getVisibleQuestions(without);
-    const prevIdx = visibleBefore.findIndex((q) => q.id === prevId);
-    // prev was removed from answers; keep only history up to prior questions
+
     const keepHistory = history.slice(0, -1);
-    const nextAnswers: Answers = {};
-    for (const id of keepHistory) {
-      if (without[id] !== undefined) nextAnswers[id] = without[id];
+    let nextAnswers: Answers = { ...answers };
+    delete nextAnswers[prevId];
+
+    if (prevId === "interest_select") {
+      const interests = getResearchInterests(answers);
+      const prunedInterests = interests.slice(0, -1);
+      nextAnswers = { research_interests: prunedInterests };
+      if (answers.ack !== undefined) nextAnswers.ack = answers.ack;
+
+      const visible = getVisibleQuestions(nextAnswers);
+      const visibleIds = new Set(visible.map((q) => q.id));
+      for (const id of keepHistory) {
+        if (id === "interest_select" || id === "more_interests") continue;
+        if (visibleIds.has(id) && answers[id] !== undefined) {
+          nextAnswers[id] = answers[id];
+        }
+      }
+
+      const nextHistory = keepHistory.filter(
+        (id) =>
+          id !== "interest_select" &&
+          id !== "more_interests" &&
+          nextAnswers[id] !== undefined,
+      );
+      setAnswers(nextAnswers);
+      setHistory(nextHistory);
+    } else {
+      const cleaned: Answers = {};
+      if (answers.research_interests !== undefined) {
+        cleaned.research_interests = answers.research_interests;
+      }
+      for (const id of keepHistory) {
+        if (nextAnswers[id] !== undefined) cleaned[id] = nextAnswers[id];
+      }
+      setAnswers(cleaned);
+      setHistory(keepHistory);
     }
-    // Clear orphaned branch answers not in keepHistory
-    void prevIdx;
-    setAnswers(nextAnswers);
-    setHistory(keepHistory);
+
     setPhase("quiz");
     setError(null);
   }
 
   function commitAnswer(questionId: string, value: string | string[]) {
+    // Loop: user wants another focus area — reopen interest picker.
+    if (questionId === "more_interests" && value === "yes") {
+      const nextAnswers: Answers = { ...answers };
+      delete nextAnswers.interest_select;
+      delete nextAnswers.more_interests;
+      const nextHistory = history.filter(
+        (id) => id !== "interest_select" && id !== "more_interests",
+      );
+      setAnswers(nextAnswers);
+      setHistory(nextHistory);
+      return;
+    }
+
     const merged: Answers = { ...answers, [questionId]: value };
-    const rebuilt = rebuildCommittedState(merged, questionId);
+
+    if (questionId === "interest_select" && typeof value === "string") {
+      const existing = getResearchInterests(answers);
+      merged.research_interests = existing.includes(value)
+        ? existing
+        : [...existing, value];
+      merged.interest_select = value;
+    }
+
+    const rebuilt = rebuildCommittedState(merged, questionId, history);
     setAnswers(rebuilt.answers);
     setHistory(rebuilt.history);
 
@@ -244,6 +281,16 @@ export function StackFinderQuiz() {
     ? (answers[question.id] as string[])
     : [];
 
+  const interestCount = getResearchInterests(answers).length;
+  const prompt =
+    question.id === "interest_select" && interestCount > 0
+      ? "What other research interest do you want to explore?"
+      : question.prompt;
+  const description =
+    question.id === "interest_select" && interestCount > 0
+      ? "Already added areas stay in your stack. Pick another focus to deepen next."
+      : question.description;
+
   return (
     <div className="animate-rise border border-line bg-paper/80">
       <div className="border-b border-line px-5 py-4 sm:px-6">
@@ -262,12 +309,30 @@ export function StackFinderQuiz() {
       </div>
 
       <div className="px-5 py-8 sm:px-6 sm:py-10">
+        {selectedInterestLabels.length > 0 ? (
+          <div className="mb-6">
+            <p className="text-xs uppercase tracking-[0.16em] text-muted">
+              Focus areas so far
+            </p>
+            <ul className="mt-2 flex flex-wrap gap-2">
+              {selectedInterestLabels.map((label) => (
+                <li
+                  key={label}
+                  className="border border-accent/30 bg-sand/60 px-3 py-1 text-xs text-ink"
+                >
+                  {label}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+
         <h2 className="font-display text-2xl tracking-tight text-ink sm:text-3xl">
-          {question.prompt}
+          {prompt}
         </h2>
-        {question.description ? (
+        {description ? (
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">
-            {question.description}
+            {description}
           </p>
         ) : null}
 
