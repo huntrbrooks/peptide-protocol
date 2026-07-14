@@ -77,6 +77,26 @@ body {
   }
 }
 
+@keyframes logo-enter {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes logo-float {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-8px);
+  }
+}
+
 .animate-rise {
   animation: rise 0.55s var(--ease-out) both;
 }
@@ -95,6 +115,15 @@ body {
 
 .animate-drift {
   animation: drift 5s ease-in-out infinite alternate;
+}
+
+.animate-logo-enter {
+  animation: logo-enter 0.7s var(--ease-out) both;
+}
+
+.hero-logo-float {
+  animation: logo-float 5.5s ease-in-out 0.7s infinite alternate;
+  will-change: transform;
 }
 
 .reveal {
@@ -189,5 +218,9 @@ button {
   .card-lift:hover,
   .btn-primary:hover {
     transform: none;
+  }
+
+  .hero-logo-float {
+    animation: none !important;
   }
 }

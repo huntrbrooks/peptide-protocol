@@ -28,32 +28,47 @@ export default function HomePage() {
           />
           <div className="absolute inset-0 bg-gradient-to-r from-ink/88 via-ink/70 to-ink/35" />
         </div>
-        <div className="relative mx-auto flex min-h-[88vh] max-w-6xl flex-col justify-end px-4 pb-16 pt-28 sm:px-6 sm:pb-20">
-          <p className="animate-rise text-xs uppercase tracking-[0.22em] text-teal-soft">
-            {home.eyebrow}
-          </p>
-          <h1 className="animate-rise-delay mt-4 max-w-3xl font-display text-4xl leading-[1.08] tracking-tight text-paper sm:text-6xl">
-            Peptide Protocol
-          </h1>
-          <p className="animate-rise-delay mt-4 max-w-2xl font-display text-2xl leading-snug text-paper/90 sm:text-3xl">
-            {home.headline}
-          </p>
-          <p className="animate-rise-delay-2 mt-5 max-w-xl text-base leading-relaxed text-paper/75">
-            {home.subheadline}
-          </p>
-          <div className="animate-rise-delay-2 mt-8 flex flex-wrap gap-3">
-            <Link
-              href={home.primaryCta.href}
-              className="btn-primary rounded-sm bg-paper px-5 py-3 text-sm font-medium text-ink hover:bg-teal-soft"
-            >
-              {home.primaryCta.label}
-            </Link>
-            <Link
-              href={home.secondaryCta.href}
-              className="rounded-sm border border-paper/30 px-5 py-3 text-sm text-paper transition hover:border-paper hover:bg-paper/10"
-            >
-              {home.secondaryCta.label}
-            </Link>
+        <div className="relative mx-auto flex min-h-[88vh] max-w-6xl flex-col justify-end gap-10 px-4 pb-16 pt-24 sm:px-6 sm:pb-20 lg:flex-row lg:items-end lg:justify-between lg:gap-12">
+          <div className="hero-logo-wrap animate-logo-enter order-first mx-auto w-full max-w-[220px] shrink-0 sm:max-w-[280px] lg:order-last lg:mx-0 lg:mb-2 lg:max-w-[340px]">
+            <div className="rounded-sm bg-paper/92 p-5 shadow-[0_20px_60px_rgba(11,31,42,0.35)] backdrop-blur-sm sm:p-7">
+              <Image
+                src="/images/logo.png"
+                alt="Peptide Protocol"
+                width={512}
+                height={951}
+                priority
+                className="hero-logo-float h-auto w-full"
+              />
+            </div>
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <p className="animate-rise text-xs uppercase tracking-[0.22em] text-teal-soft">
+              {home.eyebrow}
+            </p>
+            <h1 className="animate-rise-delay mt-4 max-w-3xl font-display text-4xl leading-[1.08] tracking-tight text-paper sm:text-6xl">
+              Peptide Protocol
+            </h1>
+            <p className="animate-rise-delay mt-4 max-w-2xl font-display text-2xl leading-snug text-paper/90 sm:text-3xl">
+              {home.headline}
+            </p>
+            <p className="animate-rise-delay-2 mt-5 max-w-xl text-base leading-relaxed text-paper/75">
+              {home.subheadline}
+            </p>
+            <div className="animate-rise-delay-2 mt-8 flex flex-wrap gap-3">
+              <Link
+                href={home.primaryCta.href}
+                className="btn-primary rounded-sm bg-paper px-5 py-3 text-sm font-medium text-ink hover:bg-teal-soft"
+              >
+                {home.primaryCta.label}
+              </Link>
+              <Link
+                href={home.secondaryCta.href}
+                className="rounded-sm border border-paper/30 px-5 py-3 text-sm text-paper transition hover:border-paper hover:bg-paper/10"
+              >
+                {home.secondaryCta.label}
+              </Link>
+            </div>
           </div>
         </div>
       </section>
