@@ -29,14 +29,15 @@ export default function HomePage() {
           <div className="absolute inset-0 bg-gradient-to-r from-ink/88 via-ink/70 to-ink/35" />
         </div>
         <div className="relative mx-auto flex min-h-[88vh] max-w-6xl flex-col justify-end gap-10 px-4 pb-16 pt-24 sm:px-6 sm:pb-20 lg:flex-row lg:items-end lg:justify-between lg:gap-12">
-          <div className="order-first mx-auto w-full max-w-[220px] shrink-0 sm:max-w-[280px] lg:order-last lg:mx-0 lg:mb-2 lg:max-w-[340px]">
+          {/* Was max-w 220/280/340 → 50% = 110/140/170 */}
+          <div className="order-first mx-auto w-full max-w-[110px] shrink-0 sm:max-w-[140px] lg:order-last lg:mx-0 lg:mb-2 lg:max-w-[170px]">
             <Image
               src="/images/logo.png"
               alt="Peptide Protocol"
               width={512}
               height={951}
               priority
-              className="logo-loop hero-logo-on-dark h-auto w-full bg-transparent"
+              className="logo-loop h-auto w-full bg-transparent"
             />
           </div>
 
