@@ -9,6 +9,7 @@
   --accent: #1a6b7a;
   --teal-soft: #9ec9d1;
   --sand: #e8efe8;
+  --brass: #c4a574;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --duration: 280ms;
 }
@@ -22,6 +23,7 @@
   --color-accent: var(--accent);
   --color-teal-soft: var(--teal-soft);
   --color-sand: var(--sand);
+  --color-brass: var(--brass);
   --font-sans: var(--font-body);
   --font-display: var(--font-display);
 }
@@ -84,6 +86,98 @@ body {
   }
   50% {
     transform: translateY(-6px);
+  }
+}
+
+/* Premium announcement marquee — slow, seamless, soft edge fades */
+@keyframes announcement-marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.announcement-banner {
+  --announcement-duration: 48s;
+  border-bottom: 1px solid color-mix(in srgb, var(--brass) 32%, transparent);
+}
+
+.announcement-banner__fade {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 2;
+  width: clamp(1.5rem, 6vw, 3.5rem);
+}
+
+.announcement-banner__fade--left {
+  left: 0;
+  background: linear-gradient(90deg, var(--ink) 0%, transparent 100%);
+}
+
+.announcement-banner__fade--right {
+  right: 0;
+  background: linear-gradient(270deg, var(--ink) 0%, transparent 100%);
+}
+
+.announcement-banner__static {
+  display: none;
+}
+
+.announcement-banner__marquee {
+  display: block;
+  overflow: hidden;
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    #000 8%,
+    #000 92%,
+    transparent 100%
+  );
+}
+
+.announcement-banner__track {
+  display: flex;
+  width: max-content;
+  animation: announcement-marquee var(--announcement-duration) linear infinite;
+  will-change: transform;
+}
+
+.announcement-banner__copy {
+  flex-shrink: 0;
+  padding-inline: 2.5rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: color-mix(in srgb, var(--sand) 92%, var(--brass));
+}
+
+.announcement-banner__copy::after {
+  content: "";
+  display: inline-block;
+  width: 0.35rem;
+  height: 0.35rem;
+  margin-inline: 1.75rem 0;
+  border-radius: 9999px;
+  vertical-align: middle;
+  background: color-mix(in srgb, var(--brass) 70%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--brass) 25%, transparent);
+}
+
+.announcement-banner:hover .announcement-banner__track {
+  animation-play-state: paused;
+}
+
+@media (min-width: 640px) {
+  .announcement-banner__copy {
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
   }
 }
 
@@ -209,6 +303,18 @@ button {
   }
 
   .logo-loop {
+    animation: none !important;
+  }
+
+  .announcement-banner__marquee {
+    display: none;
+  }
+
+  .announcement-banner__static {
+    display: block;
+  }
+
+  .announcement-banner__track {
     animation: none !important;
   }
 }

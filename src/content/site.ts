@@ -16,6 +16,11 @@ export const site = {
     "Australia Post express tracking",
     "Plain outer packaging",
   ],
+  /** Site-wide announcement marquee — edit here to update live chrome */
+  announcementBanner: [
+    "Tracked express delivery · Same-day dispatch before 2pm AEST",
+    "Complimentary bacteriostatic water with qualifying catalogue orders",
+  ],
   nav: [
     { label: "Shop", href: "/shop" },
     { label: "Quality", href: "/quality" },

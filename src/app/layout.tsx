@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Sans, Fraunces } from "next/font/google";
+import { AnnouncementBanner } from "@/components/AnnouncementBanner";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { site } from "@/content/site";
@@ -46,7 +47,10 @@ export default function RootLayout({
   return (
     <html lang="en-AU" className={`${body.variable} ${display.variable} h-full`}>
       <body className="flex min-h-full flex-col antialiased">
-        <Header />
+        <div className="sticky top-0 z-50">
+          <AnnouncementBanner />
+          <Header />
+        </div>
         <main className="flex-1">{children}</main>
         <Footer />
       </body>
