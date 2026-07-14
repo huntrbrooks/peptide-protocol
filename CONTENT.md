@@ -39,6 +39,7 @@ peptideprotocolau.io
 - `/shop/other-compounds` Other research compounds
 - `/shop/research-solvents` Research solvents & reagents
 - `/products/[slug]` × 17 products
+- `/stack-finder` Find your ideal peptide stack (adaptive questionnaire)
 - `/quality` Quality & Testing
 - `/about` About
 - `/faq` FAQ
@@ -59,6 +60,8 @@ peptideprotocolau.io
 | Categories (7) | `src/content/categories.ts` |
 | Info pages | `src/content/pages.ts` |
 | Home + social + nav | `src/content/site.ts` |
+| Stack finder tree (human-readable) | `content/stack-finder-tree.md` |
+| Stack finder questions | `src/content/stackFinder.ts` |
 
 Edit those TypeScript modules to update live site copy. This markdown file is a human-readable index.
 

@@ -23,6 +23,7 @@ export const site = {
   ],
   nav: [
     { label: "Shop", href: "/shop" },
+    { label: "Stack finder", href: "/stack-finder" },
     { label: "Quality", href: "/quality" },
     { label: "About", href: "/about" },
     { label: "FAQ", href: "/faq" },
@@ -33,6 +34,7 @@ export const site = {
       title: "Catalogue",
       links: [
         { label: "All products", href: "/shop" },
+        { label: "Find your stack", href: "/stack-finder" },
         { label: "Metabolic research", href: "/shop/metabolic" },
         { label: "Growth hormone pathway", href: "/shop/growth-hormone" },
         { label: "Tissue & recovery", href: "/shop/tissue-recovery" },
