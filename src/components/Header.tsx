@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { site } from "@/content/site";
@@ -10,11 +11,20 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-line/80 bg-paper/90 backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
-        <Link href="/" className="group flex flex-col leading-none">
-          <span className="font-display text-xl tracking-tight text-ink sm:text-2xl">
-            Peptide Protocol
-          </span>
-          <span className="mt-1 text-[10px] uppercase tracking-[0.18em] text-muted">
+        <Link
+          href="/"
+          className="group flex items-center gap-3"
+          aria-label="Peptide Protocol home"
+        >
+          <Image
+            src="/images/logo.png"
+            alt="Peptide Protocol"
+            width={220}
+            height={45}
+            priority
+            className="h-9 w-auto sm:h-10"
+          />
+          <span className="hidden text-[10px] uppercase tracking-[0.18em] text-muted sm:block">
             Australia · Research only
           </span>
         </Link>

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { site } from "@/content/site";
 
@@ -7,7 +8,16 @@ export function Footer() {
       <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
         <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
-            <p className="font-display text-2xl tracking-tight">Peptide Protocol</p>
+            <Link href="/" aria-label="Peptide Protocol home" className="inline-block">
+              <Image
+                src="/images/logo-mark.png"
+                alt="Peptide Protocol"
+                width={48}
+                height={48}
+                className="h-12 w-12 rounded-sm bg-paper p-1.5"
+              />
+            </Link>
+            <p className="mt-4 font-display text-2xl tracking-tight">Peptide Protocol</p>
             <p className="mt-3 max-w-sm text-sm leading-relaxed text-paper/70">
               Research-grade peptides for Australian laboratories. Documented
               purity. Clear research-only terms.

@@ -24,6 +24,13 @@ export const metadata: Metadata = {
     template: "%s | Peptide Protocol",
   },
   description: site.tagline,
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon-32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
+  },
   openGraph: {
     siteName: site.name,
     locale: "en_AU",
