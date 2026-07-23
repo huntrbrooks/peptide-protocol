@@ -43,10 +43,10 @@ const sharedStorage = [
   "Follow your organisation’s SOPs for labelling, use, and disposal.",
 ];
 
-/** Derive a 10-vial kit listing from a single-vial product (reuses vial image). */
+/** Derive a 10-vial kit listing from a single-vial product. */
 function kitFromSingle(
   single: Product,
-  opts: { slug: string; priceAud: number },
+  opts: { slug: string; priceAud: number; image: string },
 ): Product {
   const strengthLabel = single.strength;
   return {
@@ -76,6 +76,7 @@ function kitFromSingle(
     faqs: commonFaqs(`${single.shortName} 10-vial kit`),
     featured: false,
     promoLabel: undefined,
+    image: opts.image,
   };
 }
 
@@ -537,19 +538,60 @@ const singles: Product[] = [
   },
 ];
 
-const kitDefs: { singleSlug: string; slug: string; priceAud: number }[] = [
-  { singleSlug: "bpc-157-10mg", slug: "bpc-157-10mg-kit-10", priceAud: 594.95 },
-  { singleSlug: "ipamorelin-10mg", slug: "ipamorelin-10mg-kit-10", priceAud: 509.95 },
+const kitDefs: {
+  singleSlug: string;
+  slug: string;
+  priceAud: number;
+  image: string;
+}[] = [
+  {
+    singleSlug: "bpc-157-10mg",
+    slug: "bpc-157-10mg-kit-10",
+    priceAud: 594.95,
+    image: "/images/products/bpc-157-kit.jpg",
+  },
+  {
+    singleSlug: "ipamorelin-10mg",
+    slug: "ipamorelin-10mg-kit-10",
+    priceAud: 509.95,
+    image: "/images/products/ipamorelin-kit.jpg",
+  },
   {
     singleSlug: "cjc-1295-no-dac-10mg",
     slug: "cjc-1295-no-dac-10mg-kit-10",
     priceAud: 849.95,
+    image: "/images/products/cjc-1295-no-dac-kit.jpg",
   },
-  { singleSlug: "tb-500-10mg", slug: "tb-500-10mg-kit-10", priceAud: 1010.95 },
-  { singleSlug: "pt-141-10mg", slug: "pt-141-10mg-kit-10", priceAud: 764.95 },
-  { singleSlug: "ghk-cu-50mg", slug: "ghk-cu-50mg-kit-10", priceAud: 551.95 },
-  { singleSlug: "retatrutide-20mg", slug: "retatrutide-20mg-kit-10", priceAud: 1699.95 },
-  { singleSlug: "retatrutide-60mg", slug: "retatrutide-60mg-kit-10", priceAud: 4079.95 },
+  {
+    singleSlug: "tb-500-10mg",
+    slug: "tb-500-10mg-kit-10",
+    priceAud: 1010.95,
+    image: "/images/products/tb-500-kit.jpg",
+  },
+  {
+    singleSlug: "pt-141-10mg",
+    slug: "pt-141-10mg-kit-10",
+    priceAud: 764.95,
+    image: "/images/products/pt-141-kit.jpg",
+  },
+  {
+    singleSlug: "ghk-cu-50mg",
+    slug: "ghk-cu-50mg-kit-10",
+    priceAud: 551.95,
+    image: "/images/products/ghk-cu-50mg-kit.jpg",
+  },
+  {
+    singleSlug: "retatrutide-20mg",
+    slug: "retatrutide-20mg-kit-10",
+    priceAud: 1699.95,
+    image: "/images/products/retatrutide-20mg-kit.jpg",
+  },
+  {
+    singleSlug: "retatrutide-60mg",
+    slug: "retatrutide-60mg-kit-10",
+    priceAud: 4079.95,
+    image: "/images/products/retatrutide-60mg-kit.jpg",
+  },
 ];
 
 const kits: Product[] = kitDefs.map((def) => {
@@ -557,7 +599,11 @@ const kits: Product[] = kitDefs.map((def) => {
   if (!single) {
     throw new Error(`Missing single product for kit: ${def.singleSlug}`);
   }
-  return kitFromSingle(single, { slug: def.slug, priceAud: def.priceAud });
+  return kitFromSingle(single, {
+    slug: def.slug,
+    priceAud: def.priceAud,
+    image: def.image,
+  });
 });
 
 export const products: Product[] = [...singles, ...kits];
