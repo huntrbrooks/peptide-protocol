@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Sans, Fraunces } from "next/font/google";
 import { AnnouncementBanner } from "@/components/AnnouncementBanner";
+import { ConvexClientProvider } from "@/components/ConvexClientProvider";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { site } from "@/content/site";
@@ -51,8 +52,10 @@ export default function RootLayout({
           <AnnouncementBanner />
           <Header />
         </div>
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <ConvexClientProvider>
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </ConvexClientProvider>
       </body>
     </html>
   );

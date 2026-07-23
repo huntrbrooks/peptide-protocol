@@ -1,0 +1,57 @@
+{
+  "generatedAt": "2026-07-15T11:49:06.297Z",
+  "target": {
+    "modelAssumption": "Niimbot B21 / B1 (not confirmed in repo)",
+    "widthMm": 50,
+    "heightMm": 30,
+    "dpi": 203,
+    "format": "PNG",
+    "colorMode": "solid black (#000) on white (#FFF); thresholded for thermal",
+    "safeMarginMm": {
+      "top": 2,
+      "bottom": 2,
+      "left": 3,
+      "right": 3
+    },
+    "sources": [
+      "https://www.niimbot.co.za/pages/niimbot-b21-product-specifications (203 dpi, 20–50mm width)",
+      "https://niimbot.eu/en/comparison-of-models/ (B21 stock includes 50×30mm)",
+      "B21 retail packs commonly include 50×30mm labels"
+    ]
+  },
+  "pixelSize": {
+    "width": 400,
+    "height": 240
+  },
+  "productCount": 17,
+  "files": [
+    "bacteriostatic-water-10ml.png",
+    "bpc-157-10mg.png",
+    "cjc-1295-dac-5mg.png",
+    "cjc-1295-no-dac-10mg.png",
+    "dsip-5mg.png",
+    "epitalon-10mg.png",
+    "ghk-cu-100mg.png",
+    "hcg-5000iu.png",
+    "ipamorelin-10mg.png",
+    "melanotan-ii-10mg.png",
+    "mots-c-10mg.png",
+    "retatrutide-10mg.png",
+    "semax-11mg.png",
+    "sermorelin-10mg.png",
+    "tb-500-10mg.png",
+    "tesamorelin-10mg.png",
+    "tirzepatide-10mg.png"
+  ],
+  "flags": [
+    {
+      "slug": "bacteriostatic-water-10ml",
+      "flag": "No purity % in specs; composition (0.9% benzyl alcohol) not printed to avoid crowding — see product page."
+    },
+    {
+      "slug": "hcg-5000iu",
+      "flag": "No numeric purity in specs (COA-dependent); potency shown as strength only."
+    }
+  ],
+  "layoutSource": "OpenRouter anthropic/claude-sonnet-4 design pass + sharp SVG raster"
+}

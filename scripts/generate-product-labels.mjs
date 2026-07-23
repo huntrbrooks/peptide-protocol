@@ -45,8 +45,10 @@ const products = [
     id: "bacteriostatic-water",
     out: "public/images/products/bacteriostatic-water.jpg",
     example: "5-2.png.bv.webp",
-    productName: "BACTERIOSTATIC WATER",
+    productName: "BAC WATER",
     strength: "10 ML",
+    contentsNote:
+      "CRITICAL CONTENTS: this is bacteriostatic water — the vial must contain CLEAR COLORLESS LIQUID (nearly full), NOT white lyophilised powder or cake.",
   },
   {
     id: "bpc-157",
@@ -163,18 +165,22 @@ const products = [
 ];
 
 function buildPrompt(product) {
+  const contentsLine = product.contentsNote
+    ? `\n${product.contentsNote}\n`
+    : "2) Product vial: keep the SAME vial glass shape, powder/cake contents, camera angle, soft studio lighting, shadow, and catalogue framing as this photo.\n";
+
   return `Rebrand this research peptide vial product photograph for brand "Peptide Protocol".
 
 REFERENCE IMAGES:
 1) Logo-mark: use this EXACT DNA helix-in-circle mark on the vial label (teal ribbons, thin ring). Do not invent a different helix.
-2) Product vial: keep the SAME vial glass shape, powder/cake contents, camera angle, soft studio lighting, shadow, and catalogue framing as this photo.
+${contentsLine}Keep the SAME vial glass shape, camera angle, soft studio lighting, shadow, and catalogue framing as the product reference photo.
 
 REMOVE all existing branding completely (no "Pure Peptides", no yellow/gold label accents, no gold caps).
 
 NEW LABEL — same layout structure as the product reference, rebranded:
 • Top row: small helix mark (from logo-mark) on the LEFT + "PEPTIDE PROTOCOL" in clean sans-serif to the RIGHT, colour ${COLORS.accent}
 • Center: thick horizontal band in ${COLORS.accent} with bold product name exactly: "${product.productName}" (white or near-white text on the teal band)
-• Below the band: rectangular outlined box with strength exactly: "${product.strength}"
+• Below the band: rectangular outlined box with strength exactly: "${product.strength}" — the box MUST be HORIZONTALLY CENTERED on the label under the product name (not left-aligned), matching the centred layout of other Peptide Protocol vial labels
 • Bottom thin band: "PURITY 99% • FOR RESEARCH USE ONLY" in small readable text
 • Optional: very faint soft-teal DNA watermark on the lower white label field only
 

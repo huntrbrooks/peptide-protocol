@@ -32,24 +32,24 @@ const commonFaqs = (name: string): Product["faqs"] => [
 export const products: Product[] = [
   {
     slug: "bacteriostatic-water-10ml",
-    name: "Bacteriostatic Water (10mL)",
-    shortName: "Bacteriostatic Water",
+    name: "BAC Water (10mL)",
+    shortName: "BAC Water",
     strength: "10mL",
     priceAud: 19.99,
     categorySlugs: ["research-solvents"],
     shortLabel: "Sterile research solvent | 0.9% benzyl alcohol | 10mL vial",
-    metaTitle: "Bacteriostatic Water 10mL Australia | Peptide Protocol",
+    metaTitle: "BAC Water 10mL Australia | Peptide Protocol",
     metaDescription:
-      "Buy bacteriostatic water 10mL for research reconstitution in Australia. Sterile water with 0.9% benzyl alcohol. Research use only.",
-    headline: "Bacteriostatic water for laboratory reconstitution protocols",
+      "Buy BAC Water (bacteriostatic water) 10mL for research reconstitution in Australia. Sterile water with 0.9% benzyl alcohol. Research use only.",
+    headline: "BAC Water for laboratory reconstitution protocols",
     body: [
-      "Bacteriostatic Water is sterile water for injection containing 0.9% benzyl alcohol as a bacteriostatic preservative. Peptide Protocol supplies 10mL vials for reconstitution of lyophilised research materials under trained laboratory procedures.",
+      "BAC Water (bacteriostatic water) is sterile water for injection containing 0.9% benzyl alcohol as a bacteriostatic preservative. Peptide Protocol supplies 10mL vials for reconstitution of lyophilised research materials under trained laboratory procedures.",
       "Use only within controlled research settings and according to your organisation’s solvent handling SOPs. This product is a research reagent, not a consumer or clinical preparation.",
     ],
     researchNotice: RESEARCH_NOTICE,
     whatItsFor: {
       intro:
-        "Bacteriostatic water is a multi-dose sterile diluent. In laboratory and compounding workflows it is used for the following purposes:",
+        "BAC Water is a multi-dose sterile diluent. In laboratory and compounding workflows it is used for the following purposes:",
       uses: [
         "Reconstituting lyophilised research peptides and other powdered reagents into solution",
         "Diluting concentrated research compounds for assay preparation and protocol work",
@@ -73,7 +73,7 @@ export const products: Product[] = [
       "Dispose of according to your organisation’s chemical waste procedures.",
     ],
     included: [
-      "1 × Bacteriostatic Water, 10mL sterile vial",
+      "1 × BAC Water, 10mL sterile vial",
       "Protective inner packing",
       "Australia Post tracking after dispatch",
     ],
@@ -82,7 +82,7 @@ export const products: Product[] = [
       "Clear labelling for inventory control",
       "Tamper checks before dispatch",
     ],
-    faqs: commonFaqs("Bacteriostatic Water"),
+    faqs: commonFaqs("BAC Water"),
     disclaimer: PRODUCT_DISCLAIMER,
     image: "/images/products/bacteriostatic-water.jpg",
     promoLabel: "Often included free with qualifying catalogue orders",

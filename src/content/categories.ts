@@ -9,8 +9,8 @@ export const categories: Category[] = [
       "Shop Tirzepatide and Retatrutide research peptides in Australia. Documented purity, research use only. Browse Metabolic research at Peptide Protocol.",
     headline: "Metabolic research compounds",
     intro: [
-      "This category groups dual and multi-agonist research peptides used in controlled laboratory studies of metabolic signalling pathways.",
-      "Materials are supplied as lyophilised powders for research inventory only. They are not medicines, supplements, or consumer products.",
+      "Dual and multi-agonist materials for metabolic signalling studies.",
+      "Lyophilised powders for research inventory only — not medicines, supplements, or consumer products.",
     ],
     productSlugs: ["tirzepatide-10mg", "retatrutide-10mg"],
     image: "/images/categories/metabolic.jpg",
@@ -23,8 +23,8 @@ export const categories: Category[] = [
       "Shop CJC-1295, Ipamorelin, Sermorelin, and Tesamorelin research peptides in Australia. Research use only.",
     headline: "Growth hormone pathway research",
     intro: [
-      "GHRH analogues and related secretagogue materials for assay development and pathway investigation under laboratory controls.",
-      "Each listing includes specifications, storage guidance, and access to batch documentation where available.",
+      "GHRH analogues and secretagogues for pathway assays.",
+      "Each listing includes specifications, storage guidance, and batch docs where available.",
     ],
     productSlugs: [
       "cjc-1295-dac-5mg",
@@ -43,8 +43,8 @@ export const categories: Category[] = [
       "Shop BPC-157 and TB-500 research peptides in Australia. Specs, COA access, research use only.",
     headline: "Tissue and recovery research",
     intro: [
-      "Short-chain research peptides commonly referenced in regenerative and injury-model laboratory literature.",
-      "Supplied strictly for controlled research applications with clear research-only terms.",
+      "Short-chain peptides used in regenerative research models.",
+      "Supplied for controlled research applications with clear research-only terms.",
     ],
     productSlugs: ["bpc-157-10mg", "tb-500-10mg"],
     image: "/images/categories/tissue-recovery.jpg",
@@ -57,8 +57,8 @@ export const categories: Category[] = [
       "Shop Semax, DSIP, and Epitalon research peptides in Australia. Documented purity. Research use only.",
     headline: "Cognitive and neurological research",
     intro: [
-      "Compounds studied in neurobiology, cognitive pathway, and sleep-related research settings.",
-      "All products in this category are for laboratory and in vitro use only.",
+      "Compounds studied in neurobiology and sleep-related settings.",
+      "Laboratory and in vitro use only.",
     ],
     productSlugs: ["semax-11mg", "dsip-5mg", "epitalon-10mg"],
     image: "/images/categories/cognitive-neurological.jpg",
@@ -71,7 +71,7 @@ export const categories: Category[] = [
       "Shop MOTS-c and GHK-Cu research peptides in Australia. COA access, research use only.",
     headline: "Cellular and mitochondrial research",
     intro: [
-      "Mitochondrial-derived and copper-binding peptides for cellular pathway investigation in controlled laboratory environments.",
+      "Mitochondrial and copper-binding peptides for cellular work.",
       "Batch documentation supports intake and inventory workflows.",
     ],
     productSlugs: ["mots-c-10mg", "ghk-cu-100mg"],
@@ -85,8 +85,8 @@ export const categories: Category[] = [
       "Shop HCG and Melanotan II research materials in Australia. Research use only. Not for consumer or cosmetic use.",
     headline: "Other research compounds",
     intro: [
-      "Additional research materials maintained in the Peptide Protocol catalogue for specialised laboratory protocols.",
-      "Listings in this category remain research-only. They are not offered for cosmetic, tanning, or therapeutic use.",
+      "Specialised catalogue materials for lab protocols.",
+      "Research-only listings — not for cosmetic, tanning, or therapeutic use.",
     ],
     productSlugs: ["hcg-5000iu", "melanotan-ii-10mg"],
     image: "/images/categories/other-compounds.jpg",
@@ -96,11 +96,11 @@ export const categories: Category[] = [
     name: "Research solvents & reagents",
     metaTitle: "Research Solvents & Reagents Australia | Peptide Protocol",
     metaDescription:
-      "Buy bacteriostatic water 10mL for research reconstitution in Australia. Sterile research solvent. Research use only.",
+      "Buy BAC Water 10mL for research reconstitution in Australia. Sterile research solvent. Research use only.",
     headline: "Research solvents and reagents",
     intro: [
-      "Solvents and reagents for reconstitution protocols under trained laboratory procedures.",
-      "Bacteriostatic water is supplied as a research reagent, not a clinical or consumer preparation.",
+      "Solvents and reagents for reconstitution under lab procedures.",
+      "Bacteriostatic water is a research reagent, not a clinical or consumer preparation.",
     ],
     productSlugs: ["bacteriostatic-water-10ml"],
     image: "/images/categories/research-solvents.jpg",

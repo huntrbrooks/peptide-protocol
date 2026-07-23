@@ -88,7 +88,7 @@ export default function HomePage() {
             Built for research workflows
           </h2>
           <p className="mt-3 text-muted">
-            Spec sheets and batch documentation first. Clear Australian dispatch.
+            Specs and batch docs first. Local packing and tracked dispatch.
           </p>
         </div>
         <div className="mt-10 grid gap-6 md:grid-cols-2">
@@ -112,7 +112,7 @@ export default function HomePage() {
                 Research categories
               </h2>
               <p className="mt-3 max-w-xl text-sm text-paper/65">
-                Browse by research focus. Every listing remains laboratory use only.
+                Browse by research focus. Laboratory use only.
               </p>
             </div>
             <Link href="/shop" className="hidden text-sm text-teal-soft transition hover:text-paper sm:inline">
@@ -152,7 +152,7 @@ export default function HomePage() {
             <h2 className="font-display text-3xl tracking-tight text-ink sm:text-4xl">
               Featured materials
             </h2>
-            <p className="mt-3 text-muted">Selected catalogue items with documented purity targets.</p>
+            <p className="mt-3 text-muted">Selected items with documented purity targets.</p>
           </div>
           <Link href="/shop" className="text-sm text-accent transition hover:text-ink">
             Full catalogue
@@ -172,18 +172,18 @@ export default function HomePage() {
               Research questionnaire
             </p>
             <h2 className="mt-3 font-display text-3xl tracking-tight text-ink sm:text-4xl">
-              Find your ideal peptide stack
+              Find a research stack
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-muted">
-              An adaptive educational questionnaire that maps research goals to catalogue
-              pathways — with caution flags and a clear research-only disclaimer.
+              Maps research goals to catalogue pathways — with caution flags and a
+              research-only disclaimer.
             </p>
           </div>
           <Link
             href="/stack-finder"
             className="btn-primary w-fit rounded-sm bg-ink px-5 py-3 text-sm text-paper hover:bg-accent"
           >
-            Start the questionnaire
+            Start questionnaire
           </Link>
         </div>
       </section>

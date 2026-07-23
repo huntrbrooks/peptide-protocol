@@ -550,7 +550,7 @@ export const CATALOGUE_PEPTIDES = [
   },
   {
     slug: "bacteriostatic-water-10ml",
-    name: "Bacteriostatic Water",
+    name: "BAC Water",
     goals: ["recovery", "fat_loss", "muscle_gh", "cognition", "sleep", "skin_aging", "libido", "gut"],
   },
 ] as const;

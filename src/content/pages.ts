@@ -8,31 +8,30 @@ export const pages: Record<string, PageContent> = {
       "Learn how Peptide Protocol supplies research-grade peptides to Australian laboratories with batch documentation and clear research-only terms.",
     headline: "About Peptide Protocol",
     body: [
-      "Peptide Protocol is an Australian research materials supplier focused on lyophilised peptides, related compounds, and reconstitution solvents for laboratory use.",
-      "We built the catalogue around documentation, transit integrity, and plain language. Research buyers need specifications they can file, packing that protects vials, and terms that do not blur research supply with consumer wellness.",
+      "Australian supplier of lyophilised peptides, related compounds, and reconstitution solvents for laboratory use. Built around documentation, transit integrity, and plain research-only terms.",
     ],
     sections: [
       {
         title: "What we prioritise",
         body: [
-          "Identity and purity documentation for verified lots.",
-          "Clear product labelling for inventory control.",
-          "Discreet outer packaging with tracked Australia Post express where available.",
-          "Support replies grounded in batch notes and shipping facts.",
+          "Identity and purity docs for verified lots.",
+          "Clear labelling for inventory.",
+          "Plain outer packing; tracked Australia Post express where available.",
+          "Support grounded in batch and shipping facts.",
         ],
       },
       {
         title: "What we do not do",
         body: [
-          "We do not present research materials as medicines, supplements, or cosmetics.",
-          "We do not publish dosing, administration, or personal-use guidance.",
-          "We do not use urgency tactics or wellness marketing around research inventory.",
+          "Present materials as medicines, supplements, or cosmetics.",
+          "Publish dosing, administration, or personal-use guidance.",
+          "Use wellness marketing or urgency tactics.",
         ],
       },
       {
         title: "Australian focus",
         body: [
-          "Orders are processed for Australian research customers with local packing and clear dispatch cut-offs on business days. If you need a Certificate of Analysis or shipping clarification before ordering, contact support.",
+          "Local packing and clear business-day dispatch cut-offs. Contact support for a COA or shipping clarification before ordering.",
         ],
       },
     ],
@@ -44,36 +43,36 @@ export const pages: Record<string, PageContent> = {
       "How Peptide Protocol verifies research peptide purity, provides Certificates of Analysis, and documents third-party testing for Australian laboratories.",
     headline: "Quality and testing",
     body: [
-      "Research materials only earn a place in laboratory inventory when identity and purity can be documented. Peptide Protocol treats Certificates of Analysis as part of the product, not an afterthought.",
+      "Identity and purity must be documentable. COAs are part of the product, not an afterthought.",
     ],
     sections: [
       {
         title: "Analytical approach",
         body: [
-          "Listed peptide lots are assessed for identity and purity using reverse-phase high-performance liquid chromatography (RP-HPLC) as the primary method. Where third-party laboratory verification is listed for a batch, that documentation can be requested for your records.",
+          "Lots are assessed by RP-HPLC. Third-party verification can be requested where listed for a batch.",
         ],
         bullets: [
-          "Purity target of ≥99.0% on COA-validated peptide lots unless a batch note states otherwise",
-          "Identity confirmation against expected chromatographic profiles",
-          "Batch-linked documentation available on request for verified lots",
+          "Purity target ≥99.0% on COA-validated lots unless a batch note says otherwise",
+          "Identity vs expected chromatographic profiles",
+          "Batch-linked docs on request for verified lots",
         ],
       },
       {
         title: "How to request a COA",
         body: [
-          "Email support with your order number or the product and batch details you need. We respond with the Certificate of Analysis for verified lots, or confirm if documentation is still pending for a new receipt.",
+          "Email support with order number or product/batch details. We’ll send the COA or confirm if docs are pending.",
         ],
       },
       {
         title: "Packing and labelling",
         body: [
-          "Vials are packed with protective materials to reduce transit breakage. Labels are written for research inventory control. Outer cartons remain plain and do not advertise product names.",
+          "Protective inner pack; research inventory labels; plain outer cartons (no product names).",
         ],
       },
       {
         title: "Limits of documentation",
         body: [
-          "A Certificate of Analysis describes the tested lot under stated methods. It does not authorise human use, veterinary use, or any application outside controlled research. Always confirm parameters on the COA for the specific batch you receive.",
+          "A COA describes the tested lot under stated methods. It does not authorise human, veterinary, or non-research use. Check the COA for your batch.",
         ],
       },
     ],
@@ -85,48 +84,47 @@ export const pages: Record<string, PageContent> = {
       "Answers on research-only terms, shipping, COAs, packaging, and ordering research peptides from Peptide Protocol in Australia.",
     headline: "Frequently asked questions",
     body: [
-      "Short answers to the questions research buyers ask most often. For batch-specific documentation, contact support with your product or order details.",
+      "Common questions from research buyers. For batch docs, contact support with product or order details.",
     ],
     faqs: [
       {
         question: "Are these products for human use?",
         answer:
-          "No. All Peptide Protocol products are for laboratory and in vitro research only. They are not for human consumption, veterinary use, diagnostic procedures, or consumer applications.",
+          "No — laboratory and in vitro research only. Not for human, veterinary, diagnostic, or consumer use.",
       },
       {
         question: "Do you provide Certificates of Analysis?",
         answer:
-          "Yes. For verified lots, COAs are available on request. Email support with the product name and order or batch reference.",
+          "Yes, for verified lots. Email support with product and order/batch reference.",
       },
       {
         question: "Where do you ship?",
         answer:
-          "We focus on Australian delivery via tracked Australia Post express where available. Contact support before ordering if you need clarification on destination coverage.",
+          "Australian delivery via tracked Australia Post express where available. Ask support if unsure.",
       },
       {
         question: "When do you dispatch?",
         answer:
-          "Orders placed before 2pm AEST on business days are prioritised for same-day dispatch when stock is confirmed.",
+          "Before 2pm AEST on business days, same-day when stock is confirmed.",
       },
       {
         question: "Is packaging discreet?",
-        answer:
-          "Yes. Outer cartons use plain labelling without product descriptors.",
+        answer: "Yes — plain outer labelling, no product names.",
       },
       {
-        question: "Can I get bacteriostatic water with my order?",
+        question: "Can I get BAC Water with my order?",
         answer:
-          "Bacteriostatic Water is listed in the catalogue. Qualifying catalogue orders may include a promotional vial where stated at checkout. Confirm current promotions before purchase.",
+          "Sold in catalogue; qualifying orders may include a promo vial if stated at checkout.",
       },
       {
         question: "How do returns work?",
         answer:
-          "See the Returns page for eligibility. Unopened research materials may be considered under stated conditions. Contact support before returning any item.",
+          "See Returns. Unopened items may qualify; contact support before sending anything back.",
       },
       {
         question: "Is checkout live?",
         answer:
-          "Catalogue prices are shown in AUD. Cart and enquiry flows may be staged during launch. Use Contact if you need a formal purchase enquiry.",
+          "Prices in AUD. MoonPay Apple Pay / Google Pay (crypto) is staged pending merchant credentials. Email Contact for a purchase enquiry until live.",
       },
     ],
   },
@@ -137,31 +135,31 @@ export const pages: Record<string, PageContent> = {
       "Australia Post express shipping, dispatch cut-offs, tracking, and discreet packaging for Peptide Protocol research materials.",
     headline: "Shipping",
     body: [
-      "Clear transit expectations matter as much as clear specifications. Peptide Protocol packs locally and uses tracked Australia Post express services where available.",
+      "Local packing; tracked Australia Post express where available.",
     ],
     sections: [
       {
         title: "Dispatch timing",
         body: [
-          "Orders confirmed before 2pm AEST on business days are prioritised for same-day dispatch when stock is verified. Orders after the cut-off or on weekends and public holidays are processed on the next business day.",
+          "Before 2pm AEST on business days → same-day priority when stock is verified. After cut-off / weekends / public holidays → next business day.",
         ],
       },
       {
         title: "Delivery estimates",
         body: [
-          "Once dispatched, Australia Post express typically delivers within 1 to 3 business days depending on destination. Remote locations may take longer. Tracking is provided after dispatch.",
+          "Typically 1–3 business days after dispatch; remote areas may take longer. Tracking provided.",
         ],
       },
       {
         title: "Packaging",
         body: [
-          "Vials are protected with inner packing. Outer cartons are plain and do not list product names. Temperature-sensitive handling follows packing procedures designed for short Australian express transit. Follow storage guidance on receipt.",
+          "Protected vials; plain outer cartons; short express transit packing. Follow storage guidance on receipt.",
         ],
       },
       {
         title: "Failed delivery and address accuracy",
         body: [
-          "Provide a complete delivery address and contact number. If a parcel is returned due to an incorrect address or failed collection, contact support to arrange re-dispatch. Additional postage may apply.",
+          "Use a complete address and phone. Returned parcels: contact support to re-dispatch (extra postage may apply).",
         ],
       },
     ],
@@ -173,36 +171,35 @@ export const pages: Record<string, PageContent> = {
       "Returns and refunds policy for Peptide Protocol research materials in Australia. Contact support before returning any item.",
     headline: "Returns",
     body: [
-      "Research materials are specialised inventory. Returns are limited and must be arranged through support so batch integrity and cold-chain risks can be assessed.",
+      "Returns are limited. Arrange via support so batch integrity can be assessed.",
     ],
     sections: [
       {
         title: "Eligibility",
         body: [
-          "Unopened products in original sealed condition may be considered for return within 7 days of delivery if the item was dispatched in error or arrived damaged. Opened vials are generally not eligible for return because research materials cannot be restocked once seals are broken.",
+          "Unopened, sealed items within 7 days if wrong item or damaged on arrival. Opened vials generally not returnable.",
         ],
       },
       {
         title: "Damaged in transit",
         body: [
-          "Photograph the outer carton, inner packing, and affected vial, then contact support within 48 hours of delivery. We will advise next steps, including replacement or credit where appropriate.",
+          "Photo carton, packing, and vial; contact support within 48 hours for replacement/credit options.",
         ],
       },
       {
         title: "How to start a return",
         body: [
-          "Email support with your order number, product name, and reason for return. Do not post items back until you receive a return authorisation and instructions.",
+          "Email order number, product, and reason. Wait for authorisation before posting.",
         ],
       },
       {
         title: "Refunds",
         body: [
-          "Approved refunds are processed to the original payment method after the returned item is inspected. Postage is non-refundable unless the return results from our error or transit damage we accept responsibility for.",
+          "To original payment method after inspection. Postage non-refundable unless our error or accepted transit damage.",
         ],
       },
     ],
-  },
-  terms: {
+  },  terms: {
     slug: "terms",
     metaTitle: "Terms of Sale | Peptide Protocol Australia",
     metaDescription:
@@ -347,7 +344,7 @@ export const pages: Record<string, PageContent> = {
       "Contact Peptide Protocol for COA requests, shipping questions, and research catalogue enquiries in Australia.",
     headline: "Contact",
     body: [
-      "Need a Certificate of Analysis, shipping clarification, or a catalogue enquiry? Send a clear message with your order number or product name where relevant.",
+      "COA, shipping, or catalogue questions — include order number or product name.",
     ],
     sections: [
       {
@@ -357,22 +354,20 @@ export const pages: Record<string, PageContent> = {
       {
         title: "What to include",
         body: [
-          "Your name and organisation (if applicable).",
+          "Name and organisation (if applicable).",
           "Order number for existing purchases.",
-          "Product name and the documentation or question you need answered.",
+          "Product name and what you need.",
         ],
       },
       {
         title: "Response times",
         body: [
-          "We aim to reply within one business day. Complex documentation requests may take longer if batch files need retrieval.",
+          "Aim: one business day (batch file retrieval may take longer).",
         ],
       },
       {
         title: "Social",
-        body: [
-          "Instagram and TikTok: @peptideprotocolau",
-        ],
+        body: ["@peptideprotocolau"],
       },
     ],
   },
@@ -383,7 +378,7 @@ export const pages: Record<string, PageContent> = {
       "Browse the full Peptide Protocol catalogue of research-grade peptides and solvents in Australia. Documented purity. Research use only.",
     headline: "Research catalogue",
     body: [
-      "All listed materials are for laboratory and in vitro research only. Review specifications, storage notes, and the research use disclaimer before ordering.",
+      "Laboratory and in vitro research only. Check specs, storage notes, and the research use disclaimer before ordering.",
     ],
   },
 };

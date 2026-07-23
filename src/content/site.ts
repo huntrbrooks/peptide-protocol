@@ -6,20 +6,20 @@ export const site = {
   handle: "@peptideprotocolau",
   locale: "en-AU",
   currency: "AUD",
-  tagline: "Research peptides with documented purity, dispatched from Australia",
+  tagline: "Documented research peptides, dispatched locally",
   researchDisclaimer:
     "For research purposes only. Not for human consumption. Not a medicine, supplement, or cosmetic. Laboratory and in vitro use only.",
   trustBar: [
-    "Batch COA available on request",
-    "Third-party purity verification",
-    "Same-day dispatch on orders before 2pm AEST (business days)",
-    "Australia Post express tracking",
-    "Plain outer packaging",
+    "Batch COA on request",
+    "Third-party purity checks",
+    "Dispatch before 2pm AEST",
+    "Express tracking",
+    "Plain packaging",
   ],
   /** Site-wide announcement marquee — edit here to update live chrome */
   announcementBanner: [
-    "Tracked express delivery · Same-day dispatch before 2pm AEST",
-    "Complimentary bacteriostatic water with qualifying catalogue orders",
+    "Tracked express · Dispatch before 2pm AEST",
+    "Complimentary BAC Water on qualifying orders",
   ],
   nav: [
     { label: "Shop", href: "/shop" },
@@ -68,40 +68,40 @@ export const home = {
   metaTitle: "Research Peptides Australia | Peptide Protocol",
   metaDescription:
     "Australian supplier of research-grade peptides with batch documentation, discreet express dispatch, and clear research-only terms. Shop verified materials at Peptide Protocol.",
-  eyebrow: "Research materials for Australian laboratories",
-  headline: "Research peptides with documented purity, dispatched from Australia",
+  eyebrow: "Research materials · Australia",
+  headline: "Documented research peptides, dispatched locally",
   subheadline:
-    "Peptide Protocol supplies lyophilised research compounds with batch-linked Certificates of Analysis, clear specifications, and careful packing for transit integrity. For laboratory and in vitro research only. Not for human consumption.",
-  primaryCta: { label: "Browse the catalogue", href: "/shop" },
-  secondaryCta: { label: "View quality & testing", href: "/quality" },
+    "Lyophilised compounds with batch COAs and clear specs. Laboratory and in vitro use only — not for human consumption.",
+  primaryCta: { label: "Browse catalogue", href: "/shop" },
+  secondaryCta: { label: "Quality & testing", href: "/quality" },
   valueProps: [
     {
-      title: "Built for research workflows, not retail theatre",
-      body: "Spec sheets, storage guidance, and batch documentation come first. Marketing claims and wellness language do not belong on research materials.",
+      title: "Research-first listings",
+      body: "Spec sheets and storage notes ahead of marketing claims.",
     },
     {
-      title: "Identity and purity you can file",
-      body: "Lots are assessed by RP-HPLC, with Certificates of Analysis available so intake and inventory records stay complete.",
+      title: "File-ready purity",
+      body: "RP-HPLC assessment; COAs available for intake records.",
     },
     {
-      title: "Australian processing and clear transit expectations",
-      body: "Orders are packed and processed locally, then sent via tracked Australia Post express where available. You get a dispatch confirmation and a tracking number, not vague shipping promises.",
+      title: "Clear Australian transit",
+      body: "Local packing; tracked Australia Post express with dispatch confirmation.",
     },
     {
-      title: "Support that answers with facts",
-      body: "Need a COA, batch note, or clarification on specifications? Contact the support desk. We reply with documentation, not sales scripts.",
+      title: "Fact-based support",
+      body: "COA, batch, or shipping questions answered with documentation.",
     },
   ],
   howItWorks: [
-    "Select research materials and confirm research-use acknowledgement at checkout.",
-    "We verify stock, pack with vial protection, and dispatch on business days before 2pm AEST where possible.",
-    "You receive tracking and can request batch documentation for your records.",
+    "Choose materials and confirm research-use terms at checkout.",
+    "We confirm stock, pack vials, and dispatch before 2pm AEST on business days when possible.",
+    "You get tracking; request batch docs anytime.",
   ],
   complianceTitle: "Research use only",
   complianceBody:
-    "All Peptide Protocol products are supplied strictly for laboratory, assay development, and other controlled research applications. They are not medicines, supplements, cosmetics, or consumer products. They are not for human or veterinary use, not for diagnostic procedures, and not for human consumption. Purchase confirms you understand and accept these terms.",
+    "All products are for laboratory and controlled research only — not medicines, supplements, cosmetics, or for human or veterinary use. Purchase confirms you accept these terms.",
   finalCta: { label: "Shop research materials", href: "/shop" },
-  finalSupport: "Questions about documentation or shipping? Contact support before you order.",
+  finalSupport: "Questions on docs or shipping? Contact support first.",
 };
 
 export const social = {

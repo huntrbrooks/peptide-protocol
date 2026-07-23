@@ -69,7 +69,7 @@ Edit those TypeScript modules to update live site copy. This markdown file is a 
 
 ## Product slugs
 
-1. bacteriostatic-water-10ml  -  Bacteriostatic Water (10mL)  -  $19.99 AUD
+1. bacteriostatic-water-10ml  -  BAC Water (10mL)  -  $19.99 AUD
 2. bpc-157-10mg  -  BPC-157 (10mg)  -  $69.99 AUD
 3. cjc-1295-dac-5mg  -  CJC-1295 with DAC (5mg)  -  $74.99 AUD
 4. cjc-1295-no-dac-10mg  -  CJC-1295 without DAC (10mg)  -  $99.99 AUD

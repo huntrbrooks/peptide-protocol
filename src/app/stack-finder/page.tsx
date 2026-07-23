@@ -17,12 +17,11 @@ export default function StackFinderPage() {
           Research questionnaire
         </p>
         <h1 className="mt-3 font-display text-4xl tracking-tight text-ink sm:text-5xl">
-          Find your ideal peptide stack
+          Find a research stack
         </h1>
         <p className="mt-4 text-sm leading-relaxed text-muted sm:text-base">
-          Answer a short adaptive set of questions about research goals, lifestyle context, and
-          caution flags. We’ll return an educational stack suggestion grounded in our catalogue —
-          with reasoning, synergies, and clear research-only framing.
+          Short adaptive questions on research goals and caution flags. Returns an educational
+          catalogue suggestion — not medical advice.
         </p>
       </header>
 
