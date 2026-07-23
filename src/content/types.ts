@@ -20,6 +20,8 @@ export type Product = {
   strength: string;
   priceAud: number;
   compareAtAud?: number;
+  /** Internal warehouse / inventory code (e.g. BC10, CP10). */
+  stockCode?: string;
   categorySlugs: string[];
   shortLabel: string;
   metaTitle: string;

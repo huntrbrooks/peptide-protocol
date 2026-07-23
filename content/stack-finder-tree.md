@@ -118,17 +118,17 @@ Users may add **as many focus areas as they want** (up to all 8). The goals sect
 |---|---|
 | `health_flags` includes `pregnancy` | Skip LLM stack; show educational hard-stop screen |
 | `health_flags` includes `cancer_history` | Allow LLM but prompt forces withhold of BPC-157, TB-500, GH secretagogues; emphasize caution |
-| `health_flags` includes `thyroid_men2` | Prompt forces caution / likely withhold tirzepatide & retatrutide |
-| `health_flags` includes `melanoma_nevi` | Prompt forces caution / likely withhold Melanotan II |
+| `health_flags` includes `thyroid_men2` | Prompt forces caution / likely withhold Retatrutide |
+| `health_flags` includes `melanoma_nevi` | Prompt forces caution / likely withhold PT-141 |
 | `medications` includes `glp1_current` | Avoid stacking additional incretin agonists |
-| `delivery_pref` = `prefer_non_injectable` | Prefer Semax discussion; note most catalogue items are injectable research materials |
+| `delivery_pref` = `prefer_non_injectable` | Note that catalogue items are lyophilised injectable research materials |
 
 ---
 
 ## Catalogue constraint
 
-Recommendations should prefer in-stock slugs:
+Recommendations should prefer in-stock single-vial slugs:
 
-`bpc-157-10mg`, `tb-500-10mg`, `cjc-1295-dac-5mg`, `cjc-1295-no-dac-10mg`, `ipamorelin-10mg`, `sermorelin-10mg`, `tesamorelin-10mg`, `tirzepatide-10mg`, `retatrutide-10mg`, `mots-c-10mg`, `semax-11mg`, `dsip-5mg`, `epitalon-10mg`, `ghk-cu-100mg`, `melanotan-ii-10mg`, `hcg-5000iu`, `bacteriostatic-water-10ml`
+`bpc-157-10mg`, `tb-500-10mg`, `cjc-1295-no-dac-10mg`, `ipamorelin-10mg`, `retatrutide-20mg`, `retatrutide-60mg`, `ghk-cu-50mg`, `pt-141-10mg`
 
-Out-of-catalogue compounds (e.g. Semaglutide, PT-141, Selank) may be mentioned only as educational comparators, not primary stack picks.
+Out-of-catalogue compounds (e.g. Semaglutide, Melanotan II, Selank) may be mentioned only as educational comparators, not primary stack picks. Cognition-only interests currently have no direct catalogue SKU.

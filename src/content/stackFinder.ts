@@ -195,7 +195,7 @@ export const stackFinderQuestions: QuestionDef[] = [
       },
       {
         id: "prefer_sustained",
-        label: "More sustained elevation (e.g. DAC-style analogues)",
+        label: "More sustained elevation (longer-acting GHRH-style designs)",
       },
       { id: "unsure", label: "Not sure — recommend based on goals" },
     ],
@@ -467,6 +467,7 @@ export const stackFinderQuestions: QuestionDef[] = [
   },
 ];
 
+/** Active single-vial catalogue only (kits are pack SKUs; recommend singles here). */
 export const CATALOGUE_PEPTIDES = [
   {
     slug: "bpc-157-10mg",
@@ -479,79 +480,34 @@ export const CATALOGUE_PEPTIDES = [
     goals: ["recovery"],
   },
   {
-    slug: "cjc-1295-dac-5mg",
-    name: "CJC-1295 with DAC",
-    goals: ["muscle_gh"],
-  },
-  {
     slug: "cjc-1295-no-dac-10mg",
     name: "CJC-1295 without DAC",
-    goals: ["muscle_gh"],
+    goals: ["muscle_gh", "sleep"],
   },
   {
     slug: "ipamorelin-10mg",
     name: "Ipamorelin",
-    goals: ["muscle_gh"],
+    goals: ["muscle_gh", "sleep"],
   },
   {
-    slug: "sermorelin-10mg",
-    name: "Sermorelin",
-    goals: ["muscle_gh"],
-  },
-  {
-    slug: "tesamorelin-10mg",
-    name: "Tesamorelin",
-    goals: ["muscle_gh", "fat_loss"],
-  },
-  {
-    slug: "tirzepatide-10mg",
-    name: "Tirzepatide",
+    slug: "retatrutide-20mg",
+    name: "Retatrutide 20mg",
     goals: ["fat_loss"],
   },
   {
-    slug: "retatrutide-10mg",
-    name: "Retatrutide",
+    slug: "retatrutide-60mg",
+    name: "Retatrutide 60mg",
     goals: ["fat_loss"],
   },
   {
-    slug: "mots-c-10mg",
-    name: "MOTS-c",
-    goals: ["fat_loss", "muscle_gh"],
-  },
-  {
-    slug: "semax-11mg",
-    name: "Semax",
-    goals: ["cognition"],
-  },
-  {
-    slug: "dsip-5mg",
-    name: "DSIP",
-    goals: ["sleep"],
-  },
-  {
-    slug: "epitalon-10mg",
-    name: "Epitalon",
-    goals: ["skin_aging", "sleep"],
-  },
-  {
-    slug: "ghk-cu-100mg",
+    slug: "ghk-cu-50mg",
     name: "GHK-Cu",
     goals: ["skin_aging", "recovery"],
   },
   {
-    slug: "melanotan-ii-10mg",
-    name: "Melanotan II",
+    slug: "pt-141-10mg",
+    name: "PT-141",
     goals: ["libido"],
-  },
-  {
-    slug: "hcg-5000iu",
-    name: "HCG",
-    goals: ["muscle_gh"],
-  },
-  {
-    slug: "bacteriostatic-water-10ml",
-    name: "BAC Water",
-    goals: ["recovery", "fat_loss", "muscle_gh", "cognition", "sleep", "skin_aging", "libido", "gut"],
   },
 ] as const;
 

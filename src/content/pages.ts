@@ -8,7 +8,7 @@ export const pages: Record<string, PageContent> = {
       "Learn how Peptide Protocol supplies research-grade peptides to Australian laboratories with batch documentation and clear research-only terms.",
     headline: "About Peptide Protocol",
     body: [
-      "Australian supplier of lyophilised peptides, related compounds, and reconstitution solvents for laboratory use. Built around documentation, transit integrity, and plain research-only terms.",
+      "Australian supplier of lyophilised research peptides for laboratory use. Built around documentation, transit integrity, and plain research-only terms.",
     ],
     sections: [
       {
@@ -112,9 +112,9 @@ export const pages: Record<string, PageContent> = {
         answer: "Yes — plain outer labelling, no product names.",
       },
       {
-        question: "Can I get BAC Water with my order?",
+        question: "Do you sell single vials and kits?",
         answer:
-          "Sold in catalogue; qualifying orders may include a promo vial if stated at checkout.",
+          "Yes. In-stock peptides are offered as single vials and as 10-vial kits where listed on the product page.",
       },
       {
         question: "How do returns work?",
@@ -375,7 +375,7 @@ export const pages: Record<string, PageContent> = {
     slug: "shop",
     metaTitle: "Shop Research Peptides Australia | Peptide Protocol",
     metaDescription:
-      "Browse the full Peptide Protocol catalogue of research-grade peptides and solvents in Australia. Documented purity. Research use only.",
+      "Browse the full Peptide Protocol catalogue of research-grade peptides in Australia. Single vials and 10-vial kits. Documented purity. Research use only.",
     headline: "Research catalogue",
     body: [
       "Laboratory and in vitro research only. Check specs, storage notes, and the research use disclaimer before ordering.",

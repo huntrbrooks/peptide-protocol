@@ -19,7 +19,7 @@ export const site = {
   /** Site-wide announcement marquee — edit here to update live chrome */
   announcementBanner: [
     "Tracked express · Dispatch before 2pm AEST",
-    "Complimentary BAC Water on qualifying orders",
+    "Single vials and 10-vial kits in stock",
   ],
   nav: [
     { label: "Shop", href: "/shop" },
@@ -38,8 +38,8 @@ export const site = {
         { label: "Metabolic research", href: "/shop/metabolic" },
         { label: "Growth hormone pathway", href: "/shop/growth-hormone" },
         { label: "Tissue & recovery", href: "/shop/tissue-recovery" },
-        { label: "Cognitive & neurological", href: "/shop/cognitive-neurological" },
         { label: "Cellular & mitochondrial", href: "/shop/cellular-mitochondrial" },
+        { label: "Other compounds", href: "/shop/other-compounds" },
       ],
     },
     {

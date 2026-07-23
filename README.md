@@ -84,6 +84,8 @@ See `.env.example`:
 - Keep `npx convex dev` running while developing so schema/functions sync.
 - Do **not** run `npx convex deploy` unless shipping to production.
 - FAQ still describes checkout as staged until credentials and wallet are live.
+- MoonPay webhooks cannot hit `http://localhost:3000`. For local paid-status testing, expose the app with a tunnel (e.g. [ngrok](https://ngrok.com/) or Cloudflare Tunnel) and register `{tunnel-origin}/api/webhooks/moonpay` in the MoonPay dashboard (sandbox). Keep `NEXT_PUBLIC_SITE_URL` as the tunnel origin while testing redirects + webhooks.
+- Checklist before a sandbox checkout works: MoonPay keys in `.env.local` → `MOONPAY_WALLET_ADDRESS` set → `npx convex dev` linked → `ORDERS_WEBHOOK_SECRET` mirrored with `npx convex env set` → webhook URL reachable from the internet.
 
 ## Image generation
 

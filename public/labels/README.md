@@ -2,65 +2,53 @@
 
 ## Why these didn't match the product photos before
 
-The first pass was a **plain text thermal layout**. Your product photos use the full Peptide Protocol vial brand system (DNA mark, teal name band, strength box, research footer).
+The first pass was a **plain text thermal layout**. Your product photos use the full Peptide Protocol vial brand system (DNA mark, colour name band, strength box, research footer).
 
-**Niimbot is still a valid printer for vials** — but standard Niimbot units are **direct thermal (black only)**. They cannot print teal, gradients, or soft watermarks in color. The teal bands become solid black; the logo becomes a B&W mark.
+**Niimbot is still a valid printer for vials** — but standard Niimbot units are **direct thermal (black only)**. They cannot print colour bands, gradients, or soft watermarks. Colour bands become solid black; the logo becomes a B&W mark.
 
 - Use `niimbot-thermal/` (or root `*.png`) in the NIIMBOT app.
-- Use `color-masters/` if you print on a **color** label printer / inkjet for photo-matching teal labels.
+- Use `color-masters/` if you print on a **color** label printer / inkjet for photo-matching labels.
+- Use `kit/` for 60×40 mm kit-lid labels (cap-colour matched).
+- Use `stickers/` for universal circular packaging stickers (no peptide names).
 
 ## Spec (assumption: B21 / B1)
 
 | Item | Value |
 |------|-------|
-| Size | 50 × 30 mm |
-| DPI | 203 → 400 × 240 px |
+| Vial wrap size | 50 × 30 mm |
+| Thermal DPI | 203 → 400 × 240 px |
+| Color masters | PNG 2000×1200 |
+| Kit lid | 60 × 40 mm @ 300 DPI → 709 × 472 px |
+| Circle stickers | Ø30 mm → 354×354; Ø40 mm → 472×472 @ 300 DPI |
 | Thermal files | 1-bit PNG |
-| Color masters | PNG ~2000×1200 |
-| Model | openai/gpt-image-2 via OpenRouter |
 
-## Files
+## Original-stock SKUs (cap-matched)
 
-### Thermal (Niimbot)
-- `niimbot-thermal/bacteriostatic-water-10ml.png`
-- `niimbot-thermal/bpc-157-10mg.png`
-- `niimbot-thermal/cjc-1295-dac-5mg.png`
-- `niimbot-thermal/cjc-1295-no-dac-10mg.png`
-- `niimbot-thermal/dsip-5mg.png`
-- `niimbot-thermal/epitalon-10mg.png`
-- `niimbot-thermal/ghk-cu-100mg.png`
-- `niimbot-thermal/hcg-5000iu.png`
-- `niimbot-thermal/ipamorelin-10mg.png`
-- `niimbot-thermal/melanotan-ii-10mg.png`
-- `niimbot-thermal/mots-c-10mg.png`
-- `niimbot-thermal/retatrutide-10mg.png`
-- `niimbot-thermal/semax-11mg.png`
-- `niimbot-thermal/sermorelin-10mg.png`
-- `niimbot-thermal/tb-500-10mg.png`
-- `niimbot-thermal/tesamorelin-10mg.png`
-- `niimbot-thermal/tirzepatide-10mg.png`
+Generated via `node scripts/generate-stock-sku-labels.mjs` (SVG + sharp). Accent colours match flip-top caps:
 
-### Color masters
-- `color-masters/bacteriostatic-water-10ml.png`
-- `color-masters/bpc-157-10mg.png`
-- `color-masters/cjc-1295-dac-5mg.png`
-- `color-masters/cjc-1295-no-dac-10mg.png`
-- `color-masters/dsip-5mg.png`
-- `color-masters/epitalon-10mg.png`
-- `color-masters/ghk-cu-100mg.png`
-- `color-masters/hcg-5000iu.png`
-- `color-masters/ipamorelin-10mg.png`
-- `color-masters/melanotan-ii-10mg.png`
-- `color-masters/mots-c-10mg.png`
-- `color-masters/retatrutide-10mg.png`
-- `color-masters/semax-11mg.png`
-- `color-masters/sermorelin-10mg.png`
-- `color-masters/tb-500-10mg.png`
-- `color-masters/tesamorelin-10mg.png`
-- `color-masters/tirzepatide-10mg.png`
+| Stock | Slug | Cap |
+|-------|------|-----|
+| BC10 | bpc-157-10mg | dark blue |
+| IP10 | ipamorelin-10mg | solid red |
+| CP10 | cjc-1295-no-dac-10mg | yellow |
+| BT10 | tb-500-10mg | solid red |
+| P41 | pt-141-10mg | solid red |
+| CU50 | ghk-cu-50mg | dark blue |
+| RT20 | retatrutide-20mg | pink |
+| RT60 | retatrutide-60mg | solid red |
+
+### Outputs for stock SKUs
+- `color-masters/{slug}.png`
+- `niimbot-thermal/{slug}.png`
+- `kit/{stockCode}-kit-label.png` (e.g. `bc10-kit-label.png`)
+- `stickers/peptide-protocol-universal-circle-30mm.png`
+- `stickers/peptide-protocol-universal-circle-40mm.png`
+- `mockups/kit-box-with-sticker.png`
+
+Legacy catalogue SKUs (previous AI pass) remain under `color-masters/` / `niimbot-thermal/` with older teal branding.
 
 ### Proof
-- `PROOF-SHEET-all-labels.png`
+- `PROOF-SHEET-all-labels.png` (legacy sheet; regenerate if needed for new SKUs)
 
 ## Print (Niimbot app)
 
@@ -68,11 +56,17 @@ The first pass was a **plain text thermal layout**. Your product photos use the 
 2. NIIMBOT app → connect printer → new label at that size.
 3. Import a file from `niimbot-thermal/` → stretch edge-to-edge.
 4. Test print; raise density if light.
-5. For teal/color matching the website photos, print `color-masters/` on a color label printer instead.
+5. For colour matching the website photos, print `color-masters/` on a color label printer instead.
+6. Kit lids: print `kit/*-kit-label.png` at **60×40 mm**.
+7. Circle stickers: print at physical Ø30 / Ø40 mm from `stickers/`.
 
 ## Regenerate
 
 ```bash
+# Cap-matched stock SKUs (labels + stickers + kit lids)
+node scripts/generate-stock-sku-labels.mjs
+
+# Legacy AI colour masters (OpenRouter)
 node --env-file=.env.local scripts/generate-niimbot-labels-ai.mjs --force
 node --env-file=.env.local scripts/generate-niimbot-labels-ai.mjs --only=bpc-157-10mg --force
 ```
