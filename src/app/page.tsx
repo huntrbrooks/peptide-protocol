@@ -30,7 +30,7 @@ export default function HomePage() {
         </div>
         <div className="relative mx-auto flex min-h-[88vh] max-w-6xl flex-col items-center justify-center gap-10 px-4 py-16 sm:px-6 sm:py-20 lg:flex-row lg:items-center lg:justify-between lg:gap-12">
           {/* Animated Retatrutide product render; unoptimized keeps webp animation intact */}
-          <div className="order-first mx-auto w-full max-w-[143px] shrink-0 sm:max-w-[182px] lg:order-last lg:mx-0 lg:max-w-[221px]">
+          <div className="order-first mx-auto w-full max-w-[429px] shrink-0 sm:max-w-[546px] lg:order-last lg:mx-0 lg:max-w-[663px]">
             <Image
               src="/images/products/retatrutide-20mg-hero.webp"
               alt="Retatrutide 20 MG"
