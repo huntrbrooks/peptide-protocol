@@ -6,6 +6,8 @@ export type SpecRow = {
 export type FaqItem = {
   question: string;
   answer: string;
+  /** Optional follow-up link rendered after the answer text. */
+  link?: { href: string; label: string };
 };
 
 export type WhatItsFor = {
@@ -52,16 +54,25 @@ export type Category = {
   image: string;
 };
 
+export type PageVideo = {
+  src: string;
+  title: string;
+  caption?: string;
+};
+
 export type PageContent = {
   slug: string;
   metaTitle: string;
   metaDescription: string;
   headline: string;
   body: string[];
+  video?: PageVideo;
   sections?: {
     title: string;
     body: string[];
     bullets?: string[];
   }[];
   faqs?: FaqItem[];
+  /** Optional trailing CTA link under page content. */
+  ctaLink?: { href: string; label: string };
 };

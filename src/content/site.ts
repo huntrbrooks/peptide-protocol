@@ -46,6 +46,7 @@ export const site = {
       title: "Information",
       links: [
         { label: "Quality & testing", href: "/quality" },
+        { label: "Lab handling", href: "/lab-handling" },
         { label: "Shipping", href: "/shipping" },
         { label: "Returns", href: "/returns" },
         { label: "FAQ", href: "/faq" },

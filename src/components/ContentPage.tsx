@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { PageContent } from "@/content/types";
 import { FaqList } from "./FaqList";
 
@@ -13,6 +14,28 @@ export function ContentPage({ page }: { page: PageContent }) {
           <p key={p}>{p}</p>
         ))}
       </div>
+
+      {page.video ? (
+        <figure className="mt-8">
+          <div className="overflow-hidden border border-line bg-mist/40">
+            <video
+              controls
+              playsInline
+              preload="metadata"
+              aria-label={page.video.title}
+              className="aspect-video w-full"
+            >
+              <source src={page.video.src} type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          {page.video.caption ? (
+            <figcaption className="mt-3 text-xs leading-relaxed text-muted">
+              {page.video.caption}
+            </figcaption>
+          ) : null}
+        </figure>
+      ) : null}
 
       {page.sections?.map((section) => (
         <section key={section.title} className="mt-10">
@@ -36,6 +59,17 @@ export function ContentPage({ page }: { page: PageContent }) {
         <section className="mt-12">
           <FaqList items={page.faqs} />
         </section>
+      ) : null}
+
+      {page.ctaLink ? (
+        <p className="mt-10 text-sm text-muted">
+          <Link
+            href={page.ctaLink.href}
+            className="text-accent underline underline-offset-2"
+          >
+            {page.ctaLink.label}
+          </Link>
+        </p>
       ) : null}
     </article>
   );

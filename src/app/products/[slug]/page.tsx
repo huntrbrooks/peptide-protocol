@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AddToCartButton } from "@/components/AddToCartButton";
 import { FaqList } from "@/components/FaqList";
@@ -109,6 +110,14 @@ export default async function ProductPage({ params }: Props) {
               <li key={item}>{item}</li>
             ))}
           </ul>
+          <p className="mt-4 text-sm text-muted">
+            <Link
+              href="/lab-handling"
+              className="underline underline-offset-4 transition-colors hover:text-accent"
+            >
+              Laboratory mixing overview
+            </Link>
+          </p>
         </section>
         <section>
           <h2 className="font-display text-2xl text-ink">What is included</h2>

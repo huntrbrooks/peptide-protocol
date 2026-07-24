@@ -77,6 +77,54 @@ export const pages: Record<string, PageContent> = {
       },
     ],
   },
+  "lab-handling": {
+    slug: "lab-handling",
+    metaTitle: "Lab Handling | Research Peptide Reconstitution Overview Australia",
+    metaDescription:
+      "Laboratory overview of reconstituting lyophilised research peptides with bacteriostatic or sterile water under trained procedures. Research use only — not medical or personal-use guidance.",
+    headline: "Lab handling",
+    body: [
+      "This page is a laboratory-context overview of how lyophilised research peptides are reconstituted with bacteriostatic or sterile water under trained procedures. It is provided for research handling reference only.",
+      "It is not medical advice, dosing information, or personal-use guidance. All materials supplied by Peptide Protocol are for laboratory and in vitro research only — not for human or veterinary use.",
+    ],
+    video: {
+      src: "/videos/mixing-bac-water-peptides.mp4",
+      title: "Mixing bacteriostatic water and research peptides",
+      caption:
+        "Laboratory handling reference only. Reconstitution of research materials should follow your organisation’s SOPs and be performed by trained personnel. Not medical or personal-use guidance.",
+    },
+    sections: [
+      {
+        title: "What the video covers",
+        body: [
+          "A general laboratory walkthrough of combining a sterile solvent (bacteriostatic or sterile water) with a lyophilised research peptide to prepare a reconstituted stock solution for in vitro work.",
+        ],
+        bullets: [
+          "Sterile-solvent handling in a controlled laboratory setting",
+          "Adding solvent gently to the lyophilised material rather than agitating",
+          "Allowing the solid to dissolve without vigorous shaking",
+          "Labelling and cold storage of the reconstituted research stock",
+        ],
+      },
+      {
+        title: "Laboratory context and SOP reminder",
+        body: [
+          "Reconstitution should only be carried out by trained personnel under your organisation’s standard operating procedures, with appropriate PPE, aseptic technique, and waste handling. Solvent choice, concentration, and storage are determined by the research protocol, not by this overview.",
+          "This content does not authorise, describe, or imply any human, veterinary, clinical, or personal use of these materials.",
+        ],
+      },
+      {
+        title: "Research use disclaimer",
+        body: [
+          "All handling is subject to our Research Use Disclaimer: laboratory and in vitro use only, not for human consumption, and not a medicine, supplement, or cosmetic.",
+        ],
+      },
+    ],
+    ctaLink: {
+      href: "/disclaimer",
+      label: "Read the Research Use Disclaimer",
+    },
+  },
   faq: {
     slug: "faq",
     metaTitle: "FAQ | Peptide Protocol Research Peptides Australia",
@@ -115,6 +163,12 @@ export const pages: Record<string, PageContent> = {
         question: "Do you sell single vials and kits?",
         answer:
           "Yes. In-stock peptides are offered as single vials and as 10-vial kits where listed on the product page.",
+      },
+      {
+        question: "Do you have a laboratory mixing overview?",
+        answer:
+          "Yes — a laboratory-context overview of reconstituting lyophilised research peptides with bacteriostatic or sterile water. Research handling reference only — not medical, dosing, or personal-use guidance.",
+        link: { href: "/lab-handling", label: "Watch the lab handling video" },
       },
       {
         question: "How do returns work?",

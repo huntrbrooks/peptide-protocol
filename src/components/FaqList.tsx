@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { FaqItem } from "@/content/types";
 
 export function FaqList({ items }: { items: FaqItem[] }) {
@@ -13,6 +14,18 @@ export function FaqList({ items }: { items: FaqItem[] }) {
           </summary>
           <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted">
             {item.answer}
+            {item.link ? (
+              <>
+                {" "}
+                <Link
+                  href={item.link.href}
+                  className="text-accent underline underline-offset-2"
+                >
+                  {item.link.label}
+                </Link>
+                .
+              </>
+            ) : null}
           </p>
         </details>
       ))}
