@@ -1,17 +1,18 @@
 @import "tailwindcss";
 
-/* Palette: deep pine-charcoal + porcelain + eucalyptus/sage —
-   complementary contrast against the pink Retatrutide bottle */
+/* Palette: graphite-charcoal ink + warm porcelain + raspberry accent —
+   matched to the pink Retatrutide bottle (label pink ≈ #c03060),
+   kept clinical with neutral grounds and restrained pink usage */
 :root {
-  --paper: #f7f6f2;
-  --ink: #14211b;
-  --mist: #dbe4dc;
-  --line: #c9d5ca;
-  --muted: #5b6e60;
-  --accent: #2f6b51;
-  --teal-soft: #a7cbb4;
-  --sand: #ecefe4;
-  --brass: #c4a574;
+  --paper: #faf6f4;
+  --ink: #231c20;
+  --mist: #f1e3e9;
+  --line: #decdd4;
+  --muted: #6e5e65;
+  --accent: #b02a58;
+  --teal-soft: #eaaac2;
+  --sand: #f4ede8;
+  --brass: #c39d8d;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --duration: 280ms;
 }
@@ -36,9 +37,9 @@ html {
 
 body {
   background:
-    radial-gradient(1200px 600px at 10% -10%, rgba(167, 203, 180, 0.35), transparent 55%),
-    radial-gradient(900px 500px at 100% 0%, rgba(236, 239, 228, 0.7), transparent 50%),
-    linear-gradient(180deg, #f1f2ec 0%, var(--paper) 28%, #eff1ea 100%);
+    radial-gradient(1200px 600px at 10% -10%, rgba(234, 170, 194, 0.28), transparent 55%),
+    radial-gradient(900px 500px at 100% 0%, rgba(244, 237, 232, 0.7), transparent 50%),
+    linear-gradient(180deg, #f6eef0 0%, var(--paper) 28%, #f7efec 100%);
   color: var(--ink);
   font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
 }
@@ -48,7 +49,7 @@ body {
 }
 
 ::selection {
-  background: rgba(47, 107, 81, 0.2);
+  background: rgba(176, 42, 88, 0.18);
 }
 
 /* ——— Motion primitives ——— */
@@ -283,7 +284,7 @@ button {
 .card-lift:hover {
   transform: translateY(-3px);
   border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
-  box-shadow: 0 14px 36px rgba(20, 33, 27, 0.1);
+  box-shadow: 0 14px 36px rgba(35, 28, 32, 0.1);
 }
 
 @media (prefers-reduced-motion: reduce) {
