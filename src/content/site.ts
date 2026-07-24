@@ -24,6 +24,7 @@ export const site = {
   nav: [
     { label: "Shop", href: "/shop" },
     { label: "Stack finder", href: "/stack-finder" },
+    { label: "Research calculator", href: "/dosing-calculator" },
     { label: "Quality", href: "/quality" },
     { label: "About", href: "/about" },
     { label: "FAQ", href: "/faq" },
@@ -47,6 +48,7 @@ export const site = {
       links: [
         { label: "Quality & testing", href: "/quality" },
         { label: "Lab handling", href: "/lab-handling" },
+        { label: "Research calculator", href: "/dosing-calculator" },
         { label: "Shipping", href: "/shipping" },
         { label: "Returns", href: "/returns" },
         { label: "FAQ", href: "/faq" },

@@ -10,7 +10,9 @@
     "lint": "eslint .",
     "generate:images": "node --env-file=.env.local scripts/generate-images.mjs",
     "generate:logo": "node --env-file=.env.local scripts/generate-logo.mjs",
-    "generate:product-labels": "node --env-file=.env.local scripts/generate-product-labels.mjs"
+    "generate:product-labels": "node --env-file=.env.local scripts/generate-product-labels.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "convex": "^1.42.3",
@@ -28,6 +30,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.10"
   }
 }

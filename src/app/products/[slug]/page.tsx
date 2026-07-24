@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AddToCartButton } from "@/components/AddToCartButton";
+import { DosingCalculator } from "@/components/dosing-calculator/DosingCalculator";
 import { FaqList } from "@/components/FaqList";
 import { getProductBySlug, products } from "@/content/products";
 import { site } from "@/content/site";
@@ -118,6 +119,13 @@ export default async function ProductPage({ params }: Props) {
               Laboratory mixing overview
             </Link>
           </p>
+          <div className="mt-6">
+            <DosingCalculator
+              variant="compact"
+              initialStrength={product.strength}
+              fullCalculatorHref={`/dosing-calculator?product=${encodeURIComponent(product.slug)}`}
+            />
+          </div>
         </section>
         <section>
           <h2 className="font-display text-2xl text-ink">What is included</h2>

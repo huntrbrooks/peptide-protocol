@@ -171,6 +171,12 @@ export const pages: Record<string, PageContent> = {
         link: { href: "/lab-handling", label: "Watch the lab handling video" },
       },
       {
+        question: "Is there a research calculator for lab-math?",
+        answer:
+          "Yes — an educational tool for concentration, solvent volume, and U-100 syringe-unit arithmetic from vial mass. Research lab-math reference only — not medical advice, dosing protocols, or personal-use guidance.",
+        link: { href: "/dosing-calculator", label: "Open the research calculator" },
+      },
+      {
         question: "How do returns work?",
         answer:
           "See Returns. Unopened items may qualify; contact support before sending anything back.",
