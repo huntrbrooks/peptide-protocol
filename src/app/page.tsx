@@ -20,7 +20,7 @@ export default function HomePage() {
         <div className="absolute inset-0">
           <Image
             src="/images/hero.jpg"
-            alt="Peptide Protocol research laboratory aesthetic"
+            alt="The Protocol research laboratory aesthetic"
             fill
             priority
             className="object-cover"
@@ -29,16 +29,14 @@ export default function HomePage() {
           <div className="absolute inset-0 bg-gradient-to-r from-ink/88 via-ink/70 to-ink/35" />
         </div>
         <div className="relative mx-auto flex min-h-[88vh] max-w-6xl flex-col items-center justify-center gap-10 px-4 py-16 sm:px-6 sm:py-20 lg:flex-row lg:items-center lg:justify-between lg:gap-12">
-          {/* Animated Retatrutide product render; unoptimized keeps webp animation intact */}
           <div className="order-first mx-auto w-full max-w-[429px] shrink-0 sm:max-w-[546px] lg:order-last lg:mx-0 lg:max-w-[663px]">
             <Image
-              src="/images/products/retatrutide-20mg-hero.webp"
+              src="/images/products/retatrutide-20mg.png"
               alt="Retatrutide 20 MG"
-              width={1080}
-              height={1080}
+              width={2048}
+              height={2048}
               priority
-              unoptimized
-              className="h-auto w-full bg-transparent"
+              className="h-auto w-full"
             />
           </div>
 
@@ -47,7 +45,7 @@ export default function HomePage() {
               {home.eyebrow}
             </p>
             <h1 className="animate-rise-delay mt-4 max-w-3xl font-display text-4xl leading-[1.08] tracking-tight text-paper sm:text-6xl">
-              Peptide Protocol
+              The Protocol
             </h1>
             <p className="animate-rise-delay mt-4 max-w-2xl font-display text-2xl leading-snug text-paper/90 sm:text-3xl">
               {home.headline}
