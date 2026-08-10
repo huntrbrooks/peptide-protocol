@@ -1,5 +1,5 @@
 export const site = {
-  name: "Peptide Protocol",
+  name: "The Protocol",
   domain: "peptideprotocolau.io",
   url: "https://peptideprotocolau.io",
   email: "support@peptideprotocolau.io",
@@ -41,6 +41,7 @@ export const site = {
         { label: "Tissue & recovery", href: "/shop/tissue-recovery" },
         { label: "Cellular & mitochondrial", href: "/shop/cellular-mitochondrial" },
         { label: "Other compounds", href: "/shop/other-compounds" },
+        { label: "Research solvents", href: "/shop/research-solvents" },
       ],
     },
     {
@@ -68,9 +69,9 @@ export const site = {
 };
 
 export const home = {
-  metaTitle: "Research Peptides Australia | Peptide Protocol",
+  metaTitle: "Research Peptides Australia | The Protocol",
   metaDescription:
-    "Australian supplier of research-grade peptides with batch documentation, discreet express dispatch, and clear research-only terms. Shop verified materials at Peptide Protocol.",
+    "Australian supplier of research-grade peptides with batch documentation, discreet express dispatch, and clear research-only terms. Shop verified materials at The Protocol.",
   eyebrow: "Research materials · Australia",
   headline: "Documented research peptides, dispatched locally",
   subheadline:

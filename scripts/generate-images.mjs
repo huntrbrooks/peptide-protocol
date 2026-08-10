@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Generate Peptide Protocol brand assets via OpenRouter Images API.
+ * Generate The Protocol brand assets via OpenRouter Images API.
  * Model: openai/gpt-image-2
  *
  * Usage:
@@ -189,7 +189,7 @@ async function generate(asset) {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
       "HTTP-Referer": "https://peptideprotocolau.io",
-      "X-Title": "Peptide Protocol",
+      "X-Title": "The Protocol",
     },
     body: JSON.stringify({
       model: "openai/gpt-image-2",

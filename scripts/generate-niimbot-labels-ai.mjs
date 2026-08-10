@@ -177,7 +177,7 @@ REFERENCE IMAGES:
 2) Product vial photo: MATCH the label design style and layout already printed on this vial. Reproduce that same label as a flat 2D rectangular sticker/layout, full-bleed edge to edge.
 
 LAYOUT (landscape, aspect ~5:3, white label field) — match the vial label exactly:
-• TOP: small helix mark on the LEFT + "PEPTIDE PROTOCOL" in two lines of bold teal sans-serif to the RIGHT (colour ${COLORS.accent})
+• TOP: small helix mark on the LEFT + "THE PROTOCOL" in two lines of bold teal sans-serif to the RIGHT (colour ${COLORS.accent})
 • CENTER: thick solid horizontal band in ${COLORS.accent} with bold white product name exactly: "${product.productName}"
 • BELOW band: rectangular outlined box (teal stroke) with strength exactly: "${product.strength}" — the box MUST be HORIZONTALLY CENTERED under the product name (not left-aligned)
 • Optional: faint soft teal DNA watermark on the lower white field only (subtle)
@@ -244,7 +244,7 @@ async function callGptImage2(prompt, references) {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
       "HTTP-Referer": "https://peptideprotocolau.io",
-      "X-Title": "Peptide Protocol Labels",
+      "X-Title": "The Protocol Labels",
     },
     body: JSON.stringify({
       model: "openai/gpt-image-2",
@@ -369,7 +369,7 @@ async function writeProofSheet(slugs) {
   const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg width="${sheetW}" height="${sheetH}" xmlns="http://www.w3.org/2000/svg">
   <rect width="${sheetW}" height="${sheetH}" fill="#FFFFFF"/>
-  <text x="${sheetW / 2}" y="${pad + 36}" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" fill="#000000">Peptide Protocol — Niimbot Proof (vial-matched layout, thermal B&amp;W)</text>
+  <text x="${sheetW / 2}" y="${pad + 36}" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" fill="#000000">The Protocol — Niimbot Proof (vial-matched layout, thermal B&amp;W)</text>
   <text x="${sheetW / 2}" y="${pad + 64}" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="13" fill="#000000">${SPEC.widthMm}×${SPEC.heightMm} mm @ ${SPEC.dpi} DPI (${NIIMBOT_W}×${NIIMBOT_H} px) · Generated with openai/gpt-image-2 · Color masters in color-masters/</text>
   ${annotations
     .map(
@@ -393,7 +393,7 @@ async function writeReadme(slugs) {
 
 ## Why these didn't match the product photos before
 
-The first pass was a **plain text thermal layout**. Your product photos use the full Peptide Protocol vial brand system (DNA mark, teal name band, strength box, research footer).
+The first pass was a **plain text thermal layout**. Your product photos use the full The Protocol vial brand system (DNA mark, teal name band, strength box, research footer).
 
 **Niimbot is still a valid printer for vials** — but standard Niimbot units are **direct thermal (black only)**. They cannot print teal, gradients, or soft watermarks in color. The teal bands become solid black; the logo becomes a B&W mark.
 

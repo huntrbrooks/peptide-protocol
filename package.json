@@ -8,11 +8,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "generate:images": "node --env-file=.env.local scripts/generate-images.mjs",
     "generate:logo": "node --env-file=.env.local scripts/generate-logo.mjs",
-    "generate:product-labels": "node --env-file=.env.local scripts/generate-product-labels.mjs",
-    "test": "vitest run",
-    "test:watch": "vitest"
+    "generate:product-labels": "node --env-file=.env.local scripts/generate-product-labels.mjs"
   },
   "dependencies": {
     "convex": "^1.42.3",
@@ -29,6 +29,9 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
+    "jsqr": "^1.4.0",
+    "pngjs": "^7.0.0",
+    "qrcode": "^1.5.4",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.10"

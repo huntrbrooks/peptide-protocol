@@ -19,7 +19,7 @@ const MODEL = "z-ai/glm-5.2";
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 
 const HARD_STOP_DISCLAIMER =
-  "For research and educational purposes only. Not medical advice. Not for human consumption. Peptide Protocol materials are laboratory research reagents only.";
+  "For research and educational purposes only. Not medical advice. Not for human consumption. The Protocol materials are laboratory research reagents only.";
 
 function isAnswers(value: unknown): value is Answers {
   if (!value || typeof value !== "object") return false;

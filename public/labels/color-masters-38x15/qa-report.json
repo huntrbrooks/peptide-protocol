@@ -1,0 +1,64 @@
+{
+  "physicalMm": {
+    "width": 38,
+    "height": 15
+  },
+  "colorMastersPx": {
+    "width": 3040,
+    "height": 1200
+  },
+  "pxPerMm": 80,
+  "sourceNote": "User-finished Peptide_labels assets (1024×404 JPEG) upscaled to exact 38×15 print masters",
+  "generatedAt": "2026-08-07T08:15:06.232Z",
+  "files": [
+    {
+      "slug": "tb-500-10mg",
+      "source": "Peptide_labels-01-00355ae9-f91d-4e39-b913-3f0581321ee6.png",
+      "sourceSize": "1024x404",
+      "outputSize": "3040x1200"
+    },
+    {
+      "slug": "ipamorelin-10mg",
+      "source": "Peptide_labels-02-823adf7f-a762-492a-9af7-6f93757ce64b.png",
+      "sourceSize": "1024x404",
+      "outputSize": "3040x1200"
+    },
+    {
+      "slug": "cjc-1295-no-dac-10mg",
+      "source": "Peptide_labels-03-517b5fa2-bda5-4132-a084-eb456d5bf4eb.png",
+      "sourceSize": "1024x404",
+      "outputSize": "3040x1200"
+    },
+    {
+      "slug": "retatrutide-60mg",
+      "source": "Peptide_labels-04-078f3c18-cc7a-40c5-84ce-c0bb4071624e.png",
+      "sourceSize": "1024x404",
+      "outputSize": "3040x1200"
+    },
+    {
+      "slug": "retatrutide-20mg",
+      "source": "Peptide_labels-05-a9391e17-3abc-48a1-8dc7-b92e15b5bda3.png",
+      "sourceSize": "1024x404",
+      "outputSize": "3040x1200"
+    },
+    {
+      "slug": "bpc-157-10mg",
+      "source": "Peptide_labels-06-ac445d8c-e4bc-4c80-9ced-2bbc40407dcb.png",
+      "sourceSize": "1024x404",
+      "outputSize": "3040x1200"
+    },
+    {
+      "slug": "ghk-cu-50mg",
+      "source": "Peptide_labels-07-54bd30dc-1f21-4b23-98f4-87cd72cc7950.png",
+      "sourceSize": "1024x404",
+      "outputSize": "3040x1200"
+    },
+    {
+      "slug": "pt-141-10mg",
+      "source": "Peptide_labels-08-2da90b9f-a698-4629-9ef3-5548b6182f01.png",
+      "sourceSize": "1024x404",
+      "outputSize": "3040x1200"
+    }
+  ],
+  "allPassed": true
+}

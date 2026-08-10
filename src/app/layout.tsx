@@ -22,8 +22,8 @@ const display = Fraunces({
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: "Research Peptides Australia | Peptide Protocol",
-    template: "%s | Peptide Protocol",
+    default: "Research Peptides Australia | The Protocol",
+    template: "%s | The Protocol",
   },
   description: site.tagline,
   icons: {

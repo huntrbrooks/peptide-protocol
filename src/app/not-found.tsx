@@ -6,7 +6,7 @@ export default function NotFound() {
       <p className="text-xs uppercase tracking-[0.18em] text-muted">404</p>
       <h1 className="mt-3 font-display text-4xl text-ink">Page not found</h1>
       <p className="mt-4 text-muted">
-        That URL is not in the Peptide Protocol catalogue or information pages.
+        That URL is not in the The Protocol catalogue or information pages.
       </p>
       <Link
         href="/shop"

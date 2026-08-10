@@ -10,15 +10,15 @@ export function Footer() {
           <div>
             <Link
               href="/"
-              aria-label="Peptide Protocol home"
+              aria-label="The Protocol home"
               className="inline-block transition-opacity duration-300 hover:opacity-85"
             >
               <Image
-                src="/images/logo-footer.png"
-                alt="Peptide Protocol"
-                width={120}
-                height={160}
-                className="h-20 w-auto"
+                src="/images/brand/the-protocol-logo.png"
+                alt="The Protocol"
+                width={1024}
+                height={407}
+                className="h-auto w-44 brightness-0 invert"
               />
             </Link>
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-paper/70">
@@ -67,7 +67,7 @@ export function Footer() {
             .
           </p>
           <p className="mt-4 text-xs text-paper/40">
-            © {new Date().getFullYear()} Peptide Protocol · {site.domain}
+            © {new Date().getFullYear()} The Protocol · {site.domain}
           </p>
         </div>
       </div>

@@ -2,6 +2,13 @@
 /**
  * Print-ready labels for the 8 original-stock SKUs with cap-matched accents.
  *
+ * NOTE: In-stock vial wrap color-masters under public/labels/color-masters/
+ * for these 8 SKUs are OpenArt-generated artwork (DNA watermark + textured
+ * pale bands matching product vial photos). Running this script regenerates
+ * flatter SVG-based color-masters and will overwrite those richer files.
+ * Prefer this script for niimbot-thermal / kit / circle stickers; restore
+ * color-masters from _archive-flat/ or re-run OpenArt if overwritten.
+ *
  * Outputs:
  *   public/labels/color-masters/{slug}.png          (2000×1200)
  *   public/labels/niimbot-thermal/{slug}.png         (400×240, 1-bit style)
@@ -102,6 +109,15 @@ const SKUS = [
     cap: CAP.solidRed,
     imageOut: "public/images/products/retatrutide-60mg.jpg",
   },
+  {
+    stockCode: "KLOW80",
+    slug: "glow-up-80mg",
+    productName: "GLOW UP",
+    synonym: "KLOW80 • TB 10mg + BPC-157 10mg + GHK 50mg + KPV 10mg",
+    strength: "80 MG",
+    cap: CAP.yellow,
+    imageOut: "public/images/products/glow-up-80mg.jpg",
+  },
 ];
 
 function escapeXml(s) {
@@ -163,7 +179,7 @@ function vialLabelSvg(sku, { w, h, logoUri, thermal = false }) {
 <svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
   <rect width="${w}" height="${h}" fill="${light}"/>
   <image href="${logoUri}" x="${Math.round(w * 0.04)}" y="${Math.round(h * 0.06)}" width="${logoSize}" height="${logoSize}" preserveAspectRatio="xMidYMid meet"/>
-  <text x="${Math.round(w * 0.04) + logoSize + Math.round(w * 0.02)}" y="${Math.round(h * 0.12)}" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="${Math.round(h * 0.055)}" font-weight="700" fill="${accent}" letter-spacing="1.5">PEPTIDE</text>
+  <text x="${Math.round(w * 0.04) + logoSize + Math.round(w * 0.02)}" y="${Math.round(h * 0.12)}" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="${Math.round(h * 0.055)}" font-weight="700" fill="${accent}" letter-spacing="1.5">THE</text>
   <text x="${Math.round(w * 0.04) + logoSize + Math.round(w * 0.02)}" y="${Math.round(h * 0.18)}" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="${Math.round(h * 0.055)}" font-weight="700" fill="${accent}" letter-spacing="1.5">PROTOCOL</text>
   <rect x="0" y="${bandY}" width="${w}" height="${bandH}" fill="${accent}"/>
   <text x="${w / 2}" y="${bandY + bandH * 0.65}" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="${Math.round(h * 0.1)}" font-weight="700" fill="${onAccent}">${escapeXml(sku.productName)}</text>
@@ -183,7 +199,7 @@ function kitLabelSvg(sku, { w, h, logoUri }) {
 <svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
   <rect width="${w}" height="${h}" rx="8" fill="${light}" stroke="${accent}" stroke-width="4"/>
   <image href="${logoUri}" x="${Math.round(w * 0.04)}" y="${Math.round(h * 0.08)}" width="${logoSize}" height="${logoSize}" preserveAspectRatio="xMidYMid meet"/>
-  <text x="${Math.round(w * 0.04) + logoSize + 12}" y="${Math.round(h * 0.16)}" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="${Math.round(h * 0.065)}" font-weight="700" fill="${accent}" letter-spacing="1">PEPTIDE PROTOCOL</text>
+  <text x="${Math.round(w * 0.04) + logoSize + 12}" y="${Math.round(h * 0.16)}" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="${Math.round(h * 0.065)}" font-weight="700" fill="${accent}" letter-spacing="1">THE PROTOCOL</text>
   <text x="${Math.round(w * 0.04) + logoSize + 12}" y="${Math.round(h * 0.24)}" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="${Math.round(h * 0.04)}" fill="${accent}" opacity="0.85">peptideprotocolau.io</text>
   <rect x="${Math.round(w * 0.04)}" y="${Math.round(h * 0.32)}" width="${Math.round(w * 0.92)}" height="${Math.round(h * 0.22)}" rx="4" fill="${accent}"/>
   <text x="${w / 2}" y="${Math.round(h * 0.46)}" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="${Math.round(h * 0.09)}" font-weight="700" fill="#FFFFFF">${escapeXml(sku.productName)}</text>
@@ -200,7 +216,7 @@ function circleStickerSvg({ size, logoUri }) {
 <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
   <circle cx="${r}" cy="${r}" r="${r - 2}" fill="#FFFFFF" stroke="#1A6B7A" stroke-width="${Math.max(3, Math.round(size * 0.018))}"/>
   <image href="${logoUri}" x="${(size - logo) / 2}" y="${Math.round(size * 0.14)}" width="${logo}" height="${logo}" preserveAspectRatio="xMidYMid meet"/>
-  <text x="${r}" y="${Math.round(size * 0.55)}" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="${Math.round(size * 0.075)}" font-weight="700" fill="#1A6B7A" letter-spacing="0.5">Peptide Protocol</text>
+  <text x="${r}" y="${Math.round(size * 0.55)}" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="${Math.round(size * 0.075)}" font-weight="700" fill="#1A6B7A" letter-spacing="0.5">The Protocol</text>
   <text x="${r}" y="${Math.round(size * 0.66)}" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="${Math.round(size * 0.048)}" fill="#1A6B7A">peptideprotocolau.io</text>
   <text x="${r}" y="${Math.round(size * 0.8)}" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="${Math.round(size * 0.052)}" font-weight="700" fill="#1A6B7A" letter-spacing="1">RESEARCH USE ONLY</text>
 </svg>`;

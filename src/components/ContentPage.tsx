@@ -5,7 +5,7 @@ import { FaqList } from "./FaqList";
 export function ContentPage({ page }: { page: PageContent }) {
   return (
     <article className="mx-auto max-w-3xl px-4 py-14 sm:px-6">
-      <p className="text-xs uppercase tracking-[0.18em] text-muted">Peptide Protocol</p>
+      <p className="text-xs uppercase tracking-[0.18em] text-muted">The Protocol</p>
       <h1 className="mt-3 font-display text-4xl tracking-tight text-ink sm:text-5xl">
         {page.headline}
       </h1>

@@ -1,6 +1,6 @@
-# Peptide Protocol content archive
+# The Protocol content archive
 
-Editable copy archive for the Peptide Protocol website. Canonical structured data lives in `src/content/`.
+Editable copy archive for the The Protocol website. Canonical structured data lives in `src/content/`.
 
 **Domain:** peptideprotocolau.io  
 **Handle:** @peptideprotocolau  
@@ -36,7 +36,7 @@ peptideprotocolau.io
 - `/shop/tissue-recovery` Tissue & recovery research
 - `/shop/cellular-mitochondrial` Cellular & mitochondrial research
 - `/shop/other-compounds` Other research compounds
-- `/products/[slug]` × 16 products (8 singles + 8 kits)
+- `/products/[slug]` × 18 products (10 singles + 8 kits)
 - `/stack-finder` Find your ideal peptide stack (adaptive questionnaire)
 - `/quality` Quality & Testing
 - `/about` About
@@ -54,8 +54,8 @@ peptideprotocolau.io
 
 | Content | Path |
 |---|---|
-| Products (16 active) | `src/content/products.ts` |
-| Categories (5) | `src/content/categories.ts` |
+| Products (18 active) | `src/content/products.ts` |
+| Categories (6) | `src/content/categories.ts` |
 | Info pages | `src/content/pages.ts` |
 | Home + social + nav | `src/content/site.ts` |
 | Stack finder tree (human-readable) | `content/stack-finder-tree.md` |
@@ -76,18 +76,18 @@ Edit those TypeScript modules to update live site copy. This markdown file is a 
 6. ghk-cu-50mg — GHK-Cu (50mg) — $64.95 AUD — CU50
 7. retatrutide-20mg — Retatrutide (20mg) — $199.99 AUD — RT20
 8. retatrutide-60mg — Retatrutide (60mg) — $479.95 AUD — RT60
+9. glow-up-80mg — Glow Up / KLOW80 (80mg) — $239.95 AUD — KLOW80
+10. bacteriostatic-water-10ml — BAC Water (10mL) — $19.99 AUD — BAC10
 
 ### 10-vial kits
-9. bpc-157-10mg-kit-10 — $594.95 AUD
-10. ipamorelin-10mg-kit-10 — $509.95 AUD
-11. cjc-1295-no-dac-10mg-kit-10 — $849.95 AUD
-12. tb-500-10mg-kit-10 — $1010.95 AUD
-13. pt-141-10mg-kit-10 — $764.95 AUD
-14. ghk-cu-50mg-kit-10 — $551.95 AUD
-15. retatrutide-20mg-kit-10 — $1699.95 AUD
-16. retatrutide-60mg-kit-10 — $4079.95 AUD
-
-BAC Water and other former SKUs are hidden from the active catalogue (image assets retained).
+11. bpc-157-10mg-kit-10 — $594.95 AUD
+12. ipamorelin-10mg-kit-10 — $509.95 AUD
+13. cjc-1295-no-dac-10mg-kit-10 — $849.95 AUD
+14. tb-500-10mg-kit-10 — $1010.95 AUD
+15. pt-141-10mg-kit-10 — $764.95 AUD
+16. ghk-cu-50mg-kit-10 — $551.95 AUD
+17. retatrutide-20mg-kit-10 — $1699.95 AUD
+18. retatrutide-60mg-kit-10 — $4079.95 AUD
 
 ---
 

@@ -31,11 +31,12 @@ export default function HomePage() {
         <div className="relative mx-auto flex min-h-[88vh] max-w-6xl flex-col items-center justify-center gap-10 px-4 py-16 sm:px-6 sm:py-20 lg:flex-row lg:items-center lg:justify-between lg:gap-12">
           <div className="order-first mx-auto w-full max-w-[429px] shrink-0 sm:max-w-[546px] lg:order-last lg:mx-0 lg:max-w-[663px]">
             <Image
-              src="/images/products/retatrutide-20mg.png"
+              src="/images/products/retatrutide-20mg-hero.webp"
               alt="Retatrutide 20 MG"
               width={2048}
               height={2048}
               priority
+              unoptimized
               className="h-auto w-full"
             />
           </div>

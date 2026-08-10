@@ -1,0 +1,35 @@
+{
+  "generatedAt": "2026-08-10",
+  "model": "gpt-image-2",
+  "mode": "image2image",
+  "requestedSettings": {
+    "resolutionTier": "4k",
+    "quality": "high",
+    "aspectRatio": "1:1",
+    "outputFormat": "png"
+  },
+  "deliveredPixels": "2048x2048",
+  "referenceSource": "Finished THE / PROTOCOL label masters under public/labels/color-masters/",
+  "products": {
+    "bpc-157": "kxkGRgzgSPbrBnwETLn8",
+    "cjc-1295-no-dac": "KqKXLMF7ye0iaTlKRsON",
+    "retatrutide-60mg": "MDrl2ozPtwlBvm6YQE9o",
+    "ghk-cu-50mg": "7vRTGn234SUeZxWbzOse",
+    "pt-141": "VUKDc6fvnW9HtNvfQ2op",
+    "retatrutide-20mg": "FFSwBnjOBrIkzxIsWA7P",
+    "tb-500": "4vMslAMmDvF7CeqTXeQN",
+    "ipamorelin": "sidMWYBRUjKdjJWSwmyf",
+    "glow-up-80mg": "kpRTdkpiBRIbf3IzoLfJ",
+    "bacteriostatic-water": "noW3uHgJUx4Xx9gWK7Dy"
+  },
+  "kits": {
+    "bpc-157-kit": "UhQJ6delNXpcK9pZzkfu",
+    "cjc-1295-no-dac-kit": "f7P6FXY6sJfSR8tmye5k",
+    "ipamorelin-kit": "wl4vqqfoh6lCwaHoR9Cd",
+    "tb-500-kit": "UYNMApF4i9akxavecdru",
+    "pt-141-kit": "5ugkwupVzbDoCW6iP3u6",
+    "ghk-cu-50mg-kit": "348kqBeMa6BcHXWu0qKC",
+    "retatrutide-20mg-kit": "Lv57y1tMfoSUsgO1TiyJ",
+    "retatrutide-60mg-kit": "S5ObKc3zJoW5cNoLf29Z"
+  }
+}

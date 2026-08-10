@@ -3,10 +3,10 @@ import type { PageContent } from "./types";
 export const pages: Record<string, PageContent> = {
   about: {
     slug: "about",
-    metaTitle: "About Peptide Protocol | Research Peptides Australia",
+    metaTitle: "About The Protocol | Research Peptides Australia",
     metaDescription:
-      "Learn how Peptide Protocol supplies research-grade peptides to Australian laboratories with batch documentation and clear research-only terms.",
-    headline: "About Peptide Protocol",
+      "Learn how The Protocol supplies research-grade peptides to Australian laboratories with batch documentation and clear research-only terms.",
+    headline: "About The Protocol",
     body: [
       "Australian supplier of lyophilised research peptides for laboratory use. Built around documentation, transit integrity, and plain research-only terms.",
     ],
@@ -38,9 +38,9 @@ export const pages: Record<string, PageContent> = {
   },
   quality: {
     slug: "quality",
-    metaTitle: "Quality & Testing | Peptide Protocol Australia",
+    metaTitle: "Quality & Testing | The Protocol Australia",
     metaDescription:
-      "How Peptide Protocol verifies research peptide purity, provides Certificates of Analysis, and documents third-party testing for Australian laboratories.",
+      "How The Protocol verifies research peptide purity, provides Certificates of Analysis, and documents third-party testing for Australian laboratories.",
     headline: "Quality and testing",
     body: [
       "Identity and purity must be documentable. COAs are part of the product, not an afterthought.",
@@ -85,7 +85,7 @@ export const pages: Record<string, PageContent> = {
     headline: "Lab handling",
     body: [
       "This page is a laboratory-context overview of how lyophilised research peptides are reconstituted with bacteriostatic or sterile water under trained procedures. It is provided for research handling reference only.",
-      "It is not medical advice, dosing information, or personal-use guidance. All materials supplied by Peptide Protocol are for laboratory and in vitro research only — not for human or veterinary use.",
+      "It is not medical advice, dosing information, or personal-use guidance. All materials supplied by The Protocol are for laboratory and in vitro research only — not for human or veterinary use.",
     ],
     video: {
       src: "/videos/mixing-bac-water-peptides.mp4",
@@ -127,9 +127,9 @@ export const pages: Record<string, PageContent> = {
   },
   faq: {
     slug: "faq",
-    metaTitle: "FAQ | Peptide Protocol Research Peptides Australia",
+    metaTitle: "FAQ | The Protocol Research Peptides Australia",
     metaDescription:
-      "Answers on research-only terms, shipping, COAs, packaging, and ordering research peptides from Peptide Protocol in Australia.",
+      "Answers on research-only terms, shipping, COAs, packaging, and ordering research peptides from The Protocol in Australia.",
     headline: "Frequently asked questions",
     body: [
       "Common questions from research buyers. For batch docs, contact support with product or order details.",
@@ -190,9 +190,9 @@ export const pages: Record<string, PageContent> = {
   },
   shipping: {
     slug: "shipping",
-    metaTitle: "Shipping Information Australia | Peptide Protocol",
+    metaTitle: "Shipping Information Australia | The Protocol",
     metaDescription:
-      "Australia Post express shipping, dispatch cut-offs, tracking, and discreet packaging for Peptide Protocol research materials.",
+      "Australia Post express shipping, dispatch cut-offs, tracking, and discreet packaging for The Protocol research materials.",
     headline: "Shipping",
     body: [
       "Local packing; tracked Australia Post express where available.",
@@ -226,9 +226,9 @@ export const pages: Record<string, PageContent> = {
   },
   returns: {
     slug: "returns",
-    metaTitle: "Returns Policy | Peptide Protocol Australia",
+    metaTitle: "Returns Policy | The Protocol Australia",
     metaDescription:
-      "Returns and refunds policy for Peptide Protocol research materials in Australia. Contact support before returning any item.",
+      "Returns and refunds policy for The Protocol research materials in Australia. Contact support before returning any item.",
     headline: "Returns",
     body: [
       "Returns are limited. Arrange via support so batch integrity can be assessed.",
@@ -261,12 +261,12 @@ export const pages: Record<string, PageContent> = {
     ],
   },  terms: {
     slug: "terms",
-    metaTitle: "Terms of Sale | Peptide Protocol Australia",
+    metaTitle: "Terms of Sale | The Protocol Australia",
     metaDescription:
-      "Terms of sale for Peptide Protocol research materials, including research-use acknowledgement, pricing, and Australian supply conditions.",
+      "Terms of sale for The Protocol research materials, including research-use acknowledgement, pricing, and Australian supply conditions.",
     headline: "Terms of sale",
     body: [
-      "These terms govern purchases from Peptide Protocol. By placing an order you confirm you have read the Research Use Disclaimer and accept these terms.",
+      "These terms govern purchases from The Protocol. By placing an order you confirm you have read the Research Use Disclaimer and accept these terms.",
     ],
     sections: [
       {
@@ -296,7 +296,7 @@ export const pages: Record<string, PageContent> = {
       {
         title: "Limitation of liability",
         body: [
-          "To the maximum extent permitted by Australian Consumer Law and other applicable law, Peptide Protocol is not liable for misuse of research materials, protocol outcomes, or consequential loss arising from research use. Nothing on this site constitutes advice for personal or clinical use.",
+          "To the maximum extent permitted by Australian Consumer Law and other applicable law, The Protocol is not liable for misuse of research materials, protocol outcomes, or consequential loss arising from research use. Nothing on this site constitutes advice for personal or clinical use.",
         ],
       },
       {
@@ -309,12 +309,12 @@ export const pages: Record<string, PageContent> = {
   },
   privacy: {
     slug: "privacy",
-    metaTitle: "Privacy Policy | Peptide Protocol Australia",
+    metaTitle: "Privacy Policy | The Protocol Australia",
     metaDescription:
-      "How Peptide Protocol collects, uses, and protects personal information for Australian customers under the Privacy Act 1988.",
+      "How The Protocol collects, uses, and protects personal information for Australian customers under the Privacy Act 1988.",
     headline: "Privacy policy",
     body: [
-      "Peptide Protocol respects your privacy. This policy explains how we handle personal information when you browse the site, contact support, or place an order.",
+      "The Protocol respects your privacy. This policy explains how we handle personal information when you browse the site, contact support, or place an order.",
     ],
     sections: [
       {
@@ -357,12 +357,12 @@ export const pages: Record<string, PageContent> = {
   },
   disclaimer: {
     slug: "disclaimer",
-    metaTitle: "Research Use Disclaimer | Peptide Protocol Australia",
+    metaTitle: "Research Use Disclaimer | The Protocol Australia",
     metaDescription:
-      "Peptide Protocol research use disclaimer: laboratory and in vitro use only. Not for human consumption. Not a medicine, supplement, or cosmetic.",
+      "The Protocol research use disclaimer: laboratory and in vitro use only. Not for human consumption. Not a medicine, supplement, or cosmetic.",
     headline: "Research use disclaimer",
     body: [
-      "Read this disclaimer before browsing the catalogue or placing an order. It applies to every product sold by Peptide Protocol.",
+      "Read this disclaimer before browsing the catalogue or placing an order. It applies to every product sold by The Protocol.",
     ],
     sections: [
       {
@@ -399,9 +399,9 @@ export const pages: Record<string, PageContent> = {
   },
   contact: {
     slug: "contact",
-    metaTitle: "Contact Peptide Protocol | Research Support Australia",
+    metaTitle: "Contact The Protocol | Research Support Australia",
     metaDescription:
-      "Contact Peptide Protocol for COA requests, shipping questions, and research catalogue enquiries in Australia.",
+      "Contact The Protocol for COA requests, shipping questions, and research catalogue enquiries in Australia.",
     headline: "Contact",
     body: [
       "COA, shipping, or catalogue questions — include order number or product name.",
@@ -433,9 +433,9 @@ export const pages: Record<string, PageContent> = {
   },
   shop: {
     slug: "shop",
-    metaTitle: "Shop Research Peptides Australia | Peptide Protocol",
+    metaTitle: "Shop Research Peptides Australia | The Protocol",
     metaDescription:
-      "Browse the full Peptide Protocol catalogue of research-grade peptides in Australia. Single vials and 10-vial kits. Documented purity. Research use only.",
+      "Browse the full The Protocol catalogue of research-grade peptides in Australia. Single vials and 10-vial kits. Documented purity. Research use only.",
     headline: "Research catalogue",
     body: [
       "Laboratory and in vitro research only. Check specs, storage notes, and the research use disclaimer before ordering.",

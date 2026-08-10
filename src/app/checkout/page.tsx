@@ -5,7 +5,7 @@ import { CheckoutForm } from "./CheckoutForm";
 export const metadata: Metadata = {
   title: "Checkout",
   description:
-    "Staged MoonPay checkout for Peptide Protocol research materials. Research use only.",
+    "Staged MoonPay checkout for The Protocol research materials. Research use only.",
   robots: { index: false, follow: false },
 };
 
@@ -13,7 +13,7 @@ export default function CheckoutPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-14 sm:px-6">
       <p className="text-xs uppercase tracking-[0.18em] text-muted">
-        Peptide Protocol
+        The Protocol
       </p>
       <h1 className="mt-3 font-display text-4xl tracking-tight text-ink sm:text-5xl">
         Checkout

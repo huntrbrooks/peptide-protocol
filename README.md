@@ -1,4 +1,4 @@
-# Peptide Protocol
+# The Protocol
 
 Australian research peptide catalogue site for **peptideprotocolau.io**.
 

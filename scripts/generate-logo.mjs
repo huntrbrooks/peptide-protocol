@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Generate Peptide Protocol vertical helix logo + transparent favicon mark.
+ * Generate The Protocol vertical helix logo + transparent favicon mark.
  * Model: openai/gpt-image-2 via OpenRouter Images API.
  *
  * Usage:
@@ -58,7 +58,7 @@ const assets = [
   {
     id: "logo",
     out: "public/images/logo.png",
-    prompt: `Redesign this logo lockup for brand "Peptide Protocol" (NOT "Peptide Solutions"). Keep the SAME vertical composition and premium scientific feel as the reference: DNA double-helix ribbon icon inside a thin circular ring at top, bold all-caps primary wordmark below, smaller wider-tracked secondary line beneath.
+    prompt: `Redesign this logo lockup for brand "The Protocol" (NOT "Peptide Solutions"). Keep the SAME vertical composition and premium scientific feel as the reference: DNA double-helix ribbon icon inside a thin circular ring at top, bold all-caps primary wordmark below, smaller wider-tracked secondary line beneath.
 
 CRITICAL TEXT (exact spelling, all caps):
 - Primary line: PEPTIDE
@@ -147,7 +147,7 @@ async function generate(asset, referenceDataUrl) {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
       "HTTP-Referer": "https://peptideprotocolau.io",
-      "X-Title": "Peptide Protocol",
+      "X-Title": "The Protocol",
     },
     body: JSON.stringify(body),
   });

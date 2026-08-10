@@ -1,0 +1,43 @@
+{
+  "physicalMm": {
+    "width": 38,
+    "height": 15
+  },
+  "colorMastersPx": {
+    "width": 3040,
+    "height": 1200
+  },
+  "pipeline": "Deterministic Pillow compositor (scripts/fix-label-logo-footer.py) — THE/PROTOCOL text logo with headroom, optically centered name/footer bars, DNA watermark; web 2000×1200; print 3040×1200",
+  "brand": "THE PROTOCOL",
+  "brandStyle": "centered text logo: THE + rule above condensed PROTOCOL",
+  "generatedAt": "2026-08-10T02:35:00.000Z",
+  "fix": "logo-crop-fix + footer optical center vs ideal TB-500 screenshot",
+  "jobs": {
+    "bpc-157-10mg": "dDNUatyJksDi9Tgy1qeK",
+    "cjc-1295-no-dac-10mg": "VUT1rVvZXvIi4g6XaOOF",
+    "retatrutide-60mg": "Qcz4UDkp0yXcS5bMEWwk",
+    "ghk-cu-50mg": "HV1INIvRsKChQ143o8uD",
+    "pt-141-10mg": "GjNpPWok1umaNTJrVc0x",
+    "retatrutide-20mg": "AyJ1Bh1SGuipiW6rU9WE",
+    "tb-500-10mg": "7ntiiqGusynOlg6fx2hz",
+    "ipamorelin-10mg": "pAqXkOxPgDxxABuP51ks",
+    "glow-up-80mg": "CMs9yVaawl6SrdjozMGu"
+  },
+  "bacWaterJob": {
+    "slug": "bacteriostatic-water-10ml",
+    "historyId": "GTwA8SCD3Zy7m8s2XXqU",
+    "output": "color-masters/bacteriostatic-water-10ml.png",
+    "size": "2000x1200"
+  },
+  "files": [
+    { "slug": "bpc-157-10mg", "rawSize": "3808x1632", "outputSize": "3040x1200", "pale": "#d6e7f2" },
+    { "slug": "cjc-1295-no-dac-10mg", "rawSize": "3808x1632", "outputSize": "3040x1200", "pale": "#f4eacd" },
+    { "slug": "retatrutide-60mg", "rawSize": "3808x1632", "outputSize": "3040x1200", "pale": "#f5d3d9" },
+    { "slug": "ghk-cu-50mg", "rawSize": "3808x1632", "outputSize": "3040x1200", "pale": "#d1e5f1" },
+    { "slug": "pt-141-10mg", "rawSize": "3808x1632", "outputSize": "3040x1200", "pale": "#f4d8dd" },
+    { "slug": "retatrutide-20mg", "rawSize": "3808x1632", "outputSize": "3040x1200", "pale": "#f2dbe2" },
+    { "slug": "tb-500-10mg", "rawSize": "3808x1632", "outputSize": "3040x1200", "pale": "#efced2" },
+    { "slug": "ipamorelin-10mg", "rawSize": "3808x1632", "outputSize": "3040x1200", "pale": "#f5d3d8" },
+    { "slug": "glow-up-80mg", "rawSize": "3808x1632", "outputSize": "3040x1200", "pale": "#f2ebd7" }
+  ]
+}

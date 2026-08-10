@@ -223,7 +223,7 @@ function buildLabelSvg(product) {
   <rect width="${W}" height="${H}" fill="#FFFFFF"/>
   <!-- outer frame: 2px min stroke for thermal -->
   <rect x="2" y="2" width="${W - 4}" height="${H - 4}" fill="none" stroke="#000000" stroke-width="2"/>
-  <text x="${cx}" y="${brandY}" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="700" fill="#000000" letter-spacing="1.2">PEPTIDE PROTOCOL</text>
+  <text x="${cx}" y="${brandY}" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="700" fill="#000000" letter-spacing="1.2">THE PROTOCOL</text>
   <text x="${cx}" y="${nameY}" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="${nameSize}" font-weight="700" fill="#000000">${escapeXml(product.shortName.toUpperCase())}</text>
   <rect x="${innerX + 8}" y="${ruleY}" width="${innerW - 16}" height="3" fill="#000000"/>
   <text x="${cx}" y="${strengthY}" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="700" fill="#000000">${escapeXml(strengthLine)}</text>
@@ -346,7 +346,7 @@ async function writeProofSheet(written) {
   const svgOverlay = `<?xml version="1.0" encoding="UTF-8"?>
 <svg width="${sheetW}" height="${sheetH}" xmlns="http://www.w3.org/2000/svg">
   <rect width="${sheetW}" height="${sheetH}" fill="#FFFFFF"/>
-  <text x="${sheetW / 2}" y="${pad + mmToPx(6)}" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" fill="#000000">Peptide Protocol — Niimbot Label Proof (${SPEC.widthMm}×${SPEC.heightMm} mm @ ${SPEC.dpi} DPI)</text>
+  <text x="${sheetW / 2}" y="${pad + mmToPx(6)}" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" fill="#000000">The Protocol — Niimbot Label Proof (${SPEC.widthMm}×${SPEC.heightMm} mm @ ${SPEC.dpi} DPI)</text>
   <text x="${sheetW / 2}" y="${pad + mmToPx(11)}" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="12" fill="#000000">True scale at ${SPEC.dpi} DPI · ${written.length} labels · Assumption: ${escapeXml(SPEC.modelAssumption)}</text>
   ${annotations
     .map(

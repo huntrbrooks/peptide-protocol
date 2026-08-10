@@ -4,9 +4,9 @@ import { StackFinderQuiz } from "@/components/stack-finder/StackFinderQuiz";
 import { site } from "@/content/site";
 
 export const metadata: Metadata = {
-  title: { absolute: "Find Your Ideal Peptide Stack | Peptide Protocol" },
+  title: { absolute: "Find Your Ideal Peptide Stack | The Protocol" },
   description:
-    "Adaptive research questionnaire that suggests an educational peptide stack from the Peptide Protocol catalogue. Research and educational use only — not medical advice.",
+    "Adaptive research questionnaire that suggests an educational peptide stack from the The Protocol catalogue. Research and educational use only — not medical advice.",
 };
 
 export default function StackFinderPage() {

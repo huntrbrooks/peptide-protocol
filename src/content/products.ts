@@ -55,7 +55,7 @@ function kitFromSingle(
     name: `${single.shortName} (${strengthLabel}) — 10 Vial Kit`,
     priceAud: opts.priceAud,
     shortLabel: `10 × ${strengthLabel} vials | Research grade | Lyophilised powder`,
-    metaTitle: `${single.shortName} ${strengthLabel} 10-Vial Kit Australia | Peptide Protocol`,
+    metaTitle: `${single.shortName} ${strengthLabel} 10-Vial Kit Australia | The Protocol`,
     metaDescription: `Buy ${single.shortName} ${strengthLabel} 10-vial research kit in Australia. Ten lyophilised vials, specs, COA access. Research use only.`,
     headline: `${single.shortName} 10-vial kit for laboratory inventory`,
     body: [
@@ -85,6 +85,117 @@ function kitFromSingle(
 
 const singles: Product[] = [
   {
+    slug: "bacteriostatic-water-10ml",
+    name: "BAC Water (10mL)",
+    shortName: "BAC Water",
+    strength: "10mL",
+    priceAud: 19.99,
+    stockCode: "BAC10",
+    categorySlugs: ["research-solvents"],
+    shortLabel: "Sterile research solvent | 0.9% benzyl alcohol | 10mL vial",
+    metaTitle: "BAC Water 10mL Australia | The Protocol",
+    metaDescription:
+      "Buy BAC Water (bacteriostatic water) 10mL for research reconstitution in Australia. Sterile water with 0.9% benzyl alcohol. Research use only.",
+    headline: "BAC Water for laboratory reconstitution protocols",
+    body: [
+      "BAC Water (bacteriostatic water) is sterile water containing 0.9% benzyl alcohol as a bacteriostatic preservative. The Protocol supplies 10mL vials for reconstitution of lyophilised research materials under trained laboratory procedures.",
+      "Use only within controlled research settings and according to your organisation’s solvent handling SOPs. This product is a research reagent, not a consumer or clinical preparation.",
+    ],
+    researchNotice: RESEARCH_NOTICE,
+    whatItsFor: {
+      intro:
+        "BAC Water is a preserved sterile diluent used in controlled laboratory workflows for:",
+      uses: [
+        "Reconstituting lyophilised research peptides and other powdered reagents into solution",
+        "Diluting concentrated research compounds for assay preparation and protocol work",
+        "Multi-draw vial workflows where a bacteriostatic preservative helps limit microbial growth after first puncture",
+        "Standard solvent controls in reconstitution SOPs",
+        "Inventory pairing with lyophilised catalogue materials requiring aqueous reconstitution",
+      ],
+    },
+    specs: [
+      { label: "Stock code", value: "BAC10" },
+      { label: "Composition", value: "Sterile water with 0.9% benzyl alcohol" },
+      { label: "Vial size", value: "10mL" },
+      { label: "Form", value: "Clear, colourless liquid" },
+      { label: "Intended use", value: "Research reconstitution solvent" },
+      { label: "Net content", value: "10mL" },
+    ],
+    storage: [
+      "Store sealed at controlled room temperature unless batch documentation states otherwise.",
+      "Protect from light and contamination after opening, per laboratory SOP.",
+      "Do not use if the solution is cloudy, discoloured, or the seal is compromised.",
+      "Dispose of according to your organisation’s chemical waste procedures.",
+    ],
+    included: [
+      "1 × BAC Water, 10mL sterile vial",
+      "Protective inner packing",
+      "Australia Post tracking after dispatch",
+    ],
+    qualitySignals: [
+      "Sterile presentation for research reconstitution workflows",
+      "Clear product labelling for inventory control",
+      "Tamper checks before dispatch",
+    ],
+    faqs: commonFaqs("BAC Water"),
+    disclaimer: PRODUCT_DISCLAIMER,
+    image: "/images/products/bacteriostatic-water.png",
+    promoLabel: "Often included free with qualifying catalogue orders",
+    featured: true,
+  },
+  {
+    slug: "glow-up-80mg",
+    name: "Glow Up — KLOW80 (80mg)",
+    shortName: "Glow Up",
+    strength: "80mg",
+    priceAud: 239.95,
+    stockCode: "KLOW80",
+    categorySlugs: ["tissue-recovery", "cellular-mitochondrial"],
+    shortLabel: "KLOW80 four-peptide research blend | 3mL vial | Lyophilised powder",
+    metaTitle: "Glow Up KLOW80 80mg Research Blend Australia | The Protocol",
+    metaDescription:
+      "Glow Up KLOW80 80mg research blend: GHK-Cu 50mg, BPC-157 10mg, TB-500 10mg, and KPV 10mg. Research use only.",
+    headline: "Glow Up KLOW80 for multi-pathway laboratory research",
+    body: [
+      "Glow Up (KLOW80) combines GHK-Cu 50mg, BPC-157 10mg, TB-500 10mg, and KPV 10mg in one 80mg lyophilised research blend. The formulation is supplied in a 3mL vial for controlled laboratory investigation.",
+      "The four components are commonly investigated across copper-peptide biology, cellular signalling, extracellular-matrix, connective-tissue, immune-signalling, and inflammatory-pathway research. Confirm component identity and lot-specific results on the batch Certificate of Analysis.",
+    ],
+    researchNotice: RESEARCH_NOTICE,
+    whatItsFor: {
+      intro:
+        "KLOW80 combines four research materials for controlled investigation of complementary pathways, including:",
+      uses: [
+        "Multi-peptide interaction and cellular-signalling studies",
+        "Copper-peptide biology and extracellular-matrix research",
+        "Connective-tissue physiology and regenerative-biology models",
+        "Immune-signalling and inflammatory-pathway investigation",
+        "Cell-migration, angiogenesis, and tissue-remodelling research",
+      ],
+    },
+    specs: [
+      { label: "Stock code", value: "KLOW80" },
+      { label: "Cap colour", value: "Yellow" },
+      { label: "Vial size", value: "3mL" },
+      { label: "Blend", value: "GHK-Cu 50mg + BPC-157 10mg + TB-500 10mg + KPV 10mg" },
+      { label: "Total content", value: "80mg per vial" },
+      { label: "Form", value: "Lyophilised powder; GHK-Cu may impart a blue tint" },
+      { label: "Purity", value: "≥99.0% target per component (COA validated where listed)" },
+      { label: "Quality checks", value: "Identity and RP-HPLC assessment as listed on batch COA" },
+    ],
+    storage: sharedStorage,
+    included: [
+      "1 × Glow Up KLOW80, 80mg lyophilised blend vial",
+      "Protective inner packing",
+      "Access to batch-specific COA where available",
+      "Australia Post tracking after dispatch",
+    ],
+    qualitySignals: sharedQualitySignals,
+    faqs: commonFaqs("Glow Up KLOW80"),
+    disclaimer: PRODUCT_DISCLAIMER,
+    image: "/images/products/glow-up-80mg.png",
+    featured: true,
+  },
+  {
     slug: "bpc-157-10mg",
     name: "BPC-157 (10mg)",
     shortName: "BPC-157",
@@ -93,12 +204,12 @@ const singles: Product[] = [
     stockCode: "BC10",
     categorySlugs: ["tissue-recovery"],
     shortLabel: "Pentadecapeptide | Research grade | Lyophilised powder",
-    metaTitle: "BPC-157 10mg Research Peptide Australia | Peptide Protocol",
+    metaTitle: "BPC-157 10mg Research Peptide Australia | The Protocol",
     metaDescription:
       "Buy BPC-157 10mg lyophilised research peptide in Australia. Specs, storage notes, and COA access. Research use only.",
     headline: "BPC-157 for controlled tissue and recovery research models",
     body: [
-      "BPC-157 is a synthetic 15-amino-acid peptide sequence derived from a portion of body protection compound research literature. Peptide Protocol supplies this material as a lyophilised powder for in vitro and other controlled laboratory applications.",
+      "BPC-157 is a synthetic 15-amino-acid peptide sequence derived from a portion of body protection compound research literature. The Protocol supplies this material as a lyophilised powder for in vitro and other controlled laboratory applications.",
       "Each batch is prepared for research inventory use, with purity assessed by RP-HPLC and a Certificate of Analysis available for verified lots.",
     ],
     researchNotice: RESEARCH_NOTICE,
@@ -139,7 +250,7 @@ const singles: Product[] = [
     qualitySignals: sharedQualitySignals,
     faqs: commonFaqs("BPC-157"),
     disclaimer: PRODUCT_DISCLAIMER,
-    image: "/images/products/bpc-157.jpg",
+    image: "/images/products/bpc-157.png",
     featured: true,
   },
   {
@@ -151,12 +262,12 @@ const singles: Product[] = [
     stockCode: "IP10",
     categorySlugs: ["growth-hormone"],
     shortLabel: "Ghrelin mimetic pentapeptide | Research grade | Lyophilised powder",
-    metaTitle: "Ipamorelin 10mg Research Peptide Australia | Peptide Protocol",
+    metaTitle: "Ipamorelin 10mg Research Peptide Australia | The Protocol",
     metaDescription:
       "Buy Ipamorelin 10mg lyophilised research peptide in Australia. Specs, storage notes, and COA access. Research use only.",
     headline: "Ipamorelin for growth hormone secretagogue research",
     body: [
-      "Ipamorelin is a synthetic pentapeptide studied as a selective growth hormone secretagogue in laboratory literature. Peptide Protocol supplies Ipamorelin as a lyophilised powder for in vitro and other controlled research applications.",
+      "Ipamorelin is a synthetic pentapeptide studied as a selective growth hormone secretagogue in laboratory literature. The Protocol supplies Ipamorelin as a lyophilised powder for in vitro and other controlled research applications.",
       "Each verified lot includes access to purity documentation so research teams can maintain complete inventory records.",
     ],
     researchNotice: RESEARCH_NOTICE,
@@ -197,7 +308,7 @@ const singles: Product[] = [
     qualitySignals: sharedQualitySignals,
     faqs: commonFaqs("Ipamorelin"),
     disclaimer: PRODUCT_DISCLAIMER,
-    image: "/images/products/ipamorelin.jpg",
+    image: "/images/products/ipamorelin.png",
     featured: true,
   },
   {
@@ -209,12 +320,12 @@ const singles: Product[] = [
     stockCode: "CP10",
     categorySlugs: ["growth-hormone"],
     shortLabel: "Modified GRF (1-29) | Research grade | Lyophilised powder",
-    metaTitle: "CJC-1295 No DAC 10mg Research Peptide Australia | Peptide Protocol",
+    metaTitle: "CJC-1295 No DAC 10mg Research Peptide Australia | The Protocol",
     metaDescription:
       "Buy CJC-1295 without DAC (Mod GRF 1-29) 10mg lyophilised research peptide in Australia. Specs, storage notes, and COA access. Research use only.",
     headline: "CJC-1295 without DAC for controlled laboratory research",
     body: [
-      "CJC-1295 without DAC, also called Modified GRF (1-29), is a synthetic 29-amino-acid analogue of growth hormone-releasing hormone (GHRH). Peptide Protocol supplies this material as a lyophilised powder for in vitro and other controlled research applications.",
+      "CJC-1295 without DAC, also called Modified GRF (1-29), is a synthetic 29-amino-acid analogue of growth hormone-releasing hormone (GHRH). The Protocol supplies this material as a lyophilised powder for in vitro and other controlled research applications.",
       "Each batch is prepared for research inventory use, with purity assessed by RP-HPLC and a Certificate of Analysis available for verified lots.",
     ],
     researchNotice: RESEARCH_NOTICE,
@@ -257,7 +368,7 @@ const singles: Product[] = [
     qualitySignals: sharedQualitySignals,
     faqs: commonFaqs("CJC-1295 without DAC"),
     disclaimer: PRODUCT_DISCLAIMER,
-    image: "/images/products/cjc-1295-no-dac.jpg",
+    image: "/images/products/cjc-1295-no-dac.png",
     featured: true,
   },
   {
@@ -269,12 +380,12 @@ const singles: Product[] = [
     stockCode: "BT10",
     categorySlugs: ["tissue-recovery"],
     shortLabel: "Thymosin Beta-4 fragment research material | Lyophilised powder",
-    metaTitle: "TB-500 10mg Research Peptide Australia | Peptide Protocol",
+    metaTitle: "TB-500 10mg Research Peptide Australia | The Protocol",
     metaDescription:
       "Buy TB-500 10mg lyophilised research peptide in Australia. Specs, storage notes, and COA access. Research use only.",
     headline: "TB-500 for tissue and cytoskeletal research models",
     body: [
-      "TB-500 refers to research material related to the active region of thymosin beta-4, studied in cytoskeletal organisation and tissue-model laboratory work. Peptide Protocol supplies TB-500 as a lyophilised powder for controlled research use.",
+      "TB-500 refers to research material related to the active region of thymosin beta-4, studied in cytoskeletal organisation and tissue-model laboratory work. The Protocol supplies TB-500 as a lyophilised powder for controlled research use.",
       "Confirm exact sequence and molecular details on your batch Certificate of Analysis before incorporating the material into protocols.",
     ],
     researchNotice: RESEARCH_NOTICE,
@@ -313,7 +424,7 @@ const singles: Product[] = [
     qualitySignals: sharedQualitySignals,
     faqs: commonFaqs("TB-500"),
     disclaimer: PRODUCT_DISCLAIMER,
-    image: "/images/products/tb-500.jpg",
+    image: "/images/products/tb-500.png",
     featured: true,
   },
   {
@@ -325,12 +436,12 @@ const singles: Product[] = [
     stockCode: "P41",
     categorySlugs: ["other-compounds"],
     shortLabel: "Bremelanotide / melanocortin agonist | Research grade | Lyophilised powder",
-    metaTitle: "PT-141 10mg Research Peptide Australia | Peptide Protocol",
+    metaTitle: "PT-141 10mg Research Peptide Australia | The Protocol",
     metaDescription:
       "Buy PT-141 (bremelanotide) 10mg lyophilised research peptide in Australia. Specs, storage notes, and COA access. Research use only.",
     headline: "PT-141 for melanocortin pathway research",
     body: [
-      "PT-141 (bremelanotide) is a synthetic cyclic heptapeptide melanocortin receptor agonist studied in sexual-function and related CNS pathway literature. Peptide Protocol supplies PT-141 as a lyophilised powder for controlled laboratory research.",
+      "PT-141 (bremelanotide) is a synthetic cyclic heptapeptide melanocortin receptor agonist studied in sexual-function and related CNS pathway literature. The Protocol supplies PT-141 as a lyophilised powder for controlled laboratory research.",
       "This catalogue listing is for research inventory only. It is not offered as a medicine, consumer, or cosmetic product.",
     ],
     researchNotice: RESEARCH_NOTICE,
@@ -368,7 +479,7 @@ const singles: Product[] = [
     qualitySignals: sharedQualitySignals,
     faqs: commonFaqs("PT-141"),
     disclaimer: PRODUCT_DISCLAIMER,
-    image: "/images/products/pt-141.jpg",
+    image: "/images/products/pt-141.png",
   },
   {
     slug: "ghk-cu-50mg",
@@ -379,12 +490,12 @@ const singles: Product[] = [
     stockCode: "CU50",
     categorySlugs: ["cellular-mitochondrial"],
     shortLabel: "Copper tripeptide complex | Research grade | Lyophilised powder",
-    metaTitle: "GHK-Cu 50mg Research Peptide Australia | Peptide Protocol",
+    metaTitle: "GHK-Cu 50mg Research Peptide Australia | The Protocol",
     metaDescription:
       "Buy GHK-Cu 50mg lyophilised research peptide in Australia. Specs, storage notes, and COA access. Research use only.",
     headline: "GHK-Cu for cellular signalling and copper-peptide research",
     body: [
-      "GHK-Cu is the copper(II) complex of the tripeptide glycyl-L-histidyl-L-lysine, studied in cellular signalling, extracellular matrix, and related laboratory models. Peptide Protocol supplies GHK-Cu as a lyophilised research material.",
+      "GHK-Cu is the copper(II) complex of the tripeptide glycyl-L-histidyl-L-lysine, studied in cellular signalling, extracellular matrix, and related laboratory models. The Protocol supplies GHK-Cu as a lyophilised research material.",
       "Purity and identity documentation are available for verified lots so laboratory intake remains auditable.",
     ],
     researchNotice: RESEARCH_NOTICE,
@@ -424,7 +535,7 @@ const singles: Product[] = [
     qualitySignals: sharedQualitySignals,
     faqs: commonFaqs("GHK-Cu"),
     disclaimer: PRODUCT_DISCLAIMER,
-    image: "/images/products/ghk-cu-50mg.jpg",
+    image: "/images/products/ghk-cu-50mg.png",
     featured: true,
   },
   {
@@ -436,12 +547,12 @@ const singles: Product[] = [
     stockCode: "RT20",
     categorySlugs: ["metabolic"],
     shortLabel: "Triple agonist research peptide | Research grade | Lyophilised powder",
-    metaTitle: "Retatrutide 20mg Research Peptide Australia | Peptide Protocol",
+    metaTitle: "Retatrutide 20mg Research Peptide Australia | The Protocol",
     metaDescription:
       "Buy Retatrutide 20mg lyophilised research peptide in Australia. Specs, storage notes, and COA access. Research use only.",
     headline: "Retatrutide for multi-agonist metabolic research models",
     body: [
-      "Retatrutide is a synthetic peptide studied as a multi-agonist research compound in metabolic pathway literature. Peptide Protocol supplies Retatrutide as a lyophilised powder strictly for laboratory and in vitro research.",
+      "Retatrutide is a synthetic peptide studied as a multi-agonist research compound in metabolic pathway literature. The Protocol supplies Retatrutide as a lyophilised powder strictly for laboratory and in vitro research.",
       "Identity and purity are documented on Certificates of Analysis for verified lots. Confirm exact molecular parameters on your batch COA before protocol use.",
     ],
     researchNotice: RESEARCH_NOTICE,
@@ -479,7 +590,7 @@ const singles: Product[] = [
     qualitySignals: sharedQualitySignals,
     faqs: commonFaqs("Retatrutide"),
     disclaimer: PRODUCT_DISCLAIMER,
-    image: "/images/products/retatrutide-20mg.jpg",
+    image: "/images/products/retatrutide-20mg.png",
     featured: true,
   },
   {
@@ -491,12 +602,12 @@ const singles: Product[] = [
     stockCode: "RT60",
     categorySlugs: ["metabolic"],
     shortLabel: "Triple agonist research peptide | Research grade | Lyophilised powder",
-    metaTitle: "Retatrutide 60mg Research Peptide Australia | Peptide Protocol",
+    metaTitle: "Retatrutide 60mg Research Peptide Australia | The Protocol",
     metaDescription:
       "Buy Retatrutide 60mg lyophilised research peptide in Australia. Specs, storage notes, and COA access. Research use only.",
     headline: "Retatrutide 60mg for multi-agonist metabolic research",
     body: [
-      "Retatrutide is a synthetic peptide studied as a multi-agonist research compound in metabolic pathway literature. Peptide Protocol supplies this higher-content 60mg vial as a lyophilised powder strictly for laboratory and in vitro research.",
+      "Retatrutide is a synthetic peptide studied as a multi-agonist research compound in metabolic pathway literature. The Protocol supplies this higher-content 60mg vial as a lyophilised powder strictly for laboratory and in vitro research.",
       "Identity and purity are documented on Certificates of Analysis for verified lots. Confirm exact molecular parameters on your batch COA before protocol use.",
     ],
     researchNotice: RESEARCH_NOTICE,
@@ -534,7 +645,7 @@ const singles: Product[] = [
     qualitySignals: sharedQualitySignals,
     faqs: commonFaqs("Retatrutide"),
     disclaimer: PRODUCT_DISCLAIMER,
-    image: "/images/products/retatrutide-60mg.jpg",
+    image: "/images/products/retatrutide-60mg.png",
   },
 ];
 
@@ -548,49 +659,49 @@ const kitDefs: {
     singleSlug: "bpc-157-10mg",
     slug: "bpc-157-10mg-kit-10",
     priceAud: 594.95,
-    image: "/images/products/bpc-157-kit.jpg",
+    image: "/images/products/bpc-157-kit.png",
   },
   {
     singleSlug: "ipamorelin-10mg",
     slug: "ipamorelin-10mg-kit-10",
     priceAud: 509.95,
-    image: "/images/products/ipamorelin-kit.jpg",
+    image: "/images/products/ipamorelin-kit.png",
   },
   {
     singleSlug: "cjc-1295-no-dac-10mg",
     slug: "cjc-1295-no-dac-10mg-kit-10",
     priceAud: 849.95,
-    image: "/images/products/cjc-1295-no-dac-kit.jpg",
+    image: "/images/products/cjc-1295-no-dac-kit.png",
   },
   {
     singleSlug: "tb-500-10mg",
     slug: "tb-500-10mg-kit-10",
     priceAud: 1010.95,
-    image: "/images/products/tb-500-kit.jpg",
+    image: "/images/products/tb-500-kit.png",
   },
   {
     singleSlug: "pt-141-10mg",
     slug: "pt-141-10mg-kit-10",
     priceAud: 764.95,
-    image: "/images/products/pt-141-kit.jpg",
+    image: "/images/products/pt-141-kit.png",
   },
   {
     singleSlug: "ghk-cu-50mg",
     slug: "ghk-cu-50mg-kit-10",
     priceAud: 551.95,
-    image: "/images/products/ghk-cu-50mg-kit.jpg",
+    image: "/images/products/ghk-cu-50mg-kit.png",
   },
   {
     singleSlug: "retatrutide-20mg",
     slug: "retatrutide-20mg-kit-10",
     priceAud: 1699.95,
-    image: "/images/products/retatrutide-20mg-kit.jpg",
+    image: "/images/products/retatrutide-20mg-kit.png",
   },
   {
     singleSlug: "retatrutide-60mg",
     slug: "retatrutide-60mg-kit-10",
     priceAud: 4079.95,
-    image: "/images/products/retatrutide-60mg-kit.jpg",
+    image: "/images/products/retatrutide-60mg-kit.png",
   },
 ];
 

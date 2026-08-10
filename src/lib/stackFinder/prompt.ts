@@ -34,7 +34,7 @@ export function buildStackPrompt(answers: Answers): {
     (p) => `- ${p.name} (${p.slug}) — typical goals: ${p.goals.join(", ")}`,
   ).join("\n");
 
-  const system = `You are an educational research assistant for Peptide Protocol (Australia), a supplier of research-grade peptides for laboratory use only.
+  const system = `You are an educational research assistant for The Protocol (Australia), a supplier of research-grade peptides for laboratory use only.
 
 Your job: propose a personalized EDUCATIONAL research peptide stack based on questionnaire answers.
 

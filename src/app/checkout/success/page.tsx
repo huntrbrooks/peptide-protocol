@@ -4,7 +4,7 @@ import { OrderStatus } from "./OrderStatus";
 
 export const metadata: Metadata = {
   title: "Order status",
-  description: "MoonPay checkout return status for Peptide Protocol.",
+  description: "MoonPay checkout return status for The Protocol.",
   robots: { index: false, follow: false },
 };
 
@@ -19,7 +19,7 @@ export default async function CheckoutSuccessPage({ searchParams }: PageProps) {
   return (
     <div className="mx-auto max-w-3xl px-4 py-14 sm:px-6">
       <p className="text-xs uppercase tracking-[0.18em] text-muted">
-        Peptide Protocol
+        The Protocol
       </p>
       <h1 className="mt-3 font-display text-4xl tracking-tight text-ink sm:text-5xl">
         Order status

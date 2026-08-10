@@ -4,9 +4,9 @@ export const categories: Category[] = [
   {
     slug: "metabolic",
     name: "Metabolic research",
-    metaTitle: "Metabolic Research Peptides Australia | Peptide Protocol",
+    metaTitle: "Metabolic Research Peptides Australia | The Protocol",
     metaDescription:
-      "Shop Retatrutide research peptides in Australia. Documented purity, research use only. Browse Metabolic research at Peptide Protocol.",
+      "Shop Retatrutide research peptides in Australia. Documented purity, research use only. Browse Metabolic research at The Protocol.",
     headline: "Metabolic research compounds",
     intro: [
       "Multi-agonist materials for metabolic signalling studies.",
@@ -23,7 +23,7 @@ export const categories: Category[] = [
   {
     slug: "growth-hormone",
     name: "Growth hormone pathway research",
-    metaTitle: "Growth Hormone Pathway Research Peptides | Peptide Protocol",
+    metaTitle: "Growth Hormone Pathway Research Peptides | The Protocol",
     metaDescription:
       "Shop CJC-1295 without DAC and Ipamorelin research peptides in Australia. Research use only.",
     headline: "Growth hormone pathway research",
@@ -42,7 +42,7 @@ export const categories: Category[] = [
   {
     slug: "tissue-recovery",
     name: "Tissue & recovery research",
-    metaTitle: "Tissue & Recovery Research Peptides Australia | Peptide Protocol",
+    metaTitle: "Tissue & Recovery Research Peptides Australia | The Protocol",
     metaDescription:
       "Shop BPC-157 and TB-500 research peptides in Australia. Specs, COA access, research use only.",
     headline: "Tissue and recovery research",
@@ -53,6 +53,7 @@ export const categories: Category[] = [
     productSlugs: [
       "bpc-157-10mg",
       "tb-500-10mg",
+      "glow-up-80mg",
       "bpc-157-10mg-kit-10",
       "tb-500-10mg-kit-10",
     ],
@@ -61,7 +62,7 @@ export const categories: Category[] = [
   {
     slug: "cellular-mitochondrial",
     name: "Cellular & mitochondrial research",
-    metaTitle: "Cellular & Mitochondrial Research Peptides | Peptide Protocol",
+    metaTitle: "Cellular & Mitochondrial Research Peptides | The Protocol",
     metaDescription:
       "Shop GHK-Cu research peptides in Australia. COA access, research use only.",
     headline: "Cellular and mitochondrial research",
@@ -69,13 +70,13 @@ export const categories: Category[] = [
       "Copper-binding peptides for cellular and tissue-model work.",
       "Batch documentation supports intake and inventory workflows.",
     ],
-    productSlugs: ["ghk-cu-50mg", "ghk-cu-50mg-kit-10"],
+    productSlugs: ["ghk-cu-50mg", "glow-up-80mg", "ghk-cu-50mg-kit-10"],
     image: "/images/categories/cellular-mitochondrial.jpg",
   },
   {
     slug: "other-compounds",
     name: "Other research compounds",
-    metaTitle: "Other Research Compounds Australia | Peptide Protocol",
+    metaTitle: "Other Research Compounds Australia | The Protocol",
     metaDescription:
       "Shop PT-141 research materials in Australia. Research use only. Not for consumer or cosmetic use.",
     headline: "Other research compounds",
@@ -85,6 +86,20 @@ export const categories: Category[] = [
     ],
     productSlugs: ["pt-141-10mg", "pt-141-10mg-kit-10"],
     image: "/images/categories/other-compounds.jpg",
+  },
+  {
+    slug: "research-solvents",
+    name: "Research solvents",
+    metaTitle: "Research Solvents Australia | The Protocol",
+    metaDescription:
+      "Shop BAC Water 10mL for controlled laboratory reconstitution workflows in Australia. Research use only.",
+    headline: "Research solvents",
+    intro: [
+      "Sterile laboratory solvents for controlled reconstitution workflows.",
+      "Follow batch documentation and your organisation’s handling SOPs.",
+    ],
+    productSlugs: ["bacteriostatic-water-10ml"],
+    image: "/images/categories/research-solvents.jpg",
   },
 ];
 

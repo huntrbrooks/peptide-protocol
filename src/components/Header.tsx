@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { site } from "@/content/site";
@@ -12,15 +13,17 @@ export function Header() {
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
         <Link
           href="/"
-          className="group flex flex-col leading-none transition-opacity duration-300 hover:opacity-85"
-          aria-label="Peptide Protocol home"
+          className="group flex items-center transition-opacity duration-300 hover:opacity-85"
+          aria-label="The Protocol home"
         >
-          <span className="font-display text-xl tracking-tight text-ink sm:text-2xl">
-            Peptide Protocol
-          </span>
-          <span className="mt-1 text-[10px] uppercase tracking-[0.18em] text-muted">
-            Australia · Research only
-          </span>
+          <Image
+            src="/images/brand/the-protocol-logo.png"
+            alt="The Protocol"
+            width={1024}
+            height={407}
+            priority
+            className="h-auto w-36 sm:w-44"
+          />
         </Link>
 
         <nav className="hidden items-center gap-7 md:flex">

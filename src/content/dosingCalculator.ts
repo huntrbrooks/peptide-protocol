@@ -7,7 +7,7 @@ export const dosingCalculatorMeta = {
   /** SEO / document title — includes "Dosing calculator" */
   metaTitle: "Dosing calculator | Research Peptide Lab Math Australia",
   metaDescription:
-    "Research lab-math calculator for lyophilised peptide vial dilution examples, concentration, and U-100 syringe units. Educational reference only — not medical or personal-use guidance. Peptide Protocol Australia.",
+    "Research lab-math calculator for lyophilised peptide vial dilution examples, concentration, and U-100 syringe units. Educational reference only — not medical or personal-use guidance. The Protocol Australia.",
   /** Visible chrome label (nav, eyebrow) */
   chromeLabel: "Research calculator",
   /** H1 / primary page title for SEO alignment */
@@ -19,7 +19,7 @@ export const dosingCalculatorMeta = {
 
 export const dosingCalculatorDisclaimer = {
   sticky:
-    "Research & educational lab-math only. Outputs are arithmetic helpers for laboratory stock preparation — not medical advice, treatment recommendations, or an invitation for human or veterinary use. All Peptide Protocol materials are for laboratory and in vitro research only.",
+    "Research & educational lab-math only. Outputs are arithmetic helpers for laboratory stock preparation — not medical advice, treatment recommendations, or an invitation for human or veterinary use. All The Protocol materials are for laboratory and in vitro research only.",
   acknowledgementLabel:
     "I understand this tool is for research lab-math and educational reference only. It is not medical advice, dosing guidance, or personal-use instructions.",
   acknowledgementHint: "Required before using the calculator",
@@ -201,7 +201,7 @@ export const dosingCalculatorGlossary: GlossaryEntry[] = [
   {
     term: "IU (international unit)",
     definition:
-      "Activity-based units used for some biologics. Not used for current Peptide Protocol catalogue strengths — this calculator works in mass (mg/mcg) and volume (mL/units) only.",
+      "Activity-based units used for some biologics. Not used for current The Protocol catalogue strengths — this calculator works in mass (mg/mcg) and volume (mL/units) only.",
   },
 ];
 
@@ -265,11 +265,23 @@ export const blendPresets: BlendPreset[] = [
       { id: "tb-500", label: "TB-500", massMg: 10 },
     ],
   },
+  {
+    id: "glow-up-klow80",
+    label: "Glow Up (KLOW80)",
+    description:
+      "Label blend KLOW80: TB 10 mg + BPC-157 10 mg + GHK 50 mg + KPV 10 mg (80 mg total). Edit masses as needed for your worksheet.",
+    components: [
+      { id: "tb-500", label: "TB-500", massMg: 10 },
+      { id: "bpc-157", label: "BPC-157", massMg: 10 },
+      { id: "ghk-cu", label: "GHK-Cu", massMg: 50 },
+      { id: "kpv", label: "KPV", massMg: 10 },
+    ],
+  },
 ];
 
 export const blendCustomNote = {
   title: "Custom blend",
-  body: "Add two or three components with your own masses. There are no commercial multi-peptide blend SKUs in the catalogue — custom entry covers non-preset combinations for worksheet maths only.",
+  body: "Add two or more components with your own masses. Glow Up (KLOW80) is available as a labelled blend preset; custom entry covers other non-preset combinations for worksheet maths only.",
 };
 
 export const dosingCalculatorLinks = {

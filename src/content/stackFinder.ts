@@ -505,6 +505,11 @@ export const CATALOGUE_PEPTIDES = [
     goals: ["skin_aging", "recovery"],
   },
   {
+    slug: "glow-up-80mg",
+    name: "Glow Up (KLOW80)",
+    goals: ["skin_aging", "recovery", "gut"],
+  },
+  {
     slug: "pt-141-10mg",
     name: "PT-141",
     goals: ["libido"],
