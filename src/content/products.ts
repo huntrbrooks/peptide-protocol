@@ -89,7 +89,7 @@ const singles: Product[] = [
     name: "BAC Water (10mL)",
     shortName: "BAC Water",
     strength: "10mL",
-    priceAud: 19.99,
+    priceAud: 30.0,
     stockCode: "BAC10",
     categorySlugs: ["research-solvents"],
     shortLabel: "Sterile research solvent | 0.9% benzyl alcohol | 10mL vial",
