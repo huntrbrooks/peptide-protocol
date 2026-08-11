@@ -34,9 +34,9 @@ export function AddToCartButton({ product }: { product: Product }) {
         <p className="text-sm text-muted">
           Saved locally.{" "}
           <Link href="/checkout" className="text-accent underline">
-            Continue to checkout
+            Continue to order via WhatsApp
           </Link>{" "}
-          (MoonPay staged) or email support for an enquiry.
+          (temporary — online checkout paused).
         </p>
       ) : null}
     </div>

@@ -184,7 +184,7 @@ export const pages: Record<string, PageContent> = {
       {
         question: "Is checkout live?",
         answer:
-          "Prices in AUD. MoonPay Apple Pay / Google Pay (crypto) is staged pending merchant credentials. Email Contact for a purchase enquiry until live.",
+          "Prices in AUD. Online card/crypto checkout is temporarily paused. Order via WhatsApp from the cart/order page (QR or Chat on WhatsApp), or email Contact for a purchase enquiry.",
       },
     ],
   },
