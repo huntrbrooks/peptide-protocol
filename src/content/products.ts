@@ -104,13 +104,13 @@ const singles: Product[] = [
     researchNotice: RESEARCH_NOTICE,
     whatItsFor: {
       intro:
-        "BAC Water is a preserved sterile diluent used in controlled laboratory workflows for:",
+        "BAC Water is sterile water with a preservative. People use it in the lab to:",
       uses: [
-        "Reconstituting lyophilised research peptides and other powdered reagents into solution",
-        "Diluting concentrated research compounds for assay preparation and protocol work",
-        "Multi-draw vial workflows where a bacteriostatic preservative helps limit microbial growth after first puncture",
-        "Standard solvent controls in reconstitution SOPs",
-        "Inventory pairing with lyophilised catalogue materials requiring aqueous reconstitution",
+        "Mix freeze-dried research peptides and other powders into liquid",
+        "Thin down strong research compounds for testing work",
+        "Support multi-use vials — the preservative helps limit germ growth after the first puncture",
+        "Act as the standard mixing liquid in lab prep steps",
+        "Pair with freeze-dried catalogue items that need water to dissolve",
       ],
     },
     specs: [
@@ -163,13 +163,13 @@ const singles: Product[] = [
     researchNotice: RESEARCH_NOTICE,
     whatItsFor: {
       intro:
-        "KLOW80 combines four research materials for controlled investigation of complementary pathways, including:",
+        "Glow Up (KLOW80) blends four research peptides in one vial. It's used when teams want to look at related areas together, such as:",
       uses: [
-        "Multi-peptide interaction and cellular-signalling studies",
-        "Copper-peptide biology and extracellular-matrix research",
-        "Connective-tissue physiology and regenerative-biology models",
-        "Immune-signalling and inflammatory-pathway investigation",
-        "Cell-migration, angiogenesis, and tissue-remodelling research",
+        "How several peptides may work together in cell signalling studies",
+        "Copper-peptide and skin-structure (matrix) research",
+        "Connective tissue and repair-related biology models",
+        "Immune signalling and inflammation pathway research",
+        "Cell movement, new blood-vessel signalling, and tissue remodelling studies",
       ],
     },
     specs: [
@@ -215,15 +215,15 @@ const singles: Product[] = [
     researchNotice: RESEARCH_NOTICE,
     whatItsFor: {
       intro:
-        "BPC-157 is studied and sought for tissue-protection and recovery pathways. Research interest and commonly discussed applications include:",
+        "BPC-157 is researched for tissue protection and recovery pathways. Common interest areas include:",
       uses: [
-        "Tendon, ligament, and soft-tissue injury models (healing, angiogenesis, and extracellular-matrix signalling)",
-        "Muscle strain and sports-medicine recovery research",
-        "Gut lining and gastrointestinal mucosal protection studies",
-        "Wound healing and vascular regeneration pathway work",
-        "Inflammation and nitric-oxide pathway modulation research",
-        "Joint, connective-tissue, and chronic pain model exploration",
-        "Neuroprotective and central-nervous-system injury models in preclinical literature",
+        "Tendon, ligament, and soft-tissue injury models (healing and blood-vessel signalling)",
+        "Muscle strain and sports recovery research",
+        "Gut lining and stomach-intestine protection studies",
+        "Wound healing and blood-vessel repair pathway work",
+        "Inflammation and nitric-oxide pathway research",
+        "Joint, connective tissue, and chronic pain model exploration",
+        "Brain and nerve injury models in early research literature",
       ],
     },
     specs: [
@@ -273,15 +273,15 @@ const singles: Product[] = [
     researchNotice: RESEARCH_NOTICE,
     whatItsFor: {
       intro:
-        "Ipamorelin is a selective ghrelin-mimetic GH secretagogue. Research interest and commonly discussed applications include:",
+        "Ipamorelin is studied as a selective growth-hormone releaser (a ghrelin-like signal). Common interest areas include:",
       uses: [
-        "Selective growth-hormone release with minimal cortisol / ACTH spillover in PK/PD studies",
-        "Body-composition, recovery, and lean-mass related GH-axis research",
-        "Stacked secretagogue protocols with GHRH analogues (e.g. CJC-1295 / Mod GRF)",
-        "Sleep-associated GH pulse and overnight recovery models",
+        "Growth-hormone release studies with less spillover into stress hormones (cortisol / ACTH)",
+        "Body composition, recovery, and lean-mass related growth-hormone research",
+        "Combined secretagogue protocols with GHRH analogues (e.g. CJC-1295 / Mod GRF)",
+        "Sleep-linked growth-hormone pulses and overnight recovery models",
         "Appetite and ghrelin-receptor signalling research",
-        "Postoperative ileus and GI-motility investigation (discontinued Phase II program)",
-        "Anti-ageing and metabolic endocrine pathway exploration",
+        "Gut motility research after surgery (a discontinued Phase II program)",
+        "Ageing and metabolic hormone pathway exploration",
       ],
     },
     specs: [
@@ -331,14 +331,14 @@ const singles: Product[] = [
     researchNotice: RESEARCH_NOTICE,
     whatItsFor: {
       intro:
-        "CJC-1295 without DAC (Modified GRF 1-29) is a short-acting GHRH analogue. Common research and interest areas include:",
+        "CJC-1295 without DAC (also called Modified GRF 1-29) is a short-acting growth-hormone release signal. Common interest areas include:",
       uses: [
-        "Pulsatile growth-hormone release studies that preserve natural GH pulse patterns",
-        "Short-half-life GHRH receptor activation models (~30-minute activity window)",
-        "Stacked GH-secretagogue research with ghrelin mimetics such as Ipamorelin",
-        "Body-composition, recovery, and performance-related GH-axis work",
-        "Sleep-associated GH pulse and IGF-1 response investigation",
-        "Head-to-head comparison with long-acting DAC-modified CJC-1295",
+        "Pulse-style growth-hormone release studies that keep a more natural rhythm",
+        "Short-acting GHRH receptor models (about a 30-minute activity window)",
+        "Combined growth-hormone research with ghrelin-like compounds such as Ipamorelin",
+        "Body composition, recovery, and performance-related growth-hormone work",
+        "Sleep-linked growth-hormone pulses and IGF-1 response studies",
+        "Side-by-side comparison with long-acting DAC-modified CJC-1295",
       ],
     },
     specs: [
@@ -391,15 +391,15 @@ const singles: Product[] = [
     researchNotice: RESEARCH_NOTICE,
     whatItsFor: {
       intro:
-        "TB-500 refers to research material related to the active region of thymosin beta-4. It is studied and sought for:",
+        "TB-500 relates to the active region of thymosin beta-4. It is researched for:",
       uses: [
-        "Tissue repair, wound healing, and cell-migration research",
-        "Actin cytoskeleton organisation and cellular motility models",
+        "Tissue repair, wound healing, and cell-movement research",
+        "How cells organise their inner scaffold and move",
         "Muscle, tendon, and soft-tissue recovery pathway work",
-        "Cardiac repair and angiogenesis-related preclinical studies",
-        "Inflammation modulation and regenerative-biology research",
-        "Combined tissue-recovery protocols alongside BPC-157 in laboratory literature",
-        "Flexibility, fibrosis, and scar-remodelling exploratory models",
+        "Heart repair and new blood-vessel signalling in early studies",
+        "Inflammation and regenerative biology research",
+        "Combined tissue-recovery protocols alongside BPC-157 in lab literature",
+        "Flexibility, scarring, and scar-remodelling exploratory models",
       ],
     },
     specs: [
@@ -447,13 +447,13 @@ const singles: Product[] = [
     researchNotice: RESEARCH_NOTICE,
     whatItsFor: {
       intro:
-        "PT-141 is a melanocortin receptor agonist (notably MC3R / MC4R pathways). Laboratory and literature interest has focused on:",
+        "PT-141 acts on melanocortin pathways in the brain (especially MC3R / MC4R). Research interest has focused on:",
       uses: [
-        "Female hypoactive sexual desire disorder pathway research (approved clinical brand lineage: Vyleesi in some markets)",
-        "Male erectile function and sexual-desire models via melanocortin CNS signalling",
-        "Comparative melanocortin work alongside related analogues (e.g. Melanotan II lineage)",
-        "Appetite and energy-balance exploratory models via central melanocortin receptors",
-        "Receptor pharmacology and PK/PD characterisation in research settings",
+        "Low sexual desire pathway research in women (linked to the clinical brand Vyleesi in some markets)",
+        "Male erectile function and sexual desire models via brain signalling",
+        "Comparison with related melanocortin compounds (e.g. Melanotan II family)",
+        "Appetite and energy-balance models via central melanocortin receptors",
+        "How the compound binds receptors and moves through the body in research settings",
       ],
     },
     specs: [
@@ -501,14 +501,14 @@ const singles: Product[] = [
     researchNotice: RESEARCH_NOTICE,
     whatItsFor: {
       intro:
-        "GHK-Cu is an endogenous copper–tripeptide complex. It is studied and sought for skin, tissue, and cellular-repair pathways, including:",
+        "GHK-Cu is a copper-linked three-amino-acid peptide found in the body. It is researched for skin, tissue, and cell-repair pathways, including:",
       uses: [
-        "Skin remodelling, collagen synthesis, and wrinkle / photoageing cosmetic research",
+        "Skin renewal, collagen support, and wrinkle / sun-ageing cosmetic research",
         "Wound healing and tissue-repair signalling studies",
         "Hair follicle and hair-density related research",
-        "Extracellular-matrix gene expression and anti-inflammatory pathway work",
-        "Copper delivery and antioxidant / anti-glycation cellular models",
-        "Scar quality, dermal regeneration, and cosmetic formulation research",
+        "Skin-structure gene activity and anti-inflammatory pathway work",
+        "Copper delivery and antioxidant / anti-glycation cell models",
+        "Scar quality, skin regeneration, and cosmetic formula research",
       ],
     },
     specs: [
@@ -558,14 +558,14 @@ const singles: Product[] = [
     researchNotice: RESEARCH_NOTICE,
     whatItsFor: {
       intro:
-        "Retatrutide is an investigational triple agonist (GLP-1 / GIP / glucagon). Clinical and research interest focuses on:",
+        "Retatrutide is an investigational compound that targets three metabolic signals (GLP-1, GIP, and glucagon). Clinical and research interest focuses on:",
       uses: [
-        "Obesity and chronic weight-management clinical development",
-        "Type 2 diabetes and glycemic-control research",
-        "Metabolic dysfunction–associated steatotic liver disease (MASLD / MASH) trials",
-        "Appetite regulation, energy expenditure, and body-composition studies",
-        "Cardiometabolic risk-factor improvement research",
-        "Head-to-head comparison with dual agonists such as tirzepatide in metabolic literature",
+        "Obesity and long-term weight-management clinical development",
+        "Type 2 diabetes and blood-sugar control research",
+        "Fatty liver disease research (MASLD / MASH)",
+        "Appetite, energy use, and body-composition studies",
+        "Heart and metabolic risk-factor improvement research",
+        "Side-by-side comparison with dual-acting compounds such as tirzepatide",
       ],
     },
     specs: [
@@ -613,14 +613,14 @@ const singles: Product[] = [
     researchNotice: RESEARCH_NOTICE,
     whatItsFor: {
       intro:
-        "Retatrutide is an investigational triple agonist (GLP-1 / GIP / glucagon). Clinical and research interest focuses on:",
+        "Retatrutide is an investigational compound that targets three metabolic signals (GLP-1, GIP, and glucagon). Clinical and research interest focuses on:",
       uses: [
-        "Obesity and chronic weight-management clinical development",
-        "Type 2 diabetes and glycemic-control research",
-        "Metabolic dysfunction–associated steatotic liver disease (MASLD / MASH) trials",
-        "Appetite regulation, energy expenditure, and body-composition studies",
-        "Cardiometabolic risk-factor improvement research",
-        "Head-to-head comparison with dual agonists such as tirzepatide in metabolic literature",
+        "Obesity and long-term weight-management clinical development",
+        "Type 2 diabetes and blood-sugar control research",
+        "Fatty liver disease research (MASLD / MASH)",
+        "Appetite, energy use, and body-composition studies",
+        "Heart and metabolic risk-factor improvement research",
+        "Side-by-side comparison with dual-acting compounds such as tirzepatide",
       ],
     },
     specs: [
