@@ -1,18 +1,20 @@
 @import "tailwindcss";
 
-/* Palette: graphite-charcoal ink + warm porcelain + raspberry accent —
-   matched to the pink Retatrutide bottle (label pink ≈ #c03060),
-   kept clinical with neutral grounds and restrained pink usage */
+/* AU clinical + logistics palette: charcoal ink on flat clinical white,
+   raspberry accent matched to the pink Retatrutide vial. Express red/yellow
+   are reserved for dispatch/logistics cues only (generic — no carrier marks). */
 :root {
-  --paper: #faf6f4;
-  --ink: #231c20;
-  --mist: #f1e3e9;
-  --line: #decdd4;
-  --muted: #6e5e65;
-  --accent: #b02a58;
-  --teal-soft: #eaaac2;
-  --sand: #f4ede8;
-  --brass: #c39d8d;
+  --paper: #ffffff; /* AU clinical: pure paper white */
+  --ink: #1a1a1a; /* AU clinical: charcoal ink */
+  --mist: #f5f5f5; /* cool gray wash */
+  --line: #e0e0e0; /* hairline */
+  --muted: #5c5c5c; /* AA on paper (~6.7:1) */
+  --accent: #b03060; /* raspberry — matches vial label */
+  --teal-soft: #e8a0b8; /* retargeted: soft pink hover highlight (name kept to avoid churn) */
+  --sand: #f3f3f3; /* retargeted: cool off-white */
+  --brass: #a8a8a8; /* retargeted: warm steel */
+  --express-red: #dc1928; /* AU logistics accent */
+  --express-yellow: #ffd200; /* AU logistics accent */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --duration: 280ms;
 }
@@ -27,6 +29,8 @@
   --color-teal-soft: var(--teal-soft);
   --color-sand: var(--sand);
   --color-brass: var(--brass);
+  --color-express-red: var(--express-red);
+  --color-express-yellow: var(--express-yellow);
   --font-sans: var(--font-body);
   --font-display: var(--font-display);
 }
@@ -36,10 +40,12 @@ html {
 }
 
 body {
+  /* AU clinical: flat cool white ground with a faint industrial gray grain —
+     warm cream/pink washes removed */
   background:
-    radial-gradient(1200px 600px at 10% -10%, rgba(234, 170, 194, 0.28), transparent 55%),
-    radial-gradient(900px 500px at 100% 0%, rgba(244, 237, 232, 0.7), transparent 50%),
-    linear-gradient(180deg, #f6eef0 0%, var(--paper) 28%, #f7efec 100%);
+    radial-gradient(1100px 520px at 12% -8%, rgba(26, 26, 26, 0.04), transparent 55%),
+    radial-gradient(900px 460px at 100% 0%, rgba(92, 92, 92, 0.05), transparent 50%),
+    linear-gradient(180deg, #fafafa 0%, var(--paper) 30%, #f6f7f7 100%);
   color: var(--ink);
   font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
 }
@@ -49,7 +55,8 @@ body {
 }
 
 ::selection {
-  background: rgba(176, 42, 88, 0.18);
+  /* AU clinical: raspberry selection tint */
+  background: rgba(176, 48, 96, 0.18);
 }
 
 /* ——— Motion primitives ——— */
@@ -104,7 +111,8 @@ body {
 
 .announcement-banner {
   --announcement-duration: 48s;
-  border-bottom: 1px solid color-mix(in srgb, var(--brass) 32%, transparent);
+  /* AU logistics: express-yellow hairline under the ink banner */
+  border-bottom: 1px solid color-mix(in srgb, var(--express-yellow) 45%, transparent);
 }
 
 .announcement-banner__fade {
@@ -176,8 +184,9 @@ body {
   margin-inline: 1.75rem 0;
   border-radius: 9999px;
   vertical-align: middle;
-  background: color-mix(in srgb, var(--brass) 70%, transparent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--brass) 25%, transparent);
+  /* AU logistics: express-yellow micro-dot separators */
+  background: color-mix(in srgb, var(--express-yellow) 85%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--express-yellow) 30%, transparent);
 }
 
 .announcement-banner:hover .announcement-banner__track {
@@ -291,7 +300,8 @@ button {
 .card-lift:hover {
   transform: translateY(-3px);
   border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
-  box-shadow: 0 14px 36px rgba(35, 28, 32, 0.1);
+  /* AU clinical: cooler charcoal shadow */
+  box-shadow: 0 14px 36px rgba(26, 26, 26, 0.09);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -18,8 +18,6 @@ import {
   internalQueryGeneric,
 } from "convex/server";
 
-export const env = process.env;
-
 /**
  * Define a query in this Convex app's public API.
  *

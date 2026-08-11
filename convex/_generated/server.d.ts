@@ -21,8 +21,6 @@ import {
 } from "convex/server";
 import type { DataModel } from "./dataModel.js";
 
-export declare const env: Record<string, string | undefined>;
-
 /**
  * Define a query in this Convex app's public API.
  *

@@ -19,14 +19,17 @@ export default function HomePage() {
       <section className="relative overflow-hidden">
         <div className="absolute inset-0">
           <Image
-            src="/images/hero.jpg"
-            alt="The Protocol research laboratory aesthetic"
+            src="/images/hero-au-industrial.png"
+            alt="The Protocol research laboratory and dispatch aesthetic"
             fill
             priority
             className="object-cover"
             sizes="100vw"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-ink/88 via-ink/70 to-ink/35" />
+          {/* AU clinical: charcoal bands for type — lighter on the right so the
+              bright industrial facility / city view stays visible */}
+          <div className="absolute inset-0 bg-gradient-to-r from-ink/88 via-ink/55 to-ink/20" />
+          <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/20 to-transparent" />
         </div>
         <div className="relative mx-auto flex min-h-[88vh] max-w-6xl flex-col items-center justify-center gap-10 px-4 py-16 sm:px-6 sm:py-20 lg:flex-row lg:items-center lg:justify-between lg:gap-12">
           <div className="order-first mx-auto w-full max-w-[429px] shrink-0 sm:max-w-[546px] lg:order-last lg:mx-0 lg:max-w-[663px]">
@@ -42,7 +45,8 @@ export default function HomePage() {
           </div>
 
           <div className="min-w-0 w-full flex-1 lg:w-auto">
-            <p className="animate-rise text-xs uppercase tracking-[0.22em] text-teal-soft">
+            {/* AU clinical: raspberry-tinted eyebrow, wider tracking */}
+            <p className="animate-rise text-xs uppercase tracking-[0.3em] text-teal-soft">
               {home.eyebrow}
             </p>
             <h1 className="animate-rise-delay mt-4 max-w-3xl font-display text-4xl leading-[1.08] tracking-tight text-paper sm:text-6xl">
@@ -68,11 +72,34 @@ export default function HomePage() {
                 {home.secondaryCta.label}
               </Link>
             </div>
+            {/* AU logistics: Express Post mark under CTAs (matches reference mock) */}
+            <div className="animate-rise-delay-2 mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-paper/80">
+              <Image
+                src="/images/brand/express-post.jpg"
+                alt="Australia Post Express Post"
+                width={1024}
+                height={194}
+                className="h-7 w-auto sm:h-8"
+              />
+              {site.trustBar
+                .filter(
+                  (item) => item.includes("Dispatch") || item.includes("Express"),
+                )
+                .map((item, index, chips) => (
+                  <span key={item} className="flex items-center gap-3">
+                    <span>{item}</span>
+                    {index < chips.length - 1 ? (
+                      <span aria-hidden className="h-3 w-px bg-paper/30" />
+                    ) : null}
+                  </span>
+                ))}
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="border-y border-line/70 bg-paper/70">
+      {/* AU clinical: clean white trust bar, hairline borders */}
+      <section className="border-y border-line bg-paper">
         <div className="mx-auto flex max-w-6xl gap-6 overflow-x-auto px-4 py-4 text-sm text-muted sm:px-6">
           {site.trustBar.map((item) => (
             <p key={item} className="whitespace-nowrap">
@@ -95,7 +122,7 @@ export default function HomePage() {
           {home.valueProps.map((item) => (
             <div
               key={item.title}
-              className="card-lift border border-line bg-paper/80 p-6"
+              className="card-lift border border-line bg-paper p-6"
             >
               <h3 className="font-display text-xl text-ink">{item.title}</h3>
               <p className="mt-3 text-sm leading-relaxed text-muted">{item.body}</p>
@@ -124,7 +151,7 @@ export default function HomePage() {
               <Link
                 key={category.slug}
                 href={`/shop/${category.slug}`}
-                className="group relative min-h-44 overflow-hidden border border-paper/10 transition duration-300 hover:border-teal-soft/40"
+                className="group relative min-h-44 overflow-hidden border border-paper/10 transition duration-300 hover:border-accent/60"
               >
                 <Image
                   src={category.image}

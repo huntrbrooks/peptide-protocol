@@ -1,15 +1,71 @@
 # The Protocol
 
-Australian research peptide catalogue site for **peptideprotocolau.io**.
+Australian research peptide catalogue site. Production host: **[theprotocolau.com](https://www.theprotocolau.com)** (Vercel project `peptide-protocol`). Content still references `peptideprotocolau.io` in places during brand transition.
 
 Research materials only. Not for human consumption. Not a medicine, supplement, or cosmetic. Laboratory and in vitro use only.
 
 ## Stack
 
-- Next.js (App Router)
+- Next.js (App Router) on Vercel
 - TypeScript
 - Tailwind CSS v4
-- Convex (orders / payment status)
+- Convex cloud (orders / payment status)
+
+## Production deploy
+
+Hosting is already on Vercel (`peptide-protocol` → `https://www.theprotocolau.com`). Checkout needs **Convex cloud** + MoonPay. Until MoonPay **live** keys exist, keep `MOONPAY_ENVIRONMENT=sandbox` (test keys only — not real-money settlement).
+
+### 1. Convex cloud (required for orders)
+
+Local `.env.local` may still use anonymous Convex (`http://127.0.0.1:3210`). Production must use a cloud deployment:
+
+```bash
+# Interactive — complete browser/device login
+npx convex login
+
+# Create/link a cloud project (not anonymous), then deploy production:
+npx convex deploy
+
+# Set the same ORDERS_WEBHOOK_SECRET on the Convex **production** deployment
+# that is set on Vercel Production (generate a strong secret once):
+npx convex env set ORDERS_WEBHOOK_SECRET '<same-as-vercel-production>'
+
+# Copy cloud URLs into Vercel Production (and Preview if used):
+#   NEXT_PUBLIC_CONVEX_URL=https://….convex.cloud
+#   CONVEX_DEPLOYMENT=prod:…   # optional for local tooling
+```
+
+Then redeploy Vercel so the Next.js build picks up `NEXT_PUBLIC_CONVEX_URL`.
+
+### 2. Vercel env (Production)
+
+Set on the `peptide-protocol` project (CLI: `vercel env add … production`):
+
+| Variable | Notes |
+|---|---|
+| `NEXT_PUBLIC_SITE_URL` | `https://www.theprotocolau.com` |
+| `NEXT_PUBLIC_CONVEX_URL` | From Convex cloud after deploy |
+| `ORDERS_WEBHOOK_SECRET` | Same value as `npx convex env set` |
+| `MOONPAY_API_KEY` / `MOONPAY_SECRET_KEY` / `MOONPAY_WEBHOOK_SECRET` | `pk_test_` / `sk_test_` / `wk_test_` until live keys |
+| `MOONPAY_WALLET_ADDRESS` | Settlement wallet (e.g. `0x22ca…`) |
+| `MOONPAY_DEFAULT_CURRENCY` | `usdc` |
+| `MOONPAY_ENVIRONMENT` | `sandbox` until live keys + business verification |
+| `OPENROUTER_API_KEY` | Stack Finder (optional) |
+
+Deploy:
+
+```bash
+vercel --prod
+# or push to the linked git production branch
+```
+
+### 3. MoonPay dashboard (you must do)
+
+1. Register webhook: `https://www.theprotocolau.com/api/webhooks/moonpay`
+2. For **real money**: complete business verification, switch to `pk_live_` / `sk_live_` / `wk_live_`, set `MOONPAY_ENVIRONMENT=production` on Vercel, re-register production webhook if needed.
+3. Enable Apple Pay / Google Pay for production in MoonPay (region/account dependent).
+
+Do **not** claim FAQ checkout is fully live until live MoonPay keys are configured.
 
 ## Setup
 

@@ -1,0 +1,13 @@
+.tmp
+tmp
+.next
+node_modules
+.git
+.convex
+.env*
+!.env.example
+public/labels/**/_work
+public/labels/**/_archive*
+public/labels/**/_archive-*/
+public/images/products/_backup*
+**/*.tmp
