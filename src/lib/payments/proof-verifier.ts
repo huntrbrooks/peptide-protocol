@@ -1,10 +1,12 @@
 import "server-only";
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
+const XAI_URL = "https://api.x.ai/v1/chat/completions";
 // Claude Sonnet 5 is the production-default for reliable small-text screenshot
 // reading and structured extraction at lower cost than flagship vision models;
 // the model is env-overridable so it can be rotated without a code change.
 const DEFAULT_VISION_MODEL = "anthropic/claude-sonnet-5";
+const DEFAULT_XAI_VISION_MODEL = "grok-4.3-latest";
 
 export type PaymentProofExtraction = {
   amount: number | null;
@@ -56,7 +58,7 @@ function parseExtraction(value: unknown): PaymentProofExtraction {
   };
 }
 
-export async function extractPaymentProof(input: {
+type PaymentProofInput = {
   bytes: ArrayBuffer;
   contentType: string;
   paymentMethod: "crypto" | "bank";
@@ -64,23 +66,44 @@ export async function extractPaymentProof(input: {
   expectedNetwork?: "ethereum" | "solana";
   expectedDestination: string;
   expectedBsb?: string;
-}): Promise<PaymentProofExtraction> {
-  const apiKey = process.env.OPENROUTER_API_KEY?.trim();
-  if (!apiKey) throw new Error("Payment proof verification is not configured.");
+};
 
-  const image = `data:${input.contentType};base64,${Buffer.from(input.bytes).toString("base64")}`;
-  const response = await fetch(OPENROUTER_URL, {
+type VisionProvider = "openrouter" | "xai";
+
+async function extractWithProvider(
+  input: PaymentProofInput,
+  image: string,
+  provider: VisionProvider,
+): Promise<PaymentProofExtraction> {
+  const isOpenRouter = provider === "openrouter";
+  const apiKey = (
+    isOpenRouter
+      ? process.env.OPENROUTER_API_KEY
+      : process.env.XAI_API_KEY
+  )?.trim();
+  if (!apiKey) {
+    throw new Error(`${provider} vision verification is not configured.`);
+  }
+
+  const response = await fetch(isOpenRouter ? OPENROUTER_URL : XAI_URL, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
-      "HTTP-Referer": process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://www.theprotocolau.com",
-      "X-OpenRouter-Title": "The Protocol payment proof verifier",
+      ...(isOpenRouter
+        ? {
+            "HTTP-Referer":
+              process.env.NEXT_PUBLIC_SITE_URL?.trim() ||
+              "https://www.theprotocolau.com",
+            "X-OpenRouter-Title": "The Protocol payment proof verifier",
+          }
+        : {}),
     },
     body: JSON.stringify({
-      model:
-        process.env.OPENROUTER_VISION_MODEL?.trim() || DEFAULT_VISION_MODEL,
-      provider: { require_parameters: true },
+      model: isOpenRouter
+        ? process.env.OPENROUTER_VISION_MODEL?.trim() || DEFAULT_VISION_MODEL
+        : process.env.XAI_VISION_MODEL?.trim() || DEFAULT_XAI_VISION_MODEL,
+      ...(isOpenRouter ? { provider: { require_parameters: true } } : {}),
       temperature: 0,
       messages: [
         {
@@ -96,7 +119,7 @@ export async function extractPaymentProof(input: {
                 "failed, pending, or unreadable screenshots. A visual result is evidence only; blockchain " +
                 "confirmation is performed separately.",
             },
-            { type: "image_url", image_url: { url: image } },
+            { type: "image_url", image_url: { url: image, detail: "high" } },
           ],
         },
       ],
@@ -139,12 +162,31 @@ export async function extractPaymentProof(input: {
     signal: AbortSignal.timeout(30_000),
   });
   if (!response.ok) {
-    throw new Error("The payment screenshot could not be read. Please try again.");
+    throw new Error(`${provider} could not read the payment screenshot.`);
   }
   const payload = (await response.json()) as {
     choices?: Array<{ message?: { content?: string | null } }>;
   };
   const content = payload.choices?.[0]?.message?.content;
-  if (!content) throw new Error("The payment screenshot could not be read.");
+  if (!content) {
+    throw new Error(`${provider} returned an empty payment proof response.`);
+  }
   return parseExtraction(JSON.parse(content) as unknown);
+}
+
+export async function extractPaymentProof(
+  input: PaymentProofInput,
+): Promise<PaymentProofExtraction> {
+  const image = `data:${input.contentType};base64,${Buffer.from(input.bytes).toString("base64")}`;
+  try {
+    return await extractWithProvider(input, image, "openrouter");
+  } catch {
+    try {
+      return await extractWithProvider(input, image, "xai");
+    } catch {
+      throw new Error(
+        "The payment screenshot could not be read. Please try again.",
+      );
+    }
+  }
 }
