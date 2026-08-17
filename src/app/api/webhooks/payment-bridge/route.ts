@@ -60,7 +60,16 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   try {
     const paymentMethod =
-      body.paymentMethod === "stripe" ? "stripe" : "moonpay";
+      body.paymentMethod === "stripe" || body.paymentMethod === "moonpay"
+        ? body.paymentMethod
+        : typeof body.moonpayId === "string"
+          ? "moonpay"
+          : null;
+    if (!paymentMethod) {
+      return NextResponse.json({ ok: false, error: "Invalid webhook body" }, {
+        status: 400,
+      });
+    }
     const orderId = await updateOrderFromPaymentBridge({
       orderId: body.orderId,
       status: body.status,
