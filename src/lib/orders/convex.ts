@@ -33,6 +33,7 @@ export async function createConvexOrder(input: {
   lines: OrderLine[];
   subtotalAud: number;
   paymentMethod: PaymentMethod;
+  discountCode?: string;
   cryptoCurrency?: CryptoCurrency;
   cryptoChain?: CryptoChain;
   cryptoExpectedAmount?: number;
@@ -46,6 +47,7 @@ export async function createConvexOrder(input: {
     subtotalAud: input.subtotalAud,
     paymentMethod: input.paymentMethod,
     researchAck: true,
+    discountCode: input.discountCode,
     cryptoCurrency: input.cryptoCurrency,
     cryptoChain: input.cryptoChain,
     cryptoExpectedAmount: input.cryptoExpectedAmount,

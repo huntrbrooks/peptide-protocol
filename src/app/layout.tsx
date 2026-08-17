@@ -1,3 +1,4 @@
+import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
 import type { Metadata } from "next";
 import { IBM_Plex_Sans, Fraunces } from "next/font/google";
 import Script from "next/script";
@@ -6,6 +7,7 @@ import { AnnouncementBanner } from "@/components/AnnouncementBanner";
 import { ConvexClientProvider } from "@/components/ConvexClientProvider";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { MemberCapture } from "@/components/MemberCapture";
 import { site } from "@/content/site";
 import { AGE_GATE_COOKIE_NAME } from "@/lib/ageGate/storage";
 import "./globals.css";
@@ -51,18 +53,21 @@ export default function RootLayout({
   return (
     <html lang="en-AU" className={`${body.variable} ${display.variable} h-full`}>
       <body className="flex min-h-full flex-col antialiased">
-        <Script id="age-gate-boot" strategy="beforeInteractive">
-          {`try{if(document.cookie.split(";").some(function(c){return c.trim().indexOf("${AGE_GATE_COOKIE_NAME}=1")===0})){document.documentElement.setAttribute("data-age-ok","1")}}catch(e){}`}
-        </Script>
-        <div className="sticky top-0 z-50">
-          <AnnouncementBanner />
-          <Header />
-        </div>
-        <ConvexClientProvider>
-          <main className="flex-1">{children}</main>
-          <Footer />
-        </ConvexClientProvider>
-        <AgeGate />
+        <ConvexAuthNextjsServerProvider>
+          <Script id="age-gate-boot" strategy="beforeInteractive">
+            {`try{if(document.cookie.split(";").some(function(c){return c.trim().indexOf("${AGE_GATE_COOKIE_NAME}=1")===0})){document.documentElement.setAttribute("data-age-ok","1")}}catch(e){}`}
+          </Script>
+          <div className="sticky top-0 z-50">
+            <AnnouncementBanner />
+            <Header />
+          </div>
+          <ConvexClientProvider>
+            <main className="flex-1">{children}</main>
+            <Footer />
+            <AgeGate />
+            <MemberCapture />
+          </ConvexClientProvider>
+        </ConvexAuthNextjsServerProvider>
       </body>
     </html>
   );

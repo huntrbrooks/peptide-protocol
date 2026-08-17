@@ -1,9 +1,17 @@
 "use client";
 
+import { useConvexAuth, useQuery } from "convex/react";
 import Link from "next/link";
-import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { api } from "../../../convex/_generated/api";
 import { formatPrice, getProductBySlug } from "@/content/products";
 import { site } from "@/content/site";
+import { applyMemberDiscount } from "@/lib/membership/discount";
+import {
+  getMemberCaptureServerSnapshot,
+  getMemberCaptureSnapshot,
+  subscribeMemberCapture,
+} from "@/lib/membership/storage";
 import {
   getCartServerSnapshot,
   getCartSnapshot,
@@ -73,6 +81,51 @@ function buildLines(items: CartLine[]): LineView[] {
 const inputClass =
   "w-full rounded-sm border border-line bg-paper px-3 py-2.5 text-sm text-ink outline-none transition focus:border-accent";
 
+type MembershipQuote = {
+  percent: number;
+  code: string | null;
+};
+
+function CheckoutMembershipSync({
+  email,
+  code,
+  onQuote,
+  onPrefill,
+}: {
+  email: string;
+  code: string;
+  onQuote: (quote: MembershipQuote) => void;
+  onPrefill: (value: { email: string; code: string }) => void;
+}) {
+  const { isAuthenticated } = useConvexAuth();
+  const membership = useQuery(
+    api.members.getMyMembership,
+    isAuthenticated ? {} : "skip",
+  );
+  const quote = useQuery(
+    api.members.quoteDiscount,
+    email.includes("@") && code
+      ? { email, code }
+      : "skip",
+  );
+
+  useEffect(() => {
+    if (membership) {
+      onPrefill({ email: membership.email, code: membership.code });
+    }
+  }, [membership, onPrefill]);
+
+  useEffect(() => {
+    if (quote) {
+      onQuote({ percent: quote.percent, code: quote.code });
+    } else {
+      onQuote({ percent: 0, code: code || null });
+    }
+  }, [code, onQuote, quote]);
+
+  return null;
+}
+
 export function CheckoutForm() {
   const cart = useSyncExternalStore(
     subscribeCart,
@@ -85,6 +138,11 @@ export function CheckoutForm() {
     lines.map((line) => ({ name: line.name, quantity: line.quantity })),
   );
   const [tab, setTab] = useState<PaymentTab>("card");
+  const captured = useSyncExternalStore(
+    subscribeMemberCapture,
+    getMemberCaptureSnapshot,
+    getMemberCaptureServerSnapshot,
+  );
   const [details, setDetails] = useState({
     email: "",
     fullName: "",
@@ -95,6 +153,14 @@ export function CheckoutForm() {
     postcode: "",
     country: "AU",
   });
+  const [discountCode, setDiscountCode] = useState<string | null>(null);
+  const [memberLocked, setMemberLocked] = useState(false);
+  const [quote, setQuote] = useState<MembershipQuote>({
+    percent: 0,
+    code: null,
+  });
+  const email = details.email || captured.record?.email || "";
+  const memberCode = discountCode ?? captured.record?.code ?? "";
   const [researchAck, setResearchAck] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -108,6 +174,14 @@ export function CheckoutForm() {
     null,
   );
   const checkoutStarted = Boolean(cryptoOrder || bankOrder);
+
+  const onPrefill = useCallback((value: { email: string; code: string }) => {
+    setDetails((current) =>
+      current.email === value.email ? current : { ...current, email: value.email },
+    );
+    setDiscountCode(value.code);
+    setMemberLocked(true);
+  }, []);
 
   useEffect(() => {
     void fetch("/api/checkout/payment-options")
@@ -125,9 +199,12 @@ export function CheckoutForm() {
       .catch(() => setCryptoOptions([]));
   }, []);
 
+  const charged = applyMemberDiscount(subtotal, quote.percent);
+
   function checkoutBody() {
     return {
-      email: details.email,
+      email,
+      discountCode: (quote.code ?? memberCode).trim() || undefined,
       researchAck,
       shipping: {
         fullName: details.fullName,
@@ -144,7 +221,7 @@ export function CheckoutForm() {
 
   function validateDetails(): string | null {
     if (lines.length === 0) return "Your cart is empty.";
-    if (!details.email.includes("@")) return "Enter a valid email address.";
+                if (!email.includes("@")) return "Enter a valid email address.";
     if (
       !details.fullName ||
       !details.line1 ||
@@ -341,6 +418,14 @@ export function CheckoutForm() {
   return (
     <div className="mt-10 grid gap-10 lg:grid-cols-[1.2fr_0.8fr]">
       <div className="grid gap-6">
+        {process.env.NEXT_PUBLIC_CONVEX_URL ? (
+          <CheckoutMembershipSync
+            email={email}
+            code={memberCode}
+            onQuote={setQuote}
+            onPrefill={onPrefill}
+          />
+        ) : null}
         <section className="border border-line bg-paper p-6">
           <h2 className="font-display text-2xl text-ink">Contact and shipping</h2>
           <div className="mt-5 grid gap-4 sm:grid-cols-2">
@@ -349,15 +434,34 @@ export function CheckoutForm() {
               <input
                 type="email"
                 autoComplete="email"
-                value={details.email}
+                value={email}
                 onChange={(event) =>
                   setDetails({ ...details, email: event.target.value })
                 }
                 className={inputClass}
                 required
-                disabled={checkoutStarted}
+                disabled={checkoutStarted || memberLocked}
               />
             </label>
+            {memberLocked && quote.code ? (
+              <p className="sm:col-span-2 text-sm text-ink">
+                Member rate applied: {quote.code} · {quote.percent}%
+              </p>
+            ) : (
+              <label className="grid gap-1.5 text-sm text-muted sm:col-span-2">
+                Member code (optional)
+                <input
+                  value={memberCode}
+                  onChange={(event) =>
+                    setDiscountCode(event.target.value.toUpperCase())
+                  }
+                  className={inputClass}
+                  disabled={checkoutStarted}
+                  autoComplete="off"
+                  spellCheck={false}
+                />
+              </label>
+            )}
             <label className="grid gap-1.5 text-sm text-muted sm:col-span-2">
               Full name
               <input
@@ -772,6 +876,23 @@ export function CheckoutForm() {
           <span>Subtotal (AUD)</span>
           <span className="font-medium">{formatPrice(subtotal)}</span>
         </div>
+        {quote.percent > 0 ? (
+          <>
+            <div className="mt-2 flex justify-between text-sm text-muted">
+              <span>
+                Member rate
+                {quote.code ? ` · ${quote.code}` : ""} · {quote.percent}%
+              </span>
+              <span>−{formatPrice(charged.discountAud)}</span>
+            </div>
+            <div className="mt-2 flex justify-between text-sm text-ink">
+              <span>Total (AUD)</span>
+              <span className="font-medium">
+                {formatPrice(charged.subtotalAud)}
+              </span>
+            </div>
+          </>
+        ) : null}
         <p className="mt-3 text-xs leading-relaxed text-muted">
           {site.researchDisclaimer}
         </p>

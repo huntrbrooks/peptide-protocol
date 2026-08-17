@@ -94,6 +94,26 @@ function OrderStatusLive({ orderId }: { orderId: string | null }) {
           <dt className="text-muted">Email</dt>
           <dd className="text-ink">{order.email}</dd>
         </div>
+        {order.discountAud && order.discountAud > 0 ? (
+          <>
+            {order.subtotalBeforeDiscountAud ? (
+              <div className="flex justify-between gap-4">
+                <dt className="text-muted">Subtotal (AUD)</dt>
+                <dd className="text-ink">
+                  {formatPrice(order.subtotalBeforeDiscountAud)}
+                </dd>
+              </div>
+            ) : null}
+            <div className="flex justify-between gap-4">
+              <dt className="text-muted">
+                Member rate
+                {order.discountCode ? ` · ${order.discountCode}` : ""}
+                {order.discountPercent ? ` · ${order.discountPercent}%` : ""}
+              </dt>
+              <dd className="text-ink">−{formatPrice(order.discountAud)}</dd>
+            </div>
+          </>
+        ) : null}
         <div className="flex justify-between gap-4">
           <dt className="text-muted">Total (AUD)</dt>
           <dd className="text-ink">{formatPrice(order.subtotalAud)}</dd>

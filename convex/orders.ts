@@ -1,4 +1,9 @@
 import { v } from "convex/values";
+import { applyMemberDiscount } from "./lib/memberDiscount";
+import {
+  quoteDiscountForEmailAndCode,
+  redeemFirstOrderIfNeeded,
+} from "./members";
 import { internalMutation, mutation, query } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 import type { MutationCtx } from "./_generated/server";
@@ -63,6 +68,10 @@ const publicOrderValidator = v.object({
   paymentMethod: v.union(paymentMethodValidator, v.null()),
   email: v.string(),
   subtotalAud: v.number(),
+  subtotalBeforeDiscountAud: v.union(v.number(), v.null()),
+  discountCode: v.union(v.string(), v.null()),
+  discountPercent: v.union(v.number(), v.null()),
+  discountAud: v.union(v.number(), v.null()),
   currencyCrypto: v.union(v.string(), v.null()),
   moonpayTransactionId: v.union(v.string(), v.null()),
   stripePaymentStatus: v.union(v.string(), v.null()),
@@ -117,6 +126,7 @@ export const createPending = mutation({
     subtotalAud: v.number(),
     paymentMethod: paymentMethodValidator,
     researchAck: v.literal(true),
+    discountCode: v.optional(v.string()),
     cryptoCurrency: v.optional(cryptoCurrencyValidator),
     cryptoChain: v.optional(cryptoChainValidator),
     cryptoExpectedAmount: v.optional(v.number()),
@@ -144,13 +154,33 @@ export const createPending = mutation({
       throw new Error("Crypto quote details are required");
     }
 
+    const email = args.email.trim().toLowerCase();
+    const catalogueSubtotal =
+      Math.round(
+        args.lines.reduce((sum, line) => sum + line.lineTotalAud, 0) * 100,
+      ) / 100;
+    const quote = await quoteDiscountForEmailAndCode(
+      ctx,
+      email,
+      args.discountCode,
+    );
+    const applied = applyMemberDiscount(catalogueSubtotal, quote.percent);
+    if (Math.abs(args.subtotalAud - applied.subtotalAud) > 0.009) {
+      throw new Error("Checkout total is out of date. Refresh and try again.");
+    }
+
     const now = Date.now();
     return await ctx.db.insert("orders", {
       status: "pending",
-      email: args.email.trim().toLowerCase(),
+      email,
       shipping: args.shipping,
       lines: args.lines,
-      subtotalAud: args.subtotalAud,
+      subtotalAud: applied.subtotalAud,
+      subtotalBeforeDiscountAud: catalogueSubtotal,
+      discountCode: quote.code ?? undefined,
+      discountPercent: quote.percent > 0 ? quote.percent : undefined,
+      discountAud: quote.percent > 0 ? applied.discountAud : undefined,
+      memberId: quote.memberId ?? undefined,
       currencyFiat: "aud",
       paymentMethod: args.paymentMethod,
       currencyCrypto: args.cryptoCurrency,
@@ -178,6 +208,10 @@ export const get = query({
       paymentMethod: order.paymentMethod ?? null,
       email: order.email,
       subtotalAud: order.subtotalAud,
+      subtotalBeforeDiscountAud: order.subtotalBeforeDiscountAud ?? null,
+      discountCode: order.discountCode ?? null,
+      discountPercent: order.discountPercent ?? null,
+      discountAud: order.discountAud ?? null,
       currencyCrypto: order.currencyCrypto ?? null,
       moonpayTransactionId: order.moonpayTransactionId ?? null,
       stripePaymentStatus: order.stripePaymentStatus ?? null,
@@ -221,6 +255,12 @@ async function applyStatus(
     updatedAt: now,
     paidAt: status === "paid" ? now : order.paidAt,
   });
+  if (status === "paid") {
+    const paidOrder = await ctx.db.get("orders", orderId);
+    if (paidOrder) {
+      await redeemFirstOrderIfNeeded(ctx, paidOrder);
+    }
+  }
   return orderId;
 }
 
@@ -477,6 +517,12 @@ export const finalizePaymentProof = mutation({
       updatedAt: now,
       paidAt: paid ? now : order.paidAt,
     });
+    if (paid) {
+      const paidOrder = await ctx.db.get("orders", orderId);
+      if (paidOrder) {
+        await redeemFirstOrderIfNeeded(ctx, paidOrder);
+      }
+    }
     return orderId;
   },
 });
@@ -519,6 +565,12 @@ export const submitCryptoVerification = mutation({
       updatedAt: now,
       paidAt: args.verified ? now : order.paidAt,
     });
+    if (args.verified) {
+      const paidOrder = await ctx.db.get("orders", orderId);
+      if (paidOrder) {
+        await redeemFirstOrderIfNeeded(ctx, paidOrder);
+      }
+    }
     return orderId;
   },
 });

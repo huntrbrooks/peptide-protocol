@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { parseCheckoutDetails } from "@/lib/orders/checkout";
+import { resolveCheckoutTotals } from "@/lib/orders/checkout";
 import { createConvexOrder } from "@/lib/orders/convex";
 import type { CryptoChain } from "@/lib/orders/types";
 import { createOrderProofToken } from "@/lib/payments/order-proof";
@@ -23,7 +23,7 @@ export async function POST(request: Request): Promise<NextResponse> {
         { status: 400 },
       );
     }
-    const checkout = parseCheckoutDetails(body);
+    const checkout = await resolveCheckoutTotals(body);
     const option = getCryptoOption(body.chain);
     const quote = await createCryptoQuote(checkout.subtotalAud);
     const orderId = await createConvexOrder({

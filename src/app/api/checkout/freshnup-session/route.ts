@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { parseCheckoutDetails } from "@/lib/orders/checkout";
+import { resolveCheckoutTotals } from "@/lib/orders/checkout";
 import { createConvexOrder } from "@/lib/orders/convex";
 import { createPaymentBridgeToken } from "@/lib/payments/payment-bridge";
 
@@ -18,7 +18,7 @@ export async function POST(request: Request): Promise<NextResponse> {
         { status: 400 },
       );
     }
-    const checkout = parseCheckoutDetails(body);
+    const checkout = await resolveCheckoutTotals(body);
     const amountAudCents = Math.round(checkout.subtotalAud * 100);
     const orderId = await createConvexOrder({
       ...checkout,

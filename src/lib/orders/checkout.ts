@@ -1,4 +1,8 @@
 import { getProductBySlug } from "@/content/products";
+import { applyMemberDiscount, normalizeMemberCode } from "@/lib/membership/discount";
+import { fetchQuery } from "convex/nextjs";
+import { api } from "../../../convex/_generated/api";
+import type { Id } from "../../../convex/_generated/dataModel";
 import type { OrderLine, OrderShipping } from "./types";
 
 type CartItemInput = {
@@ -11,6 +15,14 @@ export type CheckoutDetails = {
   shipping: OrderShipping;
   lines: OrderLine[];
   subtotalAud: number;
+  discountCode?: string;
+};
+
+export type ResolvedCheckout = CheckoutDetails & {
+  subtotalBeforeDiscountAud: number;
+  discountAud: number;
+  discountPercent: number;
+  memberId?: Id<"members">;
 };
 
 type CheckoutBody = {
@@ -18,6 +30,7 @@ type CheckoutBody = {
   researchAck?: unknown;
   shipping?: unknown;
   items?: unknown;
+  discountCode?: unknown;
 };
 
 function isNonEmptyString(value: unknown): value is string {
@@ -113,10 +126,40 @@ export function parseCheckoutDetails(body: unknown): CheckoutDetails {
     throw new Error("Order total must be greater than zero.");
   }
 
+  const discountCode = isNonEmptyString(input.discountCode)
+    ? normalizeMemberCode(input.discountCode)
+    : undefined;
+
   return {
     email: input.email.trim().toLowerCase(),
     shipping,
     lines,
     subtotalAud,
+    discountCode,
+  };
+}
+
+export async function resolveCheckoutTotals(
+  body: unknown,
+): Promise<ResolvedCheckout> {
+  const checkout = parseCheckoutDetails(body);
+  if (!process.env.NEXT_PUBLIC_CONVEX_URL) {
+    throw new Error(
+      "NEXT_PUBLIC_CONVEX_URL is not set. Run `npx convex dev` to link a project.",
+    );
+  }
+  const quote = await fetchQuery(api.members.quoteDiscount, {
+    email: checkout.email,
+    code: checkout.discountCode,
+  });
+  const applied = applyMemberDiscount(checkout.subtotalAud, quote.percent);
+  return {
+    ...checkout,
+    subtotalBeforeDiscountAud: checkout.subtotalAud,
+    subtotalAud: applied.subtotalAud,
+    discountAud: applied.discountAud,
+    discountPercent: quote.percent,
+    discountCode: quote.code ?? undefined,
+    memberId: quote.memberId ?? undefined,
   };
 }

@@ -1,3 +1,4 @@
+import { authTables } from "@convex-dev/auth/server";
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
@@ -43,12 +44,29 @@ const proofVerificationStatus = v.union(
 );
 
 export default defineSchema({
+  ...authTables,
+  members: defineTable({
+    email: v.string(),
+    authUserId: v.optional(v.id("users")),
+    code: v.string(),
+    firstOrderRedeemedAt: v.optional(v.number()),
+    welcomeEmailSentAt: v.optional(v.number()),
+    createdAt: v.number(),
+  })
+    .index("by_email", ["email"])
+    .index("by_code", ["code"])
+    .index("by_auth_user", ["authUserId"]),
   orders: defineTable({
     status: orderStatus,
     email: v.string(),
     shipping: orderShipping,
     lines: v.array(orderLine),
     subtotalAud: v.number(),
+    subtotalBeforeDiscountAud: v.optional(v.number()),
+    discountCode: v.optional(v.string()),
+    discountPercent: v.optional(v.number()),
+    discountAud: v.optional(v.number()),
+    memberId: v.optional(v.id("members")),
     currencyFiat: v.literal("aud"),
     paymentMethod: v.optional(paymentMethod),
     /** Kept optional for compatibility with orders created before direct rails. */
@@ -91,6 +109,7 @@ export default defineSchema({
   })
     .index("by_status", ["status"])
     .index("by_email", ["email"])
+    .index("by_member", ["memberId"])
     .index("by_stripe_payment_intent", ["stripePaymentIntentId"])
     .index("by_crypto_txid", ["cryptoTxid"]),
 });

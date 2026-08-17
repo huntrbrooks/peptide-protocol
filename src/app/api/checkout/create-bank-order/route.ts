@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { parseCheckoutDetails } from "@/lib/orders/checkout";
+import { resolveCheckoutTotals } from "@/lib/orders/checkout";
 import { createConvexOrder } from "@/lib/orders/convex";
 import { createOrderProofToken } from "@/lib/payments/order-proof";
 import { getSettlementOptions } from "@/lib/payments/settlement";
@@ -8,7 +8,7 @@ export const runtime = "nodejs";
 
 export async function POST(request: Request): Promise<NextResponse> {
   try {
-    const checkout = parseCheckoutDetails(await request.json());
+    const checkout = await resolveCheckoutTotals(await request.json());
     const orderId = await createConvexOrder({
       ...checkout,
       paymentMethod: "bank",
