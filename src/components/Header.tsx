@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { site } from "@/content/site";
 import { useCartCount } from "@/lib/cart/useCartCount";
+import { AccountControl } from "@/components/AccountControl";
 
 function CartLink({
   className,
@@ -57,10 +58,12 @@ export function Header() {
               {item.label}
             </Link>
           ))}
+          <AccountControl />
           <CartLink />
         </nav>
 
         <div className="flex items-center gap-2 md:hidden">
+          <AccountControl />
           <CartLink />
           <button
             type="button"

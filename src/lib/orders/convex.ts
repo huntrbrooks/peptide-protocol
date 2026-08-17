@@ -62,6 +62,14 @@ export async function getConvexOrder(orderId: string) {
   });
 }
 
+export async function getConvexPaymentOrder(orderId: string) {
+  requireConvexUrl();
+  return await fetchQuery(api.orders.getForPayment, {
+    orderId,
+    paymentSecret: requirePaymentSecret(),
+  });
+}
+
 export async function attachStripeIntent(input: {
   orderId: string;
   paymentIntentId: string;

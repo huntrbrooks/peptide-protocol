@@ -52,6 +52,7 @@ function kitFromSingle(
   return {
     ...single,
     slug: opts.slug,
+    stockCode: `${single.stockCode ?? single.slug}-KIT10`,
     name: `${single.shortName} (${strengthLabel}) — 10 Vial Kit`,
     priceAud: opts.priceAud,
     shortLabel: `10 × ${strengthLabel} vials | Research grade | Lyophilised powder`,

@@ -3,7 +3,7 @@ import type { Id } from "../../../../../convex/_generated/dataModel";
 import {
   attachPaymentProof,
   finalizePaymentProof,
-  getConvexOrder,
+  getConvexPaymentOrder,
   getPaymentProofUrl,
 } from "@/lib/orders/convex";
 import { sendOrderPaidEmails } from "@/lib/orders/paid-email";
@@ -43,7 +43,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       );
     }
 
-    const order = await getConvexOrder(body.orderId);
+    const order = await getConvexPaymentOrder(body.orderId);
     if (
       !order ||
       (order.paymentMethod !== "crypto" && order.paymentMethod !== "bank") ||

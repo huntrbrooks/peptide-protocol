@@ -1,10 +1,16 @@
 import { v } from "convex/values";
+import { internal } from "./_generated/api";
 import { applyMemberDiscount } from "./lib/memberDiscount";
 import {
   quoteDiscountForEmailAndCode,
   redeemFirstOrderIfNeeded,
 } from "./members";
-import { internalMutation, mutation, query } from "./_generated/server";
+import {
+  releaseInventory,
+  reserveInventory,
+  settleInventory,
+} from "./inventory";
+import { internalMutation, internalQuery, mutation, query } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 import type { MutationCtx } from "./_generated/server";
 
@@ -30,6 +36,10 @@ const orderStatusValidator = v.union(
   v.literal("pending"),
   v.literal("pending_verification"),
   v.literal("paid"),
+  v.literal("packed"),
+  v.literal("shipped"),
+  v.literal("delivered"),
+  v.literal("refunded"),
   v.literal("failed"),
   v.literal("cancelled"),
 );
@@ -66,29 +76,20 @@ const publicOrderValidator = v.object({
   _id: v.id("orders"),
   status: orderStatusValidator,
   paymentMethod: v.union(paymentMethodValidator, v.null()),
-  email: v.string(),
   subtotalAud: v.number(),
   subtotalBeforeDiscountAud: v.union(v.number(), v.null()),
-  discountCode: v.union(v.string(), v.null()),
   discountPercent: v.union(v.number(), v.null()),
   discountAud: v.union(v.number(), v.null()),
   currencyCrypto: v.union(v.string(), v.null()),
-  moonpayTransactionId: v.union(v.string(), v.null()),
   stripePaymentStatus: v.union(v.string(), v.null()),
   cryptoCurrency: v.union(cryptoCurrencyValidator, v.null()),
   cryptoChain: v.union(cryptoChainValidator, v.null()),
   cryptoExpectedAmount: v.union(v.number(), v.null()),
-  cryptoWalletAddress: v.union(v.string(), v.null()),
-  cryptoTxid: v.union(v.string(), v.null()),
-  cryptoVerifiedAt: v.union(v.number(), v.null()),
   cryptoVerificationNote: v.union(v.string(), v.null()),
-  proofStorageId: v.union(v.id("_storage"), v.null()),
   proofVerificationStatus: v.union(
     proofVerificationStatusValidator,
     v.null(),
   ),
-  proofReference: v.union(v.string(), v.null()),
-  proofTimestamp: v.union(v.string(), v.null()),
   lines: v.array(
     v.object({
       name: v.string(),
@@ -170,6 +171,7 @@ export const createPending = mutation({
     }
 
     const now = Date.now();
+    await reserveInventory(ctx, args.lines);
     return await ctx.db.insert("orders", {
       status: "pending",
       email,
@@ -206,26 +208,17 @@ export const get = query({
       _id: order._id,
       status: order.status,
       paymentMethod: order.paymentMethod ?? null,
-      email: order.email,
       subtotalAud: order.subtotalAud,
       subtotalBeforeDiscountAud: order.subtotalBeforeDiscountAud ?? null,
-      discountCode: order.discountCode ?? null,
       discountPercent: order.discountPercent ?? null,
       discountAud: order.discountAud ?? null,
       currencyCrypto: order.currencyCrypto ?? null,
-      moonpayTransactionId: order.moonpayTransactionId ?? null,
       stripePaymentStatus: order.stripePaymentStatus ?? null,
       cryptoCurrency: order.cryptoCurrency ?? null,
       cryptoChain: order.cryptoChain ?? null,
       cryptoExpectedAmount: order.cryptoExpectedAmount ?? null,
-      cryptoWalletAddress: order.cryptoWalletAddress ?? null,
-      cryptoTxid: order.cryptoTxid ?? null,
-      cryptoVerifiedAt: order.cryptoVerifiedAt ?? null,
       cryptoVerificationNote: order.cryptoVerificationNote ?? null,
-      proofStorageId: order.proofStorageId ?? null,
       proofVerificationStatus: order.proofVerificationStatus ?? null,
-      proofReference: order.proofReference ?? null,
-      proofTimestamp: order.proofTimestamp ?? null,
       lines: order.lines.map((line) => ({
         name: line.name,
         quantity: line.quantity,
@@ -237,14 +230,56 @@ export const get = query({
   },
 });
 
-async function applyStatus(
+export const getForPayment = query({
+  args: {
+    orderId: v.string(),
+    paymentSecret: v.string(),
+  },
+  returns: v.union(
+    v.object({
+      _id: v.id("orders"),
+      status: orderStatusValidator,
+      paymentMethod: v.union(paymentMethodValidator, v.null()),
+      subtotalAud: v.number(),
+      cryptoCurrency: v.union(cryptoCurrencyValidator, v.null()),
+      cryptoChain: v.union(cryptoChainValidator, v.null()),
+      cryptoExpectedAmount: v.union(v.number(), v.null()),
+      cryptoWalletAddress: v.union(v.string(), v.null()),
+      proofStorageId: v.union(v.id("_storage"), v.null()),
+    }),
+    v.null(),
+  ),
+  handler: async (ctx, args) => {
+    requirePaymentSecret(args.paymentSecret);
+    const orderId = ctx.db.normalizeId("orders", args.orderId);
+    if (!orderId) return null;
+    const order = await ctx.db.get("orders", orderId);
+    if (!order) return null;
+    return {
+      _id: order._id,
+      status: order.status,
+      paymentMethod: order.paymentMethod ?? null,
+      subtotalAud: order.subtotalAud,
+      cryptoCurrency: order.cryptoCurrency ?? null,
+      cryptoChain: order.cryptoChain ?? null,
+      cryptoExpectedAmount: order.cryptoExpectedAmount ?? null,
+      cryptoWalletAddress: order.cryptoWalletAddress ?? null,
+      proofStorageId: order.proofStorageId ?? null,
+    };
+  },
+});
+
+export async function applyStatus(
   ctx: MutationCtx,
   orderId: Id<"orders">,
   status: "paid" | "failed" | "cancelled",
 ): Promise<Id<"orders"> | null> {
   const order = await ctx.db.get("orders", orderId);
   if (!order) return null;
-  if (order.status === "paid") return orderId;
+  if (order.status === "paid" && status === "paid") {
+    await settleInventory(ctx, order);
+    return orderId;
+  }
   if (status !== "paid" && !["pending", "pending_verification"].includes(order.status)) {
     return orderId;
   }
@@ -258,8 +293,15 @@ async function applyStatus(
   if (status === "paid") {
     const paidOrder = await ctx.db.get("orders", orderId);
     if (paidOrder) {
+      await settleInventory(ctx, paidOrder);
       await redeemFirstOrderIfNeeded(ctx, paidOrder);
     }
+    if (order.paymentMethod !== "moonpay" && order.paymentMethod !== "whatsapp") {
+      await ctx.scheduler.runAfter(0, internal.purchaseAnalytics.capture, { orderId });
+    }
+  } else {
+    const stoppedOrder = await ctx.db.get("orders", orderId);
+    if (stoppedOrder) await releaseInventory(ctx, stoppedOrder);
   }
   return orderId;
 }
@@ -520,8 +562,10 @@ export const finalizePaymentProof = mutation({
     if (paid) {
       const paidOrder = await ctx.db.get("orders", orderId);
       if (paidOrder) {
+        await settleInventory(ctx, paidOrder);
         await redeemFirstOrderIfNeeded(ctx, paidOrder);
       }
+      await ctx.scheduler.runAfter(0, internal.purchaseAnalytics.capture, { orderId });
     }
     return orderId;
   },
@@ -568,8 +612,10 @@ export const submitCryptoVerification = mutation({
     if (args.verified) {
       const paidOrder = await ctx.db.get("orders", orderId);
       if (paidOrder) {
+        await settleInventory(ctx, paidOrder);
         await redeemFirstOrderIfNeeded(ctx, paidOrder);
       }
+      await ctx.scheduler.runAfter(0, internal.purchaseAnalytics.capture, { orderId });
     }
     return orderId;
   },
@@ -654,4 +700,116 @@ export const markFailed = internalMutation({
   args: { orderId: v.id("orders") },
   returns: v.union(v.id("orders"), v.null()),
   handler: async (ctx, args) => await applyStatus(ctx, args.orderId, "failed"),
+});
+
+export const claimPurchaseEvent = mutation({
+  args: {
+    orderId: v.string(),
+    paymentSecret: v.string(),
+  },
+  returns: v.union(
+    v.object({
+      transactionId: v.string(),
+      value: v.number(),
+      valueBeforeDiscount: v.number(),
+      discount: v.number(),
+      discountPercent: v.number(),
+      paymentType: v.string(),
+      memberId: v.union(v.string(), v.null()),
+      items: v.array(v.object({
+        item_id: v.string(),
+        item_name: v.string(),
+        price: v.number(),
+        quantity: v.number(),
+      })),
+    }),
+    v.null(),
+  ),
+  handler: async (ctx, args) => {
+    requirePaymentSecret(args.paymentSecret);
+    const orderId = ctx.db.normalizeId("orders", args.orderId);
+    if (!orderId) return null;
+    const order = await ctx.db.get("orders", orderId);
+    if (
+      !order ||
+      !["paid", "packed", "shipped", "delivered", "refunded"].includes(order.status) ||
+      order.purchaseTrackedAt !== undefined
+    ) {
+      return null;
+    }
+    await ctx.db.patch("orders", orderId, { purchaseTrackedAt: Date.now() });
+    return {
+      transactionId: String(order._id),
+      value: order.subtotalAud,
+      valueBeforeDiscount: order.subtotalBeforeDiscountAud ?? order.subtotalAud,
+      discount: order.discountAud ?? 0,
+      discountPercent: order.discountPercent ?? 0,
+      paymentType: order.paymentMethod ?? "unknown",
+      memberId: order.memberId ? String(order.memberId) : null,
+      items: order.lines.map((line) => ({
+        item_id: line.slug,
+        item_name: line.name,
+        price: line.unitPriceAud,
+        quantity: line.quantity,
+      })),
+    };
+  },
+});
+
+const purchaseEventValidator = v.object({
+  transactionId: v.string(),
+  value: v.number(),
+  valueBeforeDiscount: v.number(),
+  discount: v.number(),
+  discountPercent: v.number(),
+  paymentType: v.string(),
+  memberId: v.union(v.string(), v.null()),
+  items: v.array(v.object({
+    item_id: v.string(),
+    item_name: v.string(),
+    price: v.number(),
+    quantity: v.number(),
+  })),
+});
+
+export const getPurchaseEvent = internalQuery({
+  args: { orderId: v.id("orders") },
+  returns: v.union(purchaseEventValidator, v.null()),
+  handler: async (ctx, args) => {
+    const order = await ctx.db.get("orders", args.orderId);
+    if (
+      !order ||
+      !["paid", "packed", "shipped", "delivered", "refunded"].includes(order.status) ||
+      order.purchaseTrackedAt !== undefined
+    ) {
+      return null;
+    }
+    return {
+      transactionId: String(order._id),
+      value: order.subtotalAud,
+      valueBeforeDiscount: order.subtotalBeforeDiscountAud ?? order.subtotalAud,
+      discount: order.discountAud ?? 0,
+      discountPercent: order.discountPercent ?? 0,
+      paymentType: order.paymentMethod ?? "unknown",
+      memberId: order.memberId ? String(order.memberId) : null,
+      items: order.lines.map((line) => ({
+        item_id: line.slug,
+        item_name: line.name,
+        price: line.unitPriceAud,
+        quantity: line.quantity,
+      })),
+    };
+  },
+});
+
+export const markPurchaseTracked = internalMutation({
+  args: { orderId: v.id("orders") },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const order = await ctx.db.get("orders", args.orderId);
+    if (order && order.purchaseTrackedAt === undefined) {
+      await ctx.db.patch("orders", args.orderId, { purchaseTrackedAt: Date.now() });
+    }
+    return null;
+  },
 });

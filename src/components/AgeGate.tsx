@@ -13,6 +13,7 @@ import {
   persistAgeVerified,
   subscribeAgeGate,
 } from "@/lib/ageGate/storage";
+import { track } from "@/lib/analytics/track";
 
 const FOCUSABLE = "a[href], button:not([disabled])";
 
@@ -135,7 +136,10 @@ export function AgeGate() {
           ref={enterRef}
           type="button"
           className="btn-primary mt-7 w-full rounded-sm bg-ink px-5 py-3.5 text-sm font-medium text-paper hover:bg-accent"
-          onClick={persistAgeVerified}
+          onClick={() => {
+            persistAgeVerified();
+            track("age_gate_pass");
+          }}
         >
           {copy.enterLabel}
         </button>
@@ -144,6 +148,7 @@ export function AgeGate() {
           {copy.under18Prefix}{" "}
           <a
             href={copy.leaveHref}
+            onClick={() => track("age_gate_leave")}
             rel="noopener noreferrer"
             className="font-medium text-accent underline underline-offset-2 transition hover:text-ink"
           >

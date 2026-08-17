@@ -128,8 +128,13 @@ async function allocateUniqueCode(ctx: MutationCtx): Promise<string> {
 }
 
 export const captureEmail = mutation({
-  args: { email: v.string() },
+  args: {
+    email: v.string(),
+    marketingConsent: v.boolean(),
+    attribution: v.optional(v.string()),
+  },
   returns: v.object({
+    memberId: v.id("members"),
     code: v.string(),
     isNew: v.boolean(),
   }),
@@ -141,18 +146,49 @@ export const captureEmail = mutation({
 
     const existing = await findMemberByEmail(ctx, email);
     if (existing) {
+      const now = Date.now();
+      const consent = args.marketingConsent ? "opted_in" : "opted_out";
+      if (existing.marketingConsent !== consent) {
+        await ctx.db.patch("members", existing._id, {
+          marketingConsent: consent,
+          marketingConsentAt: now,
+          lastTouch: args.attribution,
+          updatedAt: now,
+        });
+        await ctx.db.insert("consentLedger", {
+          memberId: existing._id,
+          category: "marketing",
+          state: consent,
+          source: "member_capture",
+          createdAt: now,
+        });
+      }
       if (existing.welcomeEmailSentAt === undefined) {
         await ctx.scheduler.runAfter(0, internal.welcomeEmail.sendWelcome, {
           memberId: existing._id,
         });
       }
-      return { code: existing.code, isNew: false };
+      return { memberId: existing._id, code: existing.code, isNew: false };
     }
 
+    const now = Date.now();
+    const marketingConsent = args.marketingConsent ? "opted_in" : "opted_out";
     const memberId = await ctx.db.insert("members", {
       email,
       code: await allocateUniqueCode(ctx),
-      createdAt: Date.now(),
+      marketingConsent,
+      marketingConsentAt: now,
+      firstTouch: args.attribution,
+      lastTouch: args.attribution,
+      createdAt: now,
+      updatedAt: now,
+    });
+    await ctx.db.insert("consentLedger", {
+      memberId,
+      category: "marketing",
+      state: marketingConsent,
+      source: "member_capture",
+      createdAt: now,
     });
     const member = await ctx.db.get("members", memberId);
     if (!member) {
@@ -161,7 +197,7 @@ export const captureEmail = mutation({
     await ctx.scheduler.runAfter(0, internal.welcomeEmail.sendWelcome, {
       memberId,
     });
-    return { code: member.code, isNew: true };
+    return { memberId, code: member.code, isNew: true };
   },
 });
 

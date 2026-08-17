@@ -20,6 +20,7 @@ import {
 import type { CartLine } from "@/lib/cart/types";
 import { whatsappOrderUrl } from "@/lib/orders/whatsapp";
 import type { CryptoChain, CryptoCurrency } from "@/lib/orders/types";
+import { track } from "@/lib/analytics/track";
 
 type PaymentTab = "moonpay" | "crypto" | "card" | "bank";
 
@@ -175,6 +176,31 @@ export function CheckoutForm() {
   );
   const checkoutStarted = Boolean(cryptoOrder || bankOrder);
 
+  useEffect(() => {
+    if (lines.length > 0) {
+      track("begin_checkout", {
+        currency: "AUD",
+        value: subtotal,
+        items: lines.map((line) => ({
+          item_id: line.slug,
+          item_name: line.name,
+          price: line.unitPriceAud,
+          quantity: line.quantity,
+        })),
+      });
+    }
+  }, [lines, subtotal]);
+
+  useEffect(() => {
+    if (quote.code) {
+      track("discount_quoted", {
+        percent: quote.percent,
+        first_order: quote.percent === 15,
+        code_present: true,
+      });
+    }
+  }, [quote.code, quote.percent]);
+
   const onPrefill = useCallback((value: { email: string; code: string }) => {
     setDetails((current) =>
       current.email === value.email ? current : { ...current, email: value.email },
@@ -219,6 +245,16 @@ export function CheckoutForm() {
     };
   }
 
+  function trackAppliedDiscount(): void {
+    if (quote.percent > 0) {
+      track("discount_applied", {
+        percent: quote.percent,
+        discount_aud: charged.discountAud,
+        first_order: quote.percent === 15,
+      });
+    }
+  }
+
   function validateDetails(): string | null {
     if (lines.length === 0) return "Your cart is empty.";
                 if (!email.includes("@")) return "Enter a valid email address.";
@@ -244,6 +280,7 @@ export function CheckoutForm() {
     setBusy(true);
     setError(null);
     try {
+      track("add_payment_info", { payment_type: "stripe" });
       const response = await fetch("/api/checkout/freshnup-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -256,6 +293,7 @@ export function CheckoutForm() {
       if (!response.ok || !payload.payUrl) {
         throw new Error(payload.error ?? "Unable to start secure payment.");
       }
+      trackAppliedDiscount();
       window.location.assign(payload.payUrl);
     } catch (caught) {
       setError(
@@ -276,6 +314,7 @@ export function CheckoutForm() {
     setBusy(true);
     setError(null);
     try {
+      track("add_payment_info", { payment_type: "crypto" });
       const response = await fetch("/api/checkout/create-crypto-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -287,6 +326,7 @@ export function CheckoutForm() {
       if (!response.ok || !payload.orderId) {
         throw new Error(payload.error ?? "Unable to create crypto order.");
       }
+      trackAppliedDiscount();
       setCryptoOrder(payload);
     } catch (caught) {
       setError(
@@ -308,6 +348,7 @@ export function CheckoutForm() {
     setBusy(true);
     setError(null);
     try {
+      track("add_payment_info", { payment_type: "bank" });
       const response = await fetch("/api/checkout/create-bank-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -317,6 +358,7 @@ export function CheckoutForm() {
       if (!response.ok || !payload.orderId || !payload.proofToken) {
         throw new Error(payload.error ?? "Unable to create bank order.");
       }
+      trackAppliedDiscount();
       setBankOrder(payload);
     } catch (caught) {
       setError(
@@ -399,6 +441,9 @@ export function CheckoutForm() {
       setVerificationMessage(
         verifyPayload.message ?? "Payment proof received.",
       );
+      track(tab === "crypto" ? "crypto_proof_uploaded" : "bank_proof_uploaded", {
+        payment_type: tab,
+      });
       window.setTimeout(() => {
         window.location.assign(
           `/checkout/success?orderId=${encodeURIComponent(order.orderId)}`,
@@ -557,7 +602,10 @@ export function CheckoutForm() {
             <input
               type="checkbox"
               checked={researchAck}
-              onChange={(event) => setResearchAck(event.target.checked)}
+              onChange={(event) => {
+                setResearchAck(event.target.checked);
+                if (event.target.checked) track("research_ack");
+              }}
               className="mt-1"
               disabled={checkoutStarted}
             />

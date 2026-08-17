@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import {
-  getConvexOrder,
+  getConvexPaymentOrder,
   submitCryptoVerification,
 } from "@/lib/orders/convex";
 import { sendOrderPaidEmails } from "@/lib/orders/paid-email";
@@ -26,7 +26,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       );
     }
 
-    const order = await getConvexOrder(body.orderId.trim());
+    const order = await getConvexPaymentOrder(body.orderId.trim());
     if (
       !order ||
       order.paymentMethod !== "crypto" ||

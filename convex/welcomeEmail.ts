@@ -49,7 +49,7 @@ export const sendWelcome = internalAction({
         <p style="margin:24px 0;padding:16px;border:1px solid #deded8;background:#fafafa;font-size:22px;letter-spacing:1px;text-align:center"><strong>${escapeHtml(member.code)}</strong></p>
         <p><strong>15%</strong> off your first dispatch, then <strong>10%</strong> on later orders while you remain a member.</p>
         <p>The rate applies automatically when you are logged in. Guests can type the code if the checkout email matches ${escapeHtml(member.email)}.</p>
-        <p style="margin-top:28px;font-size:12px;color:#666">Research materials only. Not for human consumption. You can unsubscribe at any time via the link Resend includes in this message.</p>
+        <p style="margin-top:28px;font-size:12px;color:#666">Research materials only. Not for human consumption. This member-code message is transactional; marketing preferences are managed separately.</p>
       </div>
     </div>
   </body>
@@ -73,6 +73,9 @@ export const sendWelcome = internalAction({
         subject: "Welcome to The Protocol — your member code",
         html,
         text,
+        headers: {
+          "List-Unsubscribe": "<mailto:contact@theprotocolau.com?subject=Unsubscribe>",
+        },
         tags: [
           { name: "email_type", value: "member_welcome" },
           { name: "member_id", value: String(member._id) },

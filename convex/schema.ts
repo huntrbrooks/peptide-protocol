@@ -6,6 +6,10 @@ const orderStatus = v.union(
   v.literal("pending"),
   v.literal("pending_verification"),
   v.literal("paid"),
+  v.literal("packed"),
+  v.literal("shipped"),
+  v.literal("delivered"),
+  v.literal("refunded"),
   v.literal("failed"),
   v.literal("cancelled"),
 );
@@ -49,9 +53,21 @@ export default defineSchema({
     email: v.string(),
     authUserId: v.optional(v.id("users")),
     code: v.string(),
+    marketingConsent: v.optional(
+      v.union(
+        v.literal("pending"),
+        v.literal("opted_in"),
+        v.literal("opted_out"),
+      ),
+    ),
+    marketingConsentAt: v.optional(v.number()),
+    analyticsConsent: v.optional(v.boolean()),
+    firstTouch: v.optional(v.string()),
+    lastTouch: v.optional(v.string()),
     firstOrderRedeemedAt: v.optional(v.number()),
     welcomeEmailSentAt: v.optional(v.number()),
     createdAt: v.number(),
+    updatedAt: v.optional(v.number()),
   })
     .index("by_email", ["email"])
     .index("by_code", ["code"])
@@ -103,6 +119,16 @@ export default defineSchema({
     createdAt: v.number(),
     updatedAt: v.number(),
     paidAt: v.optional(v.number()),
+    packedAt: v.optional(v.number()),
+    shippedAt: v.optional(v.number()),
+    deliveredAt: v.optional(v.number()),
+    refundedAt: v.optional(v.number()),
+    refundAud: v.optional(v.number()),
+    trackingNumber: v.optional(v.string()),
+    internalNotes: v.optional(v.string()),
+    purchaseTrackedAt: v.optional(v.number()),
+    inventorySettledAt: v.optional(v.number()),
+    inventoryReleasedAt: v.optional(v.number()),
     confirmationEmailClaimedAt: v.optional(v.number()),
     confirmationEmailClaimToken: v.optional(v.string()),
     confirmationEmailSentAt: v.optional(v.number()),
@@ -112,4 +138,46 @@ export default defineSchema({
     .index("by_member", ["memberId"])
     .index("by_stripe_payment_intent", ["stripePaymentIntentId"])
     .index("by_crypto_txid", ["cryptoTxid"]),
+  staffRoles: defineTable({
+    userId: v.id("users"),
+    email: v.string(),
+    role: v.union(
+      v.literal("owner"),
+      v.literal("ops"),
+      v.literal("support"),
+      v.literal("view_only"),
+    ),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_email", ["email"]),
+  consentLedger: defineTable({
+    memberId: v.id("members"),
+    category: v.union(v.literal("marketing"), v.literal("analytics")),
+    state: v.union(v.literal("pending"), v.literal("opted_in"), v.literal("opted_out")),
+    source: v.string(),
+    createdAt: v.number(),
+  }).index("by_member", ["memberId"]),
+  inventory: defineTable({
+    slug: v.string(),
+    stockCode: v.string(),
+    onHand: v.number(),
+    reserved: v.number(),
+    lowStockThreshold: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_slug", ["slug"])
+    .index("by_stock_code", ["stockCode"]),
+  auditLogs: defineTable({
+    staffUserId: v.id("users"),
+    staffEmail: v.string(),
+    action: v.string(),
+    targetType: v.string(),
+    targetId: v.string(),
+    detail: v.optional(v.string()),
+    createdAt: v.number(),
+  })
+    .index("by_staff", ["staffUserId"])
+    .index("by_created", ["createdAt"]),
 });

@@ -3,6 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AddToCartButton } from "@/components/AddToCartButton";
+import { ProductAnalytics } from "@/components/ProductAnalytics";
+import { ProductStockStatus } from "@/components/ProductStockStatus";
 import { DosingCalculator } from "@/components/dosing-calculator/DosingCalculator";
 import { FaqList } from "@/components/FaqList";
 import {
@@ -41,6 +43,13 @@ export default async function ProductPage({ params }: Props) {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+      <ProductAnalytics
+        slug={product.slug}
+        name={product.name}
+        priceAud={product.priceAud}
+        purityLabel={product.purityLabel}
+        inStock={inStock}
+      />
       <div className="grid gap-10 lg:grid-cols-[0.95fr_1.05fr]">
         <div className="relative aspect-[4/5] overflow-hidden border border-line bg-mist">
           <Image
@@ -72,19 +81,7 @@ export default async function ProductPage({ params }: Props) {
                 {product.formLabel}
               </span>
             ) : null}
-            <span
-              className={`flex items-center gap-1.5 px-1 ${
-                inStock ? "text-muted" : "text-accent"
-              }`}
-            >
-              <span
-                aria-hidden
-                className={`h-1.5 w-1.5 rounded-full ${
-                  inStock ? "bg-ink/60" : "bg-accent"
-                }`}
-              />
-              {inStock ? "In stock" : "Out of stock"}
-            </span>
+            <ProductStockStatus slug={product.slug} fallback={inStock} />
           </div>
 
           <p className="mt-5 border border-accent/20 bg-sand/60 px-4 py-3 text-sm text-ink">

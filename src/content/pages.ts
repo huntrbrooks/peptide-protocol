@@ -314,31 +314,37 @@ export const pages: Record<string, PageContent> = {
       "How The Protocol collects, uses, and protects personal information for Australian customers under the Privacy Act 1988.",
     headline: "Privacy policy",
     body: [
-      "The Protocol respects your privacy. This policy explains how we handle personal information when you browse the site, contact support, or place an order.",
+      "The Protocol respects your privacy. This policy explains how we handle personal information when you browse, create a membership, contact support, or place an order.",
     ],
     sections: [
       {
         title: "Information we collect",
         body: [
-          "We may collect your name, email address, phone number, shipping address, organisation details, order history, and correspondence. Technical data such as IP address and browser type may be collected through standard website analytics and security logs.",
+          "We may collect your name, email address, phone number, shipping address, organisation details, member code, consent choices, order history, and correspondence. If you create an account, Convex Auth stores the authentication record. With analytics consent, PostHog may collect device, page, referral, and interaction data. Masked session replay is a separate optional choice and is disabled on checkout and account pages.",
         ],
       },
       {
         title: "How we use information",
         body: [
-          "We use personal information to process orders, arrange shipping, respond to enquiries, provide COA documentation, improve site security, and meet legal obligations. We do not sell personal information.",
+          "We use personal information to operate membership discounts, authenticate accounts, process orders, arrange shipping, send transactional member-code and order messages, respond to enquiries, provide COA documentation, improve the site where consent allows, and meet legal obligations. Marketing email is sent only when you opt in; transactional code, security, and order email does not require marketing consent. We do not sell personal information.",
         ],
       },
       {
-        title: "Storage and security",
+        title: "Service providers and overseas disclosure",
         body: [
-          "Information is stored using service providers appropriate for Australian e-commerce operations. We take reasonable steps to protect personal information from misuse, interference, loss, and unauthorised access.",
+          "We use Convex and Convex Auth for application data and accounts, Resend for email delivery, Stripe and connected checkout services for card payment, and PostHog for consented analytics. These providers may process or store information outside Australia, including in the United States or other locations where they or their subprocessors operate. We take reasonable steps required by APP 8 to select and configure providers appropriately and to protect information from misuse, interference, loss, and unauthorised access.",
         ],
       },
       {
         title: "Disclosure",
         body: [
-          "We may share information with payment processors, shipping carriers, and IT providers solely to fulfil orders and operate the business. We may disclose information where required by law.",
+          "We disclose only what is reasonably needed to payment processors, shipping carriers, authentication, hosting, analytics, and email providers to operate the service. Optional analytics and replay remain off until you consent after passing the age gate. We may also disclose information where required by law.",
+        ],
+      },
+      {
+        title: "Your choices",
+        body: [
+          "You can decline analytics, marketing, and replay while continuing to use essential cart, age-gate, authentication, and checkout functions. You can withdraw marketing consent using the unsubscribe option in marketing email or by contacting us. Withdrawing marketing consent does not stop transactional member-code, security, or order messages.",
         ],
       },
       {

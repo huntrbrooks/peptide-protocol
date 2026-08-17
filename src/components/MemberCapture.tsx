@@ -27,6 +27,7 @@ import {
   persistMemberCaptureRecord,
   subscribeMemberCapture,
 } from "@/lib/membership/storage";
+import { identify, track } from "@/lib/analytics/track";
 
 const FOCUSABLE = "a[href], button:not([disabled]), input:not([disabled])";
 const SCROLL_THRESHOLD_PX = 40;
@@ -83,6 +84,7 @@ function MemberCaptureLive() {
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
   const [password, setPassword] = useState("");
+  const [marketingConsent, setMarketingConsent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -107,18 +109,19 @@ function MemberCaptureLive() {
   useEffect(() => {
     if (!canPrompt || open) return;
 
-    const reveal = () => {
+    const reveal = (trigger: "scroll" | "click") => {
       setOpen(true);
+      track("member_capture_shown", { trigger });
     };
 
     const onScroll = () => {
       if (window.scrollY >= SCROLL_THRESHOLD_PX) {
-        reveal();
+        reveal("scroll");
       }
     };
     const onClick = (event: MouseEvent) => {
       if (isInSiteAnchor(event.target)) {
-        reveal();
+        reveal("click");
       }
     };
 
@@ -167,6 +170,7 @@ function MemberCaptureLive() {
   }, [open]);
 
   function dismiss() {
+    track("member_capture_dismissed", { step });
     persistMemberCaptureDismissed();
     setOpen(false);
     setError(null);
@@ -183,7 +187,11 @@ function MemberCaptureLive() {
     setBusy(true);
     setError(null);
     try {
-      const result = await captureEmail({ email });
+      const result = await captureEmail({
+        email,
+        marketingConsent,
+        attribution: window.location.search.slice(0, 500) || undefined,
+      });
       setCode(result.code);
       setEmail(email.trim().toLowerCase());
       persistMemberCaptureRecord({
@@ -191,6 +199,11 @@ function MemberCaptureLive() {
         code: result.code,
       });
       setStep(2);
+      identify(String(result.memberId), email.trim().toLowerCase());
+      track("generate_lead", {
+        lead_source: "member_popup",
+        is_new: result.isNew,
+      });
     } catch (caught) {
       setError(
         caught instanceof Error
@@ -216,6 +229,7 @@ function MemberCaptureLive() {
       formData.set("password", password);
       formData.set("flow", "signUp");
       await signIn("password", formData);
+      track("sign_up", { method: "password" });
       finishWithCode(email, code);
     } catch (caught) {
       setError(
@@ -312,6 +326,16 @@ function MemberCaptureLive() {
             >
               {busy ? "Saving…" : copy.submitLabel}
             </button>
+            <label className="mt-4 flex items-start gap-2 text-left text-xs leading-relaxed text-muted">
+              <input
+                type="checkbox"
+                checked={marketingConsent}
+                onChange={(event) => setMarketingConsent(event.target.checked)}
+                className="mt-0.5"
+              />
+              Email me member offers and product updates. The member-code email is
+              transactional and is sent even if this remains unchecked.
+            </label>
             <p className="mt-4 text-xs leading-relaxed text-muted">
               {copy.finePrint}{" "}
               <Link

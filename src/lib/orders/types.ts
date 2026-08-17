@@ -8,6 +8,10 @@ export type OrderStatus =
   | "pending"
   | "pending_verification"
   | "paid"
+  | "packed"
+  | "shipped"
+  | "delivered"
+  | "refunded"
   | "failed"
   | "cancelled";
 

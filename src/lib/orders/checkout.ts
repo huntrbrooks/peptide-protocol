@@ -148,6 +148,18 @@ export async function resolveCheckoutTotals(
       "NEXT_PUBLIC_CONVEX_URL is not set. Run `npx convex dev` to link a project.",
     );
   }
+  const availability = await fetchQuery(api.inventory.availability, {
+    slugs: checkout.lines.map((line) => line.slug),
+  });
+  const availableBySlug = new Map(
+    availability.map((row) => [row.slug, row.available]),
+  );
+  for (const line of checkout.lines) {
+    const available = availableBySlug.get(line.slug);
+    if (available !== undefined && available < line.quantity) {
+      throw new Error(`${line.name} is out of stock.`);
+    }
+  }
   const quote = await fetchQuery(api.members.quoteDiscount, {
     email: checkout.email,
     code: checkout.discountCode,

@@ -1,14 +1,33 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import type { Product } from "@/content/types";
 import { formatPrice } from "@/content/products";
+import { track } from "@/lib/analytics/track";
+import { useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
 
 export function ProductCard({ product }: { product: Product }) {
-  const inStock = product.inStock ?? true;
+  const inventory = useQuery(
+    api.inventory.availability,
+    process.env.NEXT_PUBLIC_CONVEX_URL ? { slugs: [product.slug] } : "skip",
+  );
+  const inStock = inventory === undefined
+    ? (product.inStock ?? true)
+    : inventory[0]
+      ? inventory[0].available > 0
+      : (product.inStock ?? true);
 
   return (
     <Link
       href={`/products/${product.slug}`}
+      onClick={() =>
+        track("select_item", {
+          item_list_id: "catalogue",
+          items: [{ item_id: product.slug, item_name: product.name, price: product.priceAud }],
+        })
+      }
       className="card-lift group flex flex-col overflow-hidden border border-line bg-paper"
     >
       <div className="relative aspect-[4/5] overflow-hidden bg-mist">
