@@ -5,7 +5,13 @@ import { notFound } from "next/navigation";
 import { AddToCartButton } from "@/components/AddToCartButton";
 import { DosingCalculator } from "@/components/dosing-calculator/DosingCalculator";
 import { FaqList } from "@/components/FaqList";
-import { getProductBySlug, products } from "@/content/products";
+import {
+  formatPrice,
+  getKitForSingle,
+  getProductBySlug,
+  getSingleForKit,
+  products,
+} from "@/content/products";
 import { site } from "@/content/site";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -29,6 +35,10 @@ export default async function ProductPage({ params }: Props) {
   const product = getProductBySlug(slug);
   if (!product) notFound();
 
+  const kit = getKitForSingle(product.slug);
+  const single = getSingleForKit(product.slug);
+  const inStock = product.inStock ?? true;
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
       <div className="grid gap-10 lg:grid-cols-[0.95fr_1.05fr]">
@@ -50,20 +60,71 @@ export default async function ProductPage({ params }: Props) {
           <h1 className="mt-3 font-display text-4xl tracking-tight text-ink sm:text-5xl">
             {product.name}
           </h1>
-          <p className="mt-4 font-display text-2xl text-ink">{product.headline}</p>
-          <div className="mt-5 space-y-3 text-sm leading-relaxed text-muted">
-            {product.body.map((p) => (
-              <p key={p}>{p}</p>
-            ))}
+
+          <div className="mt-5 flex flex-wrap items-center gap-2 text-sm">
+            {product.purityLabel ? (
+              <span className="border border-line bg-mist/40 px-3 py-1 text-ink">
+                {product.purityLabel}
+              </span>
+            ) : null}
+            {product.formLabel ? (
+              <span className="border border-line bg-mist/40 px-3 py-1 text-muted">
+                {product.formLabel}
+              </span>
+            ) : null}
+            <span
+              className={`flex items-center gap-1.5 px-1 ${
+                inStock ? "text-muted" : "text-accent"
+              }`}
+            >
+              <span
+                aria-hidden
+                className={`h-1.5 w-1.5 rounded-full ${
+                  inStock ? "bg-ink/60" : "bg-accent"
+                }`}
+              />
+              {inStock ? "In stock" : "Out of stock"}
+            </span>
           </div>
+
           <p className="mt-5 border border-accent/20 bg-sand/60 px-4 py-3 text-sm text-ink">
             {product.researchNotice}
           </p>
           {product.promoLabel ? (
             <p className="mt-3 text-sm text-accent">{product.promoLabel}</p>
           ) : null}
-          <div className="mt-8">
+          <div className="mt-6">
             <AddToCartButton product={product} />
+          </div>
+
+          {kit ? (
+            <p className="mt-4 text-sm text-muted">
+              Also available:{" "}
+              <Link
+                href={`/products/${kit.slug}`}
+                className="text-accent underline underline-offset-2 transition hover:text-ink"
+              >
+                10-vial kit — {formatPrice(kit.priceAud)}
+              </Link>
+            </p>
+          ) : null}
+          {single ? (
+            <p className="mt-4 text-sm text-muted">
+              Also available:{" "}
+              <Link
+                href={`/products/${single.slug}`}
+                className="text-accent underline underline-offset-2 transition hover:text-ink"
+              >
+                single vial — {formatPrice(single.priceAud)}
+              </Link>
+            </p>
+          ) : null}
+
+          <p className="mt-6 font-display text-2xl text-ink">{product.headline}</p>
+          <div className="mt-4 space-y-3 text-sm leading-relaxed text-muted">
+            {product.body.map((p) => (
+              <p key={p}>{p}</p>
+            ))}
           </div>
         </div>
       </div>

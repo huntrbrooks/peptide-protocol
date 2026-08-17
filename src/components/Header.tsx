@@ -4,6 +4,31 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { site } from "@/content/site";
+import { useCartCount } from "@/lib/cart/useCartCount";
+
+function CartLink({
+  className,
+  onClick,
+}: {
+  className?: string;
+  onClick?: () => void;
+}) {
+  const count = useCartCount();
+
+  return (
+    <Link
+      href="/checkout"
+      onClick={onClick}
+      className={`inline-flex items-center gap-2 rounded-sm border border-line px-4 py-2 text-sm text-ink transition hover:border-accent hover:text-accent ${className ?? ""}`}
+      aria-label={`Cart, ${count} ${count === 1 ? "item" : "items"}`}
+    >
+      Cart
+      <span className="inline-flex min-w-5 items-center justify-center rounded-sm bg-ink px-1.5 py-0.5 text-xs font-medium leading-none text-paper">
+        {count}
+      </span>
+    </Link>
+  );
+}
 
 export function Header() {
   const [open, setOpen] = useState(false);
@@ -32,27 +57,25 @@ export function Header() {
               {item.label}
             </Link>
           ))}
-          <Link
-            href="/shop"
-            className="btn-primary rounded-sm bg-ink px-4 py-2 text-sm text-paper hover:bg-accent"
-          >
-            Catalogue
-          </Link>
+          <CartLink />
         </nav>
 
-        <button
-          type="button"
-          className="inline-flex h-10 w-10 items-center justify-center rounded-sm border border-line transition hover:border-accent hover:text-accent md:hidden"
-          aria-label="Toggle menu"
-          onClick={() => setOpen((v) => !v)}
-        >
-          <span className="sr-only">Menu</span>
-          <div className="flex w-4 flex-col gap-1">
-            <span className="h-px w-full bg-current" />
-            <span className="h-px w-full bg-current" />
-            <span className="h-px w-full bg-current" />
-          </div>
-        </button>
+        <div className="flex items-center gap-2 md:hidden">
+          <CartLink />
+          <button
+            type="button"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-sm border border-line transition hover:border-accent hover:text-accent"
+            aria-label="Toggle menu"
+            onClick={() => setOpen((v) => !v)}
+          >
+            <span className="sr-only">Menu</span>
+            <div className="flex w-4 flex-col gap-1">
+              <span className="h-px w-full bg-current" />
+              <span className="h-px w-full bg-current" />
+              <span className="h-px w-full bg-current" />
+            </div>
+          </button>
+        </div>
       </div>
 
       {open ? (
@@ -68,13 +91,6 @@ export function Header() {
                 {item.label}
               </Link>
             ))}
-            <Link
-              href="/shop"
-              className="btn-primary mt-1 w-fit rounded-sm bg-ink px-4 py-2 text-sm text-paper hover:bg-accent"
-              onClick={() => setOpen(false)}
-            >
-              Catalogue
-            </Link>
           </div>
         </div>
       ) : null}

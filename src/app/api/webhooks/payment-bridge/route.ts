@@ -1,6 +1,7 @@
 import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { updateMoonPayOrder } from "@/lib/orders/convex";
+import { sendOrderPaidEmails } from "@/lib/orders/paid-email";
 
 export const runtime = "nodejs";
 
@@ -61,6 +62,9 @@ export async function POST(request: Request): Promise<NextResponse> {
       return NextResponse.json({ ok: false, error: "Order not found" }, {
         status: 404,
       });
+    }
+    if (body.status === "paid") {
+      await sendOrderPaidEmails(String(orderId));
     }
     return NextResponse.json({ ok: true });
   } catch (error) {

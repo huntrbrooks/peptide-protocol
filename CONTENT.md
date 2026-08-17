@@ -2,8 +2,8 @@
 
 Editable copy archive for the The Protocol website. Canonical structured data lives in `src/content/`.
 
-**Domain:** peptideprotocolau.io  
-**Handle:** @peptideprotocolau  
+**Domain:** theprotocolau.com  
+**Handle:** @theprotocol.au  
 **Market:** Australia  
 
 All products are for research purposes only. Not for human consumption. Not a medicine, supplement, or cosmetic. Laboratory and in vitro use only.
@@ -15,15 +15,15 @@ All products are for research purposes only. Not for human consumption. Not a me
 ### Instagram / TikTok bio
 ```
 Research peptides for Australian laboratories. Documented purity. Express dispatch. Research use only. Not for human consumption.
-peptideprotocolau.io
+theprotocolau.com
 ```
 
 ### Link-in-bio
-1. Shop all research materials → https://peptideprotocolau.io/shop
-2. Quality & testing / COA requests → https://peptideprotocolau.io/quality
-3. Shipping information → https://peptideprotocolau.io/shipping
-4. Contact support → https://peptideprotocolau.io/contact
-5. Research use disclaimer → https://peptideprotocolau.io/disclaimer
+1. Shop all research materials → https://theprotocolau.com/shop
+2. Quality & testing / COA requests → https://theprotocolau.com/quality
+3. Shipping information → https://theprotocolau.com/shipping
+4. Contact support → https://theprotocolau.com/contact
+5. Research use disclaimer → https://theprotocolau.com/disclaimer
 
 ---
 

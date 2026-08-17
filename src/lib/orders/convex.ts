@@ -110,3 +110,26 @@ export async function submitCryptoVerification(input: {
     paymentSecret: requirePaymentSecret(),
   });
 }
+
+export async function claimPaidEmail(input: {
+  orderId: string;
+  claimToken: string;
+}) {
+  requireConvexUrl();
+  return await fetchMutation(api.orders.claimPaidEmail, {
+    ...input,
+    paymentSecret: requirePaymentSecret(),
+  });
+}
+
+export async function completePaidEmail(input: {
+  orderId: string;
+  claimToken: string;
+  sent: boolean;
+}): Promise<void> {
+  requireConvexUrl();
+  await fetchMutation(api.orders.completePaidEmail, {
+    ...input,
+    paymentSecret: requirePaymentSecret(),
+  });
+}

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import type { Product } from "@/content/types";
 import { formatPrice } from "@/content/products";
+import { site } from "@/content/site";
 import { addToCart } from "@/lib/cart/storage";
 
 export function AddToCartButton({ product }: { product: Product }) {
@@ -16,14 +17,13 @@ export function AddToCartButton({ product }: { product: Product }) {
         onClick={() => {
           addToCart(product.slug, 1);
           setAdded(true);
-          window.setTimeout(() => setAdded(false), 2500);
         }}
         className="btn-primary rounded-sm bg-ink px-6 py-3 text-sm text-paper hover:bg-accent"
       >
         {added ? "Added to cart" : `Add to cart · ${formatPrice(product.priceAud)}`}
       </button>
       <a
-        href={`mailto:support@peptideprotocolau.io?subject=${encodeURIComponent(
+        href={`mailto:${site.email}?subject=${encodeURIComponent(
           `COA request: ${product.name}`,
         )}`}
         className="rounded-sm border border-line px-6 py-3 text-center text-sm text-ink transition hover:border-accent hover:text-accent"
@@ -32,11 +32,10 @@ export function AddToCartButton({ product }: { product: Product }) {
       </a>
       {added ? (
         <p className="text-sm text-muted">
-          Saved locally.{" "}
+          Added —{" "}
           <Link href="/checkout" className="text-accent underline">
-            Continue to order via WhatsApp
-          </Link>{" "}
-          (temporary — online checkout paused).
+            continue to checkout
+          </Link>
         </p>
       ) : null}
     </div>

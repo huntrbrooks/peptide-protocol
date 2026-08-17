@@ -717,10 +717,48 @@ const kits: Product[] = kitDefs.map((def) => {
   });
 });
 
-export const products: Product[] = [...singles, ...kits];
+/**
+ * Derive card/PDP display fields from the published spec rows so listings
+ * never show claims that are not already on the spec sheet.
+ */
+function withDisplayFields(product: Product): Product {
+  const purityValue = product.specs.find((row) => row.label === "Purity")?.value;
+  const formValue = product.specs.find((row) => row.label === "Form")?.value;
+  const purityMatch = purityValue?.match(/≥\s*\d+(?:\.\d+)?%/);
+
+  let formLabel: string | undefined;
+  if (formValue?.toLowerCase().includes("lyophilised")) {
+    formLabel = "Lyophilised";
+  } else if (formValue?.toLowerCase().includes("liquid")) {
+    formLabel = "Sterile liquid";
+  }
+
+  return {
+    ...product,
+    purityLabel:
+      product.purityLabel ??
+      (purityMatch ? `${purityMatch[0]} RP-HPLC` : undefined),
+    formLabel: product.formLabel ?? formLabel,
+    inStock: product.inStock ?? true,
+  };
+}
+
+export const products: Product[] = [...singles, ...kits].map(withDisplayFields);
 
 export function getProductBySlug(slug: string): Product | undefined {
   return products.find((p) => p.slug === slug);
+}
+
+/** 10-vial kit listing for a single-vial product, if one exists. */
+export function getKitForSingle(singleSlug: string): Product | undefined {
+  const def = kitDefs.find((d) => d.singleSlug === singleSlug);
+  return def ? getProductBySlug(def.slug) : undefined;
+}
+
+/** Single-vial listing behind a 10-vial kit, if the product is a kit. */
+export function getSingleForKit(kitSlug: string): Product | undefined {
+  const def = kitDefs.find((d) => d.slug === kitSlug);
+  return def ? getProductBySlug(def.singleSlug) : undefined;
 }
 
 export function getProductsByCategory(categorySlug: string): Product[] {

@@ -41,6 +41,12 @@ export type Product = {
   image: string;
   featured?: boolean;
   promoLabel?: string;
+  /** Card/PDP display only — derived from the published Purity spec row (e.g. "≥99.0% RP-HPLC"). */
+  purityLabel?: string;
+  /** Card/PDP display only — derived from the published Form spec row (e.g. "Lyophilised"). */
+  formLabel?: string;
+  /** Card/PDP stock display. Defaults to true. */
+  inStock?: boolean;
 };
 
 export type Category = {

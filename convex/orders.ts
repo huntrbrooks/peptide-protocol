@@ -75,6 +75,17 @@ const publicOrderValidator = v.object({
   updatedAt: v.number(),
 });
 
+const paidEmailOrderValidator = v.object({
+  _id: v.id("orders"),
+  email: v.string(),
+  shipping: orderShippingValidator,
+  lines: v.array(orderLineValidator),
+  subtotalAud: v.number(),
+  paymentMethod: v.union(paymentMethodValidator, v.null()),
+  createdAt: v.number(),
+  paidAt: v.number(),
+});
+
 function requirePaymentSecret(secret: string): void {
   const expected = process.env.ORDERS_WEBHOOK_SECRET;
   if (!expected || secret !== expected) {
@@ -328,6 +339,75 @@ export const submitCryptoVerification = mutation({
       paidAt: args.verified ? now : order.paidAt,
     });
     return orderId;
+  },
+});
+
+export const claimPaidEmail = mutation({
+  args: {
+    orderId: v.string(),
+    claimToken: v.string(),
+    paymentSecret: v.string(),
+  },
+  returns: v.union(paidEmailOrderValidator, v.null()),
+  handler: async (ctx, args) => {
+    requirePaymentSecret(args.paymentSecret);
+    const orderId = ctx.db.normalizeId("orders", args.orderId);
+    if (!orderId) return null;
+
+    const order = await ctx.db.get("orders", orderId);
+    if (!order || order.status !== "paid" || !order.paidAt) return null;
+    if (order.confirmationEmailSentAt) return null;
+
+    const now = Date.now();
+    const claimIsFresh =
+      order.confirmationEmailClaimedAt !== undefined &&
+      now - order.confirmationEmailClaimedAt < 15 * 60 * 1000;
+    if (order.confirmationEmailClaimToken && claimIsFresh) return null;
+
+    await ctx.db.patch("orders", orderId, {
+      confirmationEmailClaimedAt: now,
+      confirmationEmailClaimToken: args.claimToken,
+    });
+
+    return {
+      _id: order._id,
+      email: order.email,
+      shipping: order.shipping,
+      lines: order.lines,
+      subtotalAud: order.subtotalAud,
+      paymentMethod: order.paymentMethod ?? null,
+      createdAt: order.createdAt,
+      paidAt: order.paidAt,
+    };
+  },
+});
+
+export const completePaidEmail = mutation({
+  args: {
+    orderId: v.string(),
+    claimToken: v.string(),
+    sent: v.boolean(),
+    paymentSecret: v.string(),
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    requirePaymentSecret(args.paymentSecret);
+    const orderId = ctx.db.normalizeId("orders", args.orderId);
+    if (!orderId) return null;
+
+    const order = await ctx.db.get("orders", orderId);
+    if (!order || order.confirmationEmailClaimToken !== args.claimToken) {
+      return null;
+    }
+
+    await ctx.db.patch("orders", orderId, {
+      confirmationEmailClaimedAt: undefined,
+      confirmationEmailClaimToken: undefined,
+      confirmationEmailSentAt: args.sent
+        ? Date.now()
+        : order.confirmationEmailSentAt,
+    });
+    return null;
   },
 });
 

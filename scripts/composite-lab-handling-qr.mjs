@@ -1,6 +1,6 @@
 /**
  * Detect solid white QR placeholders on lab-handling inserts and composite a real QR.
- * Target URL: https://peptideprotocolau.io/lab-handling
+ * Target URL: https://theprotocolau.com/lab-handling
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -12,7 +12,7 @@ import { PNG } from "pngjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PRINT_DIR = path.join(__dirname, "../public/images/print");
-const QR_URL = "https://peptideprotocolau.io/lab-handling";
+const QR_URL = "https://theprotocolau.com/lab-handling";
 
 /**
  * Find the largest solid near-white square via row-run histogram + density check.

@@ -350,7 +350,7 @@ export const pages: Record<string, PageContent> = {
       {
         title: "Contact",
         body: [
-          "Privacy requests: support@peptideprotocolau.io",
+          "Privacy requests: contact@theprotocolau.com",
         ],
       },
     ],
@@ -409,7 +409,7 @@ export const pages: Record<string, PageContent> = {
     sections: [
       {
         title: "Support email",
-        body: ["support@peptideprotocolau.io"],
+        body: ["contact@theprotocolau.com"],
       },
       {
         title: "What to include",
@@ -427,7 +427,7 @@ export const pages: Record<string, PageContent> = {
       },
       {
         title: "Social",
-        body: ["@peptideprotocolau"],
+        body: ["@theprotocol.au"],
       },
     ],
   },

@@ -3,6 +3,7 @@ import {
   getConvexOrder,
   submitCryptoVerification,
 } from "@/lib/orders/convex";
+import { sendOrderPaidEmails } from "@/lib/orders/paid-email";
 import { verifyCryptoTransaction } from "@/lib/payments/crypto";
 
 export const runtime = "nodejs";
@@ -55,6 +56,23 @@ export async function POST(request: Request): Promise<NextResponse> {
         { ok: false, error: "Crypto order not found." },
         { status: 404 },
       );
+    }
+    if (result.verified) {
+      try {
+        await sendOrderPaidEmails(String(updated));
+      } catch (error) {
+        console.error("[checkout] paid-order email failed", error);
+        return NextResponse.json(
+          {
+            ok: false,
+            verified: true,
+            status: "paid",
+            error:
+              "Payment was confirmed, but the confirmation email could not be sent. Please contact support.",
+          },
+          { status: 502 },
+        );
+      }
     }
 
     return NextResponse.json({

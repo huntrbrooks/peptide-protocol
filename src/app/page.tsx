@@ -110,23 +110,20 @@ export default function HomePage() {
       </section>
 
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        <div className="reveal max-w-2xl">
-          <h2 className="font-display text-3xl tracking-tight text-ink sm:text-4xl">
-            Built for research workflows
-          </h2>
-          <p className="mt-3 text-muted">
-            Specs and batch docs first. Local packing and tracked dispatch.
-          </p>
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <h2 className="font-display text-3xl tracking-tight text-ink sm:text-4xl">
+              Featured materials
+            </h2>
+            <p className="mt-3 text-muted">Selected items with documented purity targets.</p>
+          </div>
+          <Link href="/shop" className="text-sm text-accent transition hover:text-ink">
+            Full catalogue
+          </Link>
         </div>
-        <div className="mt-10 grid gap-6 md:grid-cols-2">
-          {home.valueProps.map((item) => (
-            <div
-              key={item.title}
-              className="card-lift border border-line bg-paper p-6"
-            >
-              <h3 className="font-display text-xl text-ink">{item.title}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-muted">{item.body}</p>
-            </div>
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {featured.map((product) => (
+            <ProductCard key={product.slug} product={product} />
           ))}
         </div>
       </section>
@@ -173,78 +170,33 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        <div className="flex items-end justify-between gap-4">
-          <div>
-            <h2 className="font-display text-3xl tracking-tight text-ink sm:text-4xl">
-              Featured materials
-            </h2>
-            <p className="mt-3 text-muted">Selected items with documented purity targets.</p>
-          </div>
-          <Link href="/shop" className="text-sm text-accent transition hover:text-ink">
-            Full catalogue
-          </Link>
-        </div>
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {featured.map((product) => (
-            <ProductCard key={product.slug} product={product} />
-          ))}
-        </div>
-      </section>
-
-      <section className="border-y border-line bg-mist/30">
-        <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-16 sm:px-6 md:flex-row md:items-end md:justify-between">
-          <div className="max-w-xl">
-            <p className="text-xs uppercase tracking-[0.18em] text-muted">
-              Research questionnaire
-            </p>
-            <h2 className="mt-3 font-display text-3xl tracking-tight text-ink sm:text-4xl">
-              Find a research stack
-            </h2>
-            <p className="mt-3 text-sm leading-relaxed text-muted">
-              Maps research goals to catalogue pathways — with caution flags and a
-              research-only disclaimer.
-            </p>
-          </div>
-          <Link
-            href="/stack-finder"
-            className="btn-primary w-fit rounded-sm bg-ink px-5 py-3 text-sm text-paper hover:bg-accent"
-          >
-            Start questionnaire
-          </Link>
-        </div>
-      </section>
-
-      <section className="border-b border-line bg-sand/50">
-        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-16 sm:px-6 md:grid-cols-[1fr_1.2fr]">
+      <section className="border-t border-line bg-sand/50">
+        <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 sm:px-6 md:grid-cols-[1fr_1.2fr]">
           <div>
             <h2 className="font-display text-3xl tracking-tight text-ink">How ordering works</h2>
+            <p className="mt-6 text-sm font-medium text-ink">{home.complianceTitle}</p>
+            <p className="mt-2 max-w-md text-sm leading-relaxed text-muted">
+              {home.complianceBody}
+            </p>
           </div>
-          <ol className="space-y-5">
-            {home.howItWorks.map((step, index) => (
-              <li key={step} className="flex gap-4">
-                <span className="font-display text-2xl text-accent">{index + 1}</span>
-                <p className="pt-1 text-sm leading-relaxed text-muted">{step}</p>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        <div className="border border-line bg-paper p-8 sm:p-10">
-          <h2 className="font-display text-3xl text-ink">{home.complianceTitle}</h2>
-          <p className="mt-4 max-w-3xl text-sm leading-relaxed text-muted">
-            {home.complianceBody}
-          </p>
-          <div className="mt-8 flex flex-wrap items-center gap-4">
-            <Link
-              href={home.finalCta.href}
-              className="btn-primary rounded-sm bg-ink px-5 py-3 text-sm text-paper hover:bg-accent"
-            >
-              {home.finalCta.label}
-            </Link>
-            <p className="text-sm text-muted">{home.finalSupport}</p>
+          <div>
+            <ol className="space-y-5">
+              {home.howItWorks.map((step, index) => (
+                <li key={step} className="flex gap-4">
+                  <span className="font-display text-2xl text-accent">{index + 1}</span>
+                  <p className="pt-1 text-sm leading-relaxed text-muted">{step}</p>
+                </li>
+              ))}
+            </ol>
+            <p className="mt-8 text-sm text-muted">
+              {home.finalSupport}{" "}
+              <Link
+                href="/contact"
+                className="text-accent underline underline-offset-2 transition hover:text-ink"
+              >
+                Contact
+              </Link>
+            </p>
           </div>
         </div>
       </section>

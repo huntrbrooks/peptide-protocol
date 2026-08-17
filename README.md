@@ -1,6 +1,6 @@
 # The Protocol
 
-Australian research peptide catalogue site. Production host: **[theprotocolau.com](https://www.theprotocolau.com)** (Vercel project `peptide-protocol`). Content still references `peptideprotocolau.io` in places during brand transition.
+Australian research peptide catalogue site. Production host: **[theprotocolau.com](https://www.theprotocolau.com)** (Vercel project `peptide-protocol`).
 
 Research materials only. Not for human consumption. Not a medicine, supplement, or cosmetic. Laboratory and in vitro use only.
 
@@ -51,6 +51,10 @@ Set on the `peptide-protocol` project (CLI: `vercel env add … production`):
 | `STRIPE_SECRET_KEY` | Stripe test secret (or a least-privilege restricted key where supported) |
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe test publishable key |
 | `STRIPE_WEBHOOK_SECRET` | Signing secret for `/api/webhooks/stripe` |
+| `RESEND_API_KEY` | Resend server-side API key; never expose with a `NEXT_PUBLIC_` prefix |
+| `RESEND_FROM_EMAIL` | Sender address on a verified Resend domain |
+| `ORDERS_NOTIFY_EMAIL` | Merchant operations recipient (or use `RESEND_TO_OPS`) |
+| `SHIPPING_FROM_*` | Real merchant name and postal return-address fields used on labels |
 | `CRYPTO_ETH_ADDRESS` | Ethereum settlement wallet |
 | `CRYPTO_USDT_ADDRESS` / `CRYPTO_BTC_ADDRESS` | Optional; unset currencies are hidden |
 | `ETH_RPC_URL` | Optional Ethereum mainnet RPC; enables automatic ETH/USDT checks |
@@ -116,6 +120,19 @@ This secret gates payment mutations so only the Next.js Stripe/crypto routes can
 `/checkout` uses Freshnup-hosted MoonPay as the primary payment path. Embedded Stripe and direct self-custody crypto remain alternate tabs, and WhatsApp remains a help link.
 
 Orders persist in **Convex**. The success page subscribes with `useQuery`, so webhook and chain-verification updates appear live.
+
+### Paid-order email notifications
+
+Stripe, verified crypto, and the Freshnup payment bridge all call the same paid-order email service after Convex records the first `paid` transition. Convex atomically claims the notification and stores `confirmationEmailSentAt`, preventing duplicate sends from repeated webhooks.
+
+The customer receives an HTML confirmation with order lines, AUD total, shipping address, payment method, and research disclaimer. A formal receipt PDF and a 100 × 150 mm printable postal label PDF are attached; `ORDERS_NOTIFY_EMAIL` receives a hidden copy with both attachments.
+
+Before enabling production sends:
+
+1. Add and verify the exact `RESEND_FROM_EMAIL` domain in the [Resend Domains dashboard](https://resend.com/domains), including its SPF and DKIM DNS records.
+2. Set `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `ORDERS_NOTIFY_EMAIL` (or `RESEND_TO_OPS`), and every `SHIPPING_FROM_*` variable on Vercel Production.
+3. Replace the example return address in `.env.example` with the real dispatch address in Vercel; the example values are not suitable for live labels.
+4. Redeploy after changing Vercel environment variables.
 
 ### Freshnup MoonPay bridge
 

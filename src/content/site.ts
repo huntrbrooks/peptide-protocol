@@ -1,9 +1,9 @@
 export const site = {
   name: "The Protocol",
-  domain: "peptideprotocolau.io",
-  url: "https://peptideprotocolau.io",
-  email: "support@peptideprotocolau.io",
-  handle: "@peptideprotocolau",
+  domain: "theprotocolau.com",
+  url: "https://theprotocolau.com",
+  email: "contact@theprotocolau.com",
+  handle: "@theprotocol.au",
   locale: "en-AU",
   currency: "AUD",
   tagline: "Documented research peptides, dispatched locally",
@@ -16,18 +16,14 @@ export const site = {
     "Express tracking",
     "Plain packaging",
   ],
-  /** Site-wide announcement marquee — edit here to update live chrome */
+  /** Site-wide announcement bar — static one-liner, edit here to update live chrome */
   announcementBanner: [
-    "Tracked express · Dispatch before 2pm AEST",
-    "Single vials and 10-vial kits in stock",
+    "Dispatch before 2pm AEST · Tracked Express Post Australia-wide",
   ],
   nav: [
     { label: "Shop", href: "/shop" },
-    { label: "Stack finder", href: "/stack-finder" },
-    { label: "Research calculator", href: "/dosing-calculator" },
     { label: "Quality", href: "/quality" },
     { label: "About", href: "/about" },
-    { label: "FAQ", href: "/faq" },
     { label: "Contact", href: "/contact" },
   ],
   footerNav: [
@@ -35,7 +31,6 @@ export const site = {
       title: "Catalogue",
       links: [
         { label: "All products", href: "/shop" },
-        { label: "Find your stack", href: "/stack-finder" },
         { label: "Metabolic research", href: "/shop/metabolic" },
         { label: "Growth hormone pathway", href: "/shop/growth-hormone" },
         { label: "Tissue & recovery", href: "/shop/tissue-recovery" },
@@ -50,6 +45,7 @@ export const site = {
         { label: "Quality & testing", href: "/quality" },
         { label: "Lab handling", href: "/lab-handling" },
         { label: "Research calculator", href: "/dosing-calculator" },
+        { label: "Stack finder", href: "/stack-finder" },
         { label: "Shipping", href: "/shipping" },
         { label: "Returns", href: "/returns" },
         { label: "FAQ", href: "/faq" },
@@ -76,26 +72,8 @@ export const home = {
   headline: "Documented research peptides, dispatched locally",
   subheadline:
     "Lyophilised compounds with batch COAs and clear specs. Laboratory and in vitro use only — not for human consumption.",
-  primaryCta: { label: "Browse catalogue", href: "/shop" },
+  primaryCta: { label: "Shop research peptides", href: "/shop" },
   secondaryCta: { label: "Quality & testing", href: "/quality" },
-  valueProps: [
-    {
-      title: "Research-first listings",
-      body: "Spec sheets and storage notes ahead of marketing claims.",
-    },
-    {
-      title: "File-ready purity",
-      body: "RP-HPLC assessment; COAs available for intake records.",
-    },
-    {
-      title: "Clear Australian transit",
-      body: "Local packing; tracked Australia Post express with dispatch confirmation.",
-    },
-    {
-      title: "Fact-based support",
-      body: "COA, batch, or shipping questions answered with documentation.",
-    },
-  ],
   howItWorks: [
     "Choose materials, accept the research-use terms, then pay securely by card or supported crypto.",
     "We confirm stock, pack vials, and dispatch before 2pm AEST on business days when possible.",
@@ -104,17 +82,16 @@ export const home = {
   complianceTitle: "Research use only",
   complianceBody:
     "All products are for laboratory and controlled research only — not medicines, supplements, cosmetics, or for human or veterinary use. Purchase confirms you accept these terms.",
-  finalCta: { label: "Shop research materials", href: "/shop" },
   finalSupport: "Questions on docs or shipping? Contact support first.",
 };
 
 export const social = {
-  bio: "Research peptides for Australian laboratories. Documented purity. Express dispatch. Research use only. Not for human consumption.\npeptideprotocolau.io",
+  bio: "Research peptides for Australian laboratories. Documented purity. Express dispatch. Research use only. Not for human consumption.\ntheprotocolau.com",
   linkInBio: [
-    { label: "Shop all research materials", href: "https://peptideprotocolau.io/shop" },
-    { label: "Quality & testing / COA requests", href: "https://peptideprotocolau.io/quality" },
-    { label: "Shipping information", href: "https://peptideprotocolau.io/shipping" },
-    { label: "Contact support", href: "https://peptideprotocolau.io/contact" },
-    { label: "Research use disclaimer", href: "https://peptideprotocolau.io/disclaimer" },
+    { label: "Shop all research materials", href: "https://theprotocolau.com/shop" },
+    { label: "Quality & testing / COA requests", href: "https://theprotocolau.com/quality" },
+    { label: "Shipping information", href: "https://theprotocolau.com/shipping" },
+    { label: "Contact support", href: "https://theprotocolau.com/contact" },
+    { label: "Research use disclaimer", href: "https://theprotocolau.com/disclaimer" },
   ],
 };

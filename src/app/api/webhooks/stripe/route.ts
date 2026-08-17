@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { updateStripeOrder } from "@/lib/orders/convex";
+import { sendOrderPaidEmails } from "@/lib/orders/paid-email";
 import { getStripe } from "@/lib/payments/stripe";
 
 export const runtime = "nodejs";
@@ -53,6 +54,9 @@ export async function POST(request: Request): Promise<NextResponse> {
         event.type === "payment_intent.payment_failed" ||
         event.type === "payment_intent.canceled",
     });
+    if (updated && event.type === "payment_intent.succeeded") {
+      await sendOrderPaidEmails(String(updated));
+    }
     return NextResponse.json({ ok: true, ignored: !updated });
   } catch (error) {
     console.error("[stripe webhook] order update failed", error);

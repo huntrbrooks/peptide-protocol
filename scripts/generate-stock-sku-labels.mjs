@@ -200,7 +200,7 @@ function kitLabelSvg(sku, { w, h, logoUri }) {
   <rect width="${w}" height="${h}" rx="8" fill="${light}" stroke="${accent}" stroke-width="4"/>
   <image href="${logoUri}" x="${Math.round(w * 0.04)}" y="${Math.round(h * 0.08)}" width="${logoSize}" height="${logoSize}" preserveAspectRatio="xMidYMid meet"/>
   <text x="${Math.round(w * 0.04) + logoSize + 12}" y="${Math.round(h * 0.16)}" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="${Math.round(h * 0.065)}" font-weight="700" fill="${accent}" letter-spacing="1">THE PROTOCOL</text>
-  <text x="${Math.round(w * 0.04) + logoSize + 12}" y="${Math.round(h * 0.24)}" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="${Math.round(h * 0.04)}" fill="${accent}" opacity="0.85">peptideprotocolau.io</text>
+  <text x="${Math.round(w * 0.04) + logoSize + 12}" y="${Math.round(h * 0.24)}" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="${Math.round(h * 0.04)}" fill="${accent}" opacity="0.85">theprotocolau.com</text>
   <rect x="${Math.round(w * 0.04)}" y="${Math.round(h * 0.32)}" width="${Math.round(w * 0.92)}" height="${Math.round(h * 0.22)}" rx="4" fill="${accent}"/>
   <text x="${w / 2}" y="${Math.round(h * 0.46)}" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="${Math.round(h * 0.09)}" font-weight="700" fill="#FFFFFF">${escapeXml(sku.productName)}</text>
   <text x="${w / 2}" y="${Math.round(h * 0.62)}" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="${Math.round(h * 0.07)}" font-weight="700" fill="${accent}">${escapeXml(sku.strength)}  ·  10 × vials</text>
@@ -217,7 +217,7 @@ function circleStickerSvg({ size, logoUri }) {
   <circle cx="${r}" cy="${r}" r="${r - 2}" fill="#FFFFFF" stroke="#1A6B7A" stroke-width="${Math.max(3, Math.round(size * 0.018))}"/>
   <image href="${logoUri}" x="${(size - logo) / 2}" y="${Math.round(size * 0.14)}" width="${logo}" height="${logo}" preserveAspectRatio="xMidYMid meet"/>
   <text x="${r}" y="${Math.round(size * 0.55)}" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="${Math.round(size * 0.075)}" font-weight="700" fill="#1A6B7A" letter-spacing="0.5">The Protocol</text>
-  <text x="${r}" y="${Math.round(size * 0.66)}" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="${Math.round(size * 0.048)}" fill="#1A6B7A">peptideprotocolau.io</text>
+  <text x="${r}" y="${Math.round(size * 0.66)}" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="${Math.round(size * 0.048)}" fill="#1A6B7A">theprotocolau.com</text>
   <text x="${r}" y="${Math.round(size * 0.8)}" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="${Math.round(size * 0.052)}" font-weight="700" fill="#1A6B7A" letter-spacing="1">RESEARCH USE ONLY</text>
 </svg>`;
 }
