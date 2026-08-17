@@ -10,8 +10,17 @@ export type MemberCaptureRecord = {
 };
 
 const listeners = new Set<() => void>();
+const EMPTY_CAPTURE_STATE = { record: null, dismissed: false } as const;
+let cachedRecordRaw: string | null | undefined;
+let cachedDismissedRaw: string | null | undefined;
+let cachedCaptureState: {
+  record: MemberCaptureRecord | null;
+  dismissed: boolean;
+} = EMPTY_CAPTURE_STATE;
 
 function emit(): void {
+  cachedRecordRaw = undefined;
+  cachedDismissedRaw = undefined;
   for (const listener of listeners) {
     listener();
   }
@@ -96,15 +105,24 @@ export function getMemberCaptureSnapshot(): {
   record: MemberCaptureRecord | null;
   dismissed: boolean;
 } {
-  return {
+  if (typeof window === "undefined") return EMPTY_CAPTURE_STATE;
+  const recordRaw = window.localStorage.getItem(MEMBER_CAPTURE_RECORD_KEY);
+  const dismissedRaw = window.localStorage.getItem(MEMBER_CAPTURE_DISMISS_KEY);
+  if (recordRaw === cachedRecordRaw && dismissedRaw === cachedDismissedRaw) {
+    return cachedCaptureState;
+  }
+  cachedRecordRaw = recordRaw;
+  cachedDismissedRaw = dismissedRaw;
+  cachedCaptureState = {
     record: readMemberCaptureRecord(),
     dismissed: isMemberCaptureDismissed(),
   };
+  return cachedCaptureState;
 }
 
 export function getMemberCaptureServerSnapshot(): {
   record: MemberCaptureRecord | null;
   dismissed: boolean;
 } {
-  return { record: null, dismissed: false };
+  return EMPTY_CAPTURE_STATE;
 }

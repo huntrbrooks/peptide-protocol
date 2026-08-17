@@ -1,6 +1,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   MEMBER_CAPTURE_DISMISS_MS,
+  getMemberCaptureServerSnapshot,
+  getMemberCaptureSnapshot,
   isMemberCaptureDismissed,
   isMemberCaptureExemptPath,
   persistMemberCaptureDismissed,
@@ -46,6 +48,15 @@ describe("member capture storage", () => {
       email: "lab@theprotocolau.com",
       code: "PROTOCOL-AB12CD",
     });
+  });
+
+  it("returns stable snapshots while storage is unchanged", () => {
+    stubWindowStorage();
+
+    expect(getMemberCaptureSnapshot()).toBe(getMemberCaptureSnapshot());
+    expect(getMemberCaptureServerSnapshot()).toBe(
+      getMemberCaptureServerSnapshot(),
+    );
   });
 
   it("treats dismiss as active for seven days", () => {
