@@ -97,7 +97,7 @@ export const home = {
     },
   ],
   howItWorks: [
-    "Choose materials, then confirm your order via WhatsApp (temporary while online checkout is paused).",
+    "Choose materials, accept the research-use terms, then pay securely by card or supported crypto.",
     "We confirm stock, pack vials, and dispatch before 2pm AEST on business days when possible.",
     "You get tracking; request batch docs anytime.",
   ],

@@ -73,6 +73,8 @@ function OrderStatusLive({ orderId }: { orderId: string | null }) {
       ? "Paid"
       : order.status === "pending"
         ? "Pending confirmation"
+        : order.status === "pending_verification"
+          ? "Pending transaction verification"
         : order.status === "failed"
           ? "Failed"
           : order.status;
@@ -96,10 +98,18 @@ function OrderStatusLive({ orderId }: { orderId: string | null }) {
           <dt className="text-muted">Total (AUD)</dt>
           <dd className="text-ink">{formatPrice(order.subtotalAud)}</dd>
         </div>
-        <div className="flex justify-between gap-4">
-          <dt className="text-muted">Settlement</dt>
-          <dd className="uppercase text-ink">{order.currencyCrypto}</dd>
-        </div>
+        {order.paymentMethod ? (
+          <div className="flex justify-between gap-4">
+            <dt className="text-muted">Payment method</dt>
+            <dd className="capitalize text-ink">{order.paymentMethod}</dd>
+          </div>
+        ) : null}
+        {order.cryptoCurrency ? (
+          <div className="flex justify-between gap-4">
+            <dt className="text-muted">Settlement</dt>
+            <dd className="uppercase text-ink">{order.cryptoCurrency}</dd>
+          </div>
+        ) : null}
       </dl>
 
       <ul className="mt-6 space-y-2 border-t border-line pt-4 text-sm text-muted">
@@ -118,14 +128,24 @@ function OrderStatusLive({ orderId }: { orderId: string | null }) {
 
       {order.status === "pending" ? (
         <p className="mt-4 text-xs text-muted">
-          Payment return does not confirm funds. Waiting for the MoonPay webhook
-          to mark this order paid…
+          Payment has not been confirmed yet. This page updates automatically
+          after MoonPay, Stripe, or the selected network confirms funds.
+        </p>
+      ) : null}
+
+      {order.status === "pending_verification" ? (
+        <p className="mt-4 text-xs text-muted">
+          Your TXID was received and is waiting for confirmations or staff
+          review.
+          {order.cryptoVerificationNote
+            ? ` ${order.cryptoVerificationNote}`
+            : ""}
         </p>
       ) : null}
 
       {order.status === "paid" ? (
         <p className="mt-4 text-xs text-muted">
-          Confirmed via MoonPay webhook
+          Payment confirmed
           {order.paidAt
             ? ` at ${new Date(order.paidAt).toLocaleString("en-AU")}`
             : ""}

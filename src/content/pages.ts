@@ -184,7 +184,7 @@ export const pages: Record<string, PageContent> = {
       {
         question: "Is checkout live?",
         answer:
-          "Prices in AUD. Online card/crypto checkout is temporarily paused. Order via WhatsApp from the cart/order page (QR or Chat on WhatsApp), or email Contact for a purchase enquiry.",
+          "Yes. Prices are in AUD. Checkout supports cards and eligible Apple Pay or Google Pay wallets through Stripe, plus configured self-custody crypto payments. WhatsApp remains available for ordering help.",
       },
     ],
   },

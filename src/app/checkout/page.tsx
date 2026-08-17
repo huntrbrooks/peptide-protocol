@@ -3,9 +3,9 @@ import { site } from "@/content/site";
 import { CheckoutForm } from "./CheckoutForm";
 
 export const metadata: Metadata = {
-  title: "Order via WhatsApp",
+  title: "Secure checkout",
   description:
-    "Temporary WhatsApp ordering for The Protocol research materials while online checkout is staged. Research use only.",
+    "Secure MoonPay, card, and self-custody crypto checkout for The Protocol research materials. Research use only.",
   robots: { index: false, follow: false },
 };
 
@@ -16,13 +16,15 @@ export default function CheckoutPage() {
         The Protocol
       </p>
       <h1 className="mt-3 font-display text-4xl tracking-tight text-ink sm:text-5xl">
-        Order
+        Secure checkout
       </h1>
       <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted">
-        Temporary path: confirm your order on WhatsApp Business while online
-        payment is unavailable. {site.researchDisclaimer}
+        Pay securely through MoonPay on Fresh&apos;n Up, or choose direct
+        crypto or Stripe as an alternate. {site.researchDisclaimer}
       </p>
-      <CheckoutForm />
+      <CheckoutForm
+        bankEnabled={process.env.NEXT_PUBLIC_BANK_TRANSFER_ENABLED === "true"}
+      />
     </div>
   );
 }

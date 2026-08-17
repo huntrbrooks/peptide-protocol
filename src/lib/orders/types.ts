@@ -4,7 +4,23 @@
  * Timestamps in Convex are epoch ms; REST fallbacks may expose numbers.
  */
 
-export type OrderStatus = "pending" | "paid" | "failed" | "cancelled";
+export type OrderStatus =
+  | "pending"
+  | "pending_verification"
+  | "paid"
+  | "failed"
+  | "cancelled";
+
+export type PaymentMethod =
+  | "moonpay"
+  | "stripe"
+  | "crypto"
+  | "bank"
+  | "whatsapp";
+
+export type CryptoCurrency = "eth" | "usdt" | "btc";
+
+export type CryptoChain = "ethereum" | "bitcoin";
 
 export type OrderLine = {
   slug: string;

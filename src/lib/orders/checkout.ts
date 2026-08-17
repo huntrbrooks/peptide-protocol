@@ -1,0 +1,122 @@
+import { getProductBySlug } from "@/content/products";
+import type { OrderLine, OrderShipping } from "./types";
+
+type CartItemInput = {
+  slug: string;
+  quantity: number;
+};
+
+export type CheckoutDetails = {
+  email: string;
+  shipping: OrderShipping;
+  lines: OrderLine[];
+  subtotalAud: number;
+};
+
+type CheckoutBody = {
+  email?: unknown;
+  researchAck?: unknown;
+  shipping?: unknown;
+  items?: unknown;
+};
+
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+function parseItems(value: unknown): CartItemInput[] | null {
+  if (!Array.isArray(value) || value.length === 0) return null;
+  const items: CartItemInput[] = [];
+  for (const row of value) {
+    if (!row || typeof row !== "object") return null;
+    const slug = (row as { slug?: unknown }).slug;
+    const quantity = (row as { quantity?: unknown }).quantity;
+    if (!isNonEmptyString(slug)) return null;
+    if (
+      typeof quantity !== "number" ||
+      !Number.isInteger(quantity) ||
+      quantity < 1 ||
+      quantity > 99
+    ) {
+      return null;
+    }
+    items.push({ slug: slug.trim(), quantity });
+  }
+  return items;
+}
+
+function parseShipping(value: unknown): OrderShipping | null {
+  if (!value || typeof value !== "object") return null;
+  const shipping = value as Record<string, unknown>;
+  if (
+    !isNonEmptyString(shipping.fullName) ||
+    !isNonEmptyString(shipping.line1) ||
+    !isNonEmptyString(shipping.city) ||
+    !isNonEmptyString(shipping.state) ||
+    !isNonEmptyString(shipping.postcode)
+  ) {
+    return null;
+  }
+  return {
+    fullName: shipping.fullName.trim(),
+    line1: shipping.line1.trim(),
+    line2: isNonEmptyString(shipping.line2)
+      ? shipping.line2.trim()
+      : undefined,
+    city: shipping.city.trim(),
+    state: shipping.state.trim(),
+    postcode: shipping.postcode.trim(),
+    country: isNonEmptyString(shipping.country)
+      ? shipping.country.trim().toUpperCase()
+      : "AU",
+  };
+}
+
+export function parseCheckoutDetails(body: unknown): CheckoutDetails {
+  if (!body || typeof body !== "object") {
+    throw new Error("Invalid checkout request.");
+  }
+  const input = body as CheckoutBody;
+  if (input.researchAck !== true) {
+    throw new Error("Research-use acknowledgement is required.");
+  }
+  if (!isNonEmptyString(input.email) || !input.email.includes("@")) {
+    throw new Error("A valid email is required.");
+  }
+  const shipping = parseShipping(input.shipping);
+  if (!shipping) {
+    throw new Error("Shipping details are incomplete.");
+  }
+  const items = parseItems(input.items);
+  if (!items) {
+    throw new Error("Cart items are invalid or empty.");
+  }
+
+  const lines = items.map((item): OrderLine => {
+    const product = getProductBySlug(item.slug);
+    if (!product) {
+      throw new Error(`Unknown product: ${item.slug}`);
+    }
+    return {
+      slug: product.slug,
+      name: product.name,
+      quantity: item.quantity,
+      unitPriceAud: product.priceAud,
+      lineTotalAud:
+        Math.round(product.priceAud * item.quantity * 100) / 100,
+    };
+  });
+  const subtotalAud =
+    Math.round(lines.reduce((sum, line) => sum + line.lineTotalAud, 0) * 100) /
+    100;
+  if (subtotalAud <= 0) {
+    throw new Error("Order total must be greater than zero.");
+  }
+
+  return {
+    email: input.email.trim().toLowerCase(),
+    shipping,
+    lines,
+    subtotalAud,
+  };
+}

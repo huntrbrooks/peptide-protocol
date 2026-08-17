@@ -4,7 +4,7 @@ import { OrderStatus } from "./OrderStatus";
 
 export const metadata: Metadata = {
   title: "Order status",
-  description: "MoonPay checkout return status for The Protocol.",
+  description: "Payment and order status for The Protocol.",
   robots: { index: false, follow: false },
 };
 
@@ -25,8 +25,8 @@ export default async function CheckoutSuccessPage({ searchParams }: PageProps) {
         Order status
       </h1>
       <p className="mt-4 text-base leading-relaxed text-muted">
-        Thanks for completing the MoonPay flow. Final payment status comes from
-        the webhook, not this page alone.
+        Your order has been recorded. Final status comes from Stripe or network
+        verification, not the browser return alone.
       </p>
 
       <OrderStatus orderId={orderId} />

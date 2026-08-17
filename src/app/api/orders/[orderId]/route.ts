@@ -36,9 +36,13 @@ export async function GET(
       order: {
         id: order._id,
         status: order.status,
+        paymentMethod: order.paymentMethod,
         email: order.email,
         subtotalAud: order.subtotalAud,
         currencyCrypto: order.currencyCrypto,
+        stripePaymentStatus: order.stripePaymentStatus,
+        cryptoTxid: order.cryptoTxid,
+        cryptoVerificationNote: order.cryptoVerificationNote,
         lines: order.lines,
         paidAt: order.paidAt,
         updatedAt: order.updatedAt,

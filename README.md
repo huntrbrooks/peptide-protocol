@@ -13,7 +13,7 @@ Research materials only. Not for human consumption. Not a medicine, supplement, 
 
 ## Production deploy
 
-Hosting is already on Vercel (`peptide-protocol` → `https://www.theprotocolau.com`). Checkout needs **Convex cloud** + MoonPay. Until MoonPay **live** keys exist, keep `MOONPAY_ENVIRONMENT=sandbox` (test keys only — not real-money settlement).
+Hosting is already on Vercel (`peptide-protocol` → `https://www.theprotocolau.com`). Checkout needs **Convex cloud** and the shared **Freshnup MoonPay bridge**. Stripe and direct crypto remain alternate rails.
 
 ### 1. Convex cloud (required for orders)
 
@@ -46,10 +46,16 @@ Set on the `peptide-protocol` project (CLI: `vercel env add … production`):
 | `NEXT_PUBLIC_SITE_URL` | `https://www.theprotocolau.com` |
 | `NEXT_PUBLIC_CONVEX_URL` | From Convex cloud after deploy |
 | `ORDERS_WEBHOOK_SECRET` | Same value as `npx convex env set` |
-| `MOONPAY_API_KEY` / `MOONPAY_SECRET_KEY` / `MOONPAY_WEBHOOK_SECRET` | `pk_test_` / `sk_test_` / `wk_test_` until live keys |
-| `MOONPAY_WALLET_ADDRESS` | Settlement wallet (e.g. `0x22ca…`) |
-| `MOONPAY_DEFAULT_CURRENCY` | `usdc` |
-| `MOONPAY_ENVIRONMENT` | `sandbox` until live keys + business verification |
+| `PAYMENT_BRIDGE_SECRET` | Strong HMAC secret; same value on the Freshnup Vercel project |
+| `FRESHNUP_PAYMENT_URL` | `https://www.freshnup.global/pay` |
+| `STRIPE_SECRET_KEY` | Stripe test secret (or a least-privilege restricted key where supported) |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe test publishable key |
+| `STRIPE_WEBHOOK_SECRET` | Signing secret for `/api/webhooks/stripe` |
+| `CRYPTO_ETH_ADDRESS` | Ethereum settlement wallet |
+| `CRYPTO_USDT_ADDRESS` / `CRYPTO_BTC_ADDRESS` | Optional; unset currencies are hidden |
+| `ETH_RPC_URL` | Optional Ethereum mainnet RPC; enables automatic ETH/USDT checks |
+| `CRYPTO_USDT_CONTRACT` | Optional override; defaults to Ethereum mainnet USDT |
+| `NEXT_PUBLIC_BANK_TRANSFER_ENABLED` | Keep `false` until PayID/bank instructions are operational |
 | `OPENROUTER_API_KEY` | Stack Finder (optional) |
 
 Deploy:
@@ -59,20 +65,23 @@ vercel --prod
 # or push to the linked git production branch
 ```
 
-### 3. MoonPay dashboard (you must do)
+### 3. Stripe Dashboard (you must do)
 
-1. Register webhook: `https://www.theprotocolau.com/api/webhooks/moonpay`
-2. For **real money**: complete business verification, switch to `pk_live_` / `sk_live_` / `wk_live_`, set `MOONPAY_ENVIRONMENT=production` on Vercel, re-register production webhook if needed.
-3. Enable Apple Pay / Google Pay for production in MoonPay (region/account dependent).
+1. In test mode, register `https://www.theprotocolau.com/api/webhooks/stripe`.
+2. Subscribe to `payment_intent.succeeded`, `payment_intent.processing`, `payment_intent.payment_failed`, and `payment_intent.canceled`.
+3. Put the endpoint signing secret in `STRIPE_WEBHOOK_SECRET`.
+4. Enable desired payment methods in Stripe Dashboard. The PaymentIntent intentionally omits `payment_method_types` so Stripe can show eligible dynamic methods.
+5. Add `www.theprotocolau.com` under **Payment method domains** for Apple Pay in production. Repeat for any additional production checkout domain.
+6. Test with Stripe test keys and test cards before switching Vercel to live keys.
 
-Do **not** claim FAQ checkout is fully live until live MoonPay keys are configured.
+**Processing risk:** Stripe may classify or decline peptide-category businesses during underwriting, just as MoonPay or another card processor may. Approval is not guaranteed. MoonPay KYB still applies to the merchant account and disclosed business; cross-domain routing is technical and does not change those obligations.
 
 ## Setup
 
 ```bash
 npm install
 cp .env.example .env.local
-# Add OpenRouter + MoonPay keys to .env.local (never commit them)
+# Add OpenRouter + Stripe test keys to .env.local (never commit real keys)
 
 # Link Convex (creates CONVEX_DEPLOYMENT + NEXT_PUBLIC_CONVEX_URL in .env.local)
 npx convex dev
@@ -94,54 +103,56 @@ After `npx convex dev` is linked, set the same secret in both places:
 npx convex env set ORDERS_WEBHOOK_SECRET '<same-value-as-.env.local>'
 ```
 
-This secret gates `orders.updateStatusFromWebhook` so only the Next.js MoonPay webhook route can mark orders paid/failed.
+This secret gates payment mutations so only the Next.js Stripe/crypto routes can attach processor details or mark orders paid/failed. Use the same value in Next.js and Convex.
 
 ## Content
 
 - Live copy: `src/content/` (`products.ts`, `categories.ts`, `pages.ts`, `site.ts`)
 - Human index: `CONTENT.md`
-- Prices are AUD catalogue placeholders. Cart persists to `localStorage` and feeds the staged MoonPay checkout.
+- Prices are AUD catalogue values. Cart persists to `localStorage` and feeds the Stripe/crypto checkout.
 
-## MoonPay checkout (staged)
+## Payments
 
-Apple Pay / Google Pay (and other MoonPay methods) buy crypto on the hosted on-ramp widget; crypto settles to `MOONPAY_WALLET_ADDRESS`. **The MoonPay webhook is the source of truth for “paid”** — do not trust the browser return URL alone.
+`/checkout` uses Freshnup-hosted MoonPay as the primary payment path. Embedded Stripe and direct self-custody crypto remain alternate tabs, and WhatsApp remains a help link.
 
-Orders persist in **Convex**. The success page subscribes with `useQuery` so status updates live when the webhook marks an order paid.
+Orders persist in **Convex**. The success page subscribes with `useQuery`, so webhook and chain-verification updates appear live.
 
-### Account setup
+### Freshnup MoonPay bridge
 
-1. Create a MoonPay account and open the [dashboard](https://dashboard.moonpay.com/).
-2. Copy publishable (`MOONPAY_API_KEY`) and secret (`MOONPAY_SECRET_KEY`) keys for sandbox, then live when ready.
-3. Set `MOONPAY_WALLET_ADDRESS` to the merchant wallet that should receive settlement crypto. Confirm the chain matches `MOONPAY_DEFAULT_CURRENCY` (default `usdc`).
-4. Set `MOONPAY_ENVIRONMENT` to `sandbox` or `production`.
-5. Set `NEXT_PUBLIC_SITE_URL` to your public origin (e.g. `https://peptideprotocolau.io`).
-6. Register the webhook URL in MoonPay Developers settings:
-   - `{NEXT_PUBLIC_SITE_URL}/api/webhooks/moonpay`
-7. Copy the webhook signing key into `MOONPAY_WEBHOOK_SECRET`.
-8. Enable Apple Pay / Google Pay in the MoonPay dashboard where available for your account and regions (availability is MoonPay-controlled; AUD base currency is passed as `baseCurrencyCode=aud`).
-9. Complete Convex setup above (`npx convex dev` + `ORDERS_WEBHOOK_SECRET`).
+1. `POST /api/checkout/freshnup-session` validates products and prices against the server catalogue, creates a pending Convex order, and signs a 45-minute HMAC token containing the order ID, AUD cents, email, and item summary.
+2. The browser opens `https://www.freshnup.global/pay`, where Freshnup verifies the token and builds the signed MoonPay URL server-side.
+3. MoonPay redirects the customer to `https://www.theprotocolau.com/checkout/success?orderId=…`.
+4. MoonPay calls Freshnup's verified webhook. Freshnup then calls `POST /api/webhooks/payment-bridge` with `PAYMENT_BRIDGE_SECRET`; The Protocol updates the Convex order through the separately secret-gated Convex mutation.
 
-### Env vars
+Set the same `PAYMENT_BRIDGE_SECRET` on both Vercel projects. Keep
+`ORDERS_WEBHOOK_SECRET` on The Protocol and its Convex deployment only.
 
-See `.env.example`:
+In MoonPay, whitelist both `freshnup.global` and `www.freshnup.global`, and register
+`https://www.freshnup.global/api/webhooks/moonpay`.
 
-- Convex: `CONVEX_DEPLOYMENT`, `NEXT_PUBLIC_CONVEX_URL`, `ORDERS_WEBHOOK_SECRET` (also set via `npx convex env set`)
-- MoonPay: `MOONPAY_API_KEY`, `MOONPAY_SECRET_KEY`, `MOONPAY_WEBHOOK_SECRET`, `MOONPAY_WALLET_ADDRESS`, `MOONPAY_DEFAULT_CURRENCY`, `MOONPAY_ENVIRONMENT`, `NEXT_PUBLIC_SITE_URL`
+### Card flow
 
-### Flow
+1. `POST /api/checkout/create-payment-intent` validates the cart against server catalogue prices, creates a pending Convex order, then creates an AUD Stripe PaymentIntent.
+2. Stripe Payment Element confirms the payment on `/checkout`; eligible Apple Pay / Google Pay methods are determined by Stripe, device, browser, and Dashboard configuration.
+3. `POST /api/webhooks/stripe` verifies the Stripe signature and marks the matching order paid on `payment_intent.succeeded`.
+4. The browser return page is informational; it never marks an order paid.
 
-1. `/checkout` → `POST /api/checkout/session` creates a pending Convex order and returns a signed MoonPay URL (`externalTransactionId` = Convex order id).
-2. Customer pays on MoonPay; browser returns to `/checkout/success?orderId=…`.
-3. MoonPay calls `POST /api/webhooks/moonpay` (signature verified) → Convex `orders.updateStatusFromWebhook` marks paid/failed.
-4. Success page updates reactively via `useQuery(api.orders.get)`.
+### Crypto flow
+
+1. `POST /api/checkout/create-crypto-order` obtains a CoinGecko AUD quote and adds a 2% volatility buffer.
+2. Checkout displays the exact amount and configured merchant wallet. Unset BTC/USDT addresses are hidden.
+3. The customer sends from their own wallet and submits the TXID to `POST /api/checkout/verify-crypto`.
+4. BTC is checked through Blockstream. ETH and Ethereum USDT are checked through `ETH_RPC_URL` when configured (12 confirmations). If a verifier is unavailable or the transaction is not fully confirmed, the order moves to `pending_verification` for staff review instead of being falsely marked paid.
+5. A TXID can only be attached to one order.
+
+The default ETH wallet in `.env.example` is `0x22ca069363df8cf72c1d900e001c218e1fb62025`. Confirm ownership and network before production. USDT support is Ethereum ERC-20; do not send TRC-20 USDT to this rail.
 
 ### Local notes
 
 - Keep `npx convex dev` running while developing so schema/functions sync.
 - Do **not** run `npx convex deploy` unless shipping to production.
-- FAQ still describes checkout as staged until credentials and wallet are live.
-- MoonPay webhooks cannot hit `http://localhost:3000`. For local paid-status testing, expose the app with a tunnel (e.g. [ngrok](https://ngrok.com/) or Cloudflare Tunnel) and register `{tunnel-origin}/api/webhooks/moonpay` in the MoonPay dashboard (sandbox). Keep `NEXT_PUBLIC_SITE_URL` as the tunnel origin while testing redirects + webhooks.
-- Checklist before a sandbox checkout works: MoonPay keys in `.env.local` → `MOONPAY_WALLET_ADDRESS` set → `npx convex dev` linked → `ORDERS_WEBHOOK_SECRET` mirrored with `npx convex env set` → webhook URL reachable from the internet.
+- Stripe webhooks cannot hit `http://localhost:3000`. Use `stripe listen --forward-to localhost:3000/api/webhooks/stripe` and copy the temporary `whsec_…` into `.env.local`.
+- Bridge checklist: matching `PAYMENT_BRIDGE_SECRET` on both sites → Freshnup MoonPay sandbox keys set → `npx convex dev` linked → `ORDERS_WEBHOOK_SECRET` mirrored with `npx convex env set`.
 
 ## Image generation
 

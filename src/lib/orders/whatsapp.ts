@@ -1,7 +1,4 @@
-/**
- * Temporary WhatsApp ordering path while MoonPay checkout is staged.
- * Reverse: restore CheckoutForm MoonPay UI and FAQ copy; leave this module unused.
- */
+/** Secondary assisted-order link shown beneath the primary checkout rails. */
 
 export const WHATSAPP_ORDER = {
   /** E.164 digits only (AU mobile 0475… → 61475…) */
