@@ -1,7 +1,8 @@
 {
-  "generatedAt": "2026-08-10",
+  "generatedAt": "2026-08-18",
   "model": "gpt-image-2",
   "mode": "image2image",
+  "projectId": "pMhJD2IMzzeqsnGPobgI",
   "requestedSettings": {
     "resolutionTier": "4k",
     "quality": "high",
@@ -9,18 +10,21 @@
     "outputFormat": "png"
   },
   "deliveredPixels": "2048x2048",
-  "referenceSource": "Finished THE / PROTOCOL label masters under public/labels/color-masters/",
+  "referenceSource": "Current single-vial heroes + finished THE / PROTOCOL label masters",
+  "brief": "Locked 3ml vial proportions (10ml BAC only). Soft cyclorama backgrounds tinted to each cap/label. White lyophilised powder except GHK-Cu (blue) and BAC Water (clear liquid).",
+  "backup": "public/images/products/_backup-pre-uniform-2026-08-18/",
+  "work": "public/images/products/_work-uniform-2026-08-18/",
   "products": {
-    "bpc-157": "kxkGRgzgSPbrBnwETLn8",
-    "cjc-1295-no-dac": "KqKXLMF7ye0iaTlKRsON",
-    "retatrutide-60mg": "MDrl2ozPtwlBvm6YQE9o",
-    "ghk-cu-50mg": "7vRTGn234SUeZxWbzOse",
-    "pt-141": "VUKDc6fvnW9HtNvfQ2op",
-    "retatrutide-20mg": "FFSwBnjOBrIkzxIsWA7P",
-    "tb-500": "4vMslAMmDvF7CeqTXeQN",
-    "ipamorelin": "sidMWYBRUjKdjJWSwmyf",
-    "glow-up-80mg": "kpRTdkpiBRIbf3IzoLfJ",
-    "bacteriostatic-water": "noW3uHgJUx4Xx9gWK7Dy"
+    "bpc-157": "zlKvCmxVX3FFfTKo1xkE",
+    "ipamorelin": "8vR9qaDdyh6bfcVXcZY6",
+    "cjc-1295-no-dac": "cRNmrWNN7KS2S1eXUUI6",
+    "tb-500": "8T6vzooZ3qgywBdDkT69",
+    "pt-141": "XmZsXVPgYmotCmxaXZJX",
+    "ghk-cu-50mg": "VqctBPaKtaewungxr4nc",
+    "retatrutide-20mg": "Zdkgz5ICiH5wJPSHrNX3",
+    "glow-up-80mg": "43ILkphwTeiCDodwaEwp",
+    "retatrutide-60mg": "EhvJt9drOVwmDAPhgX2S",
+    "bacteriostatic-water": "4b3isxsNmEdIY8OLZoJv"
   },
   "kits": {
     "bpc-157-kit": "UhQJ6delNXpcK9pZzkfu",
