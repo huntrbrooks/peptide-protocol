@@ -148,9 +148,14 @@ export async function resolveCheckoutTotals(
       "NEXT_PUBLIC_CONVEX_URL is not set. Run `npx convex dev` to link a project.",
     );
   }
-  const availability = await fetchQuery(api.inventory.availability, {
-    slugs: checkout.lines.map((line) => line.slug),
-  });
+  let availability: Array<{ slug: string; available: number }> = [];
+  try {
+    availability = await fetchQuery(api.inventory.availability, {
+      slugs: checkout.lines.map((line) => line.slug),
+    });
+  } catch {
+    availability = [];
+  }
   const availableBySlug = new Map(
     availability.map((row) => [row.slug, row.available]),
   );

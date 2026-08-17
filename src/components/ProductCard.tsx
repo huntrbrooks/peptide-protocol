@@ -5,19 +5,10 @@ import Image from "next/image";
 import type { Product } from "@/content/types";
 import { formatPrice } from "@/content/products";
 import { track } from "@/lib/analytics/track";
-import { useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
+import { useInventoryInStock } from "@/lib/inventory/useAvailability";
 
 export function ProductCard({ product }: { product: Product }) {
-  const inventory = useQuery(
-    api.inventory.availability,
-    process.env.NEXT_PUBLIC_CONVEX_URL ? { slugs: [product.slug] } : "skip",
-  );
-  const inStock = inventory === undefined
-    ? (product.inStock ?? true)
-    : inventory[0]
-      ? inventory[0].available > 0
-      : (product.inStock ?? true);
+  const inStock = useInventoryInStock(product.slug, product.inStock ?? true);
 
   return (
     <Link
