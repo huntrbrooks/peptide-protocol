@@ -98,6 +98,19 @@ export async function updateMoonPayOrder(input: {
   });
 }
 
+export async function updateOrderFromPaymentBridge(input: {
+  orderId: string;
+  paymentMethod: "stripe" | "moonpay";
+  status: "paid" | "failed";
+  transactionId?: string;
+}): Promise<Id<"orders"> | null> {
+  requireConvexUrl();
+  return await fetchMutation(api.orders.updateFromPaymentBridge, {
+    ...input,
+    paymentSecret: requirePaymentSecret(),
+  });
+}
+
 export async function submitCryptoVerification(input: {
   orderId: string;
   txid: string;
@@ -106,6 +119,51 @@ export async function submitCryptoVerification(input: {
 }): Promise<Id<"orders"> | null> {
   requireConvexUrl();
   return await fetchMutation(api.orders.submitCryptoVerification, {
+    ...input,
+    paymentSecret: requirePaymentSecret(),
+  });
+}
+
+export async function generateProofUploadUrl(): Promise<string> {
+  requireConvexUrl();
+  return await fetchMutation(api.orders.generateProofUploadUrl, {
+    paymentSecret: requirePaymentSecret(),
+  });
+}
+
+export async function attachPaymentProof(input: {
+  orderId: string;
+  storageId: Id<"_storage">;
+}): Promise<Id<"orders"> | null> {
+  requireConvexUrl();
+  return await fetchMutation(api.orders.attachPaymentProof, {
+    ...input,
+    paymentSecret: requirePaymentSecret(),
+  });
+}
+
+export async function getPaymentProofUrl(input: {
+  orderId: string;
+  storageId: Id<"_storage">;
+}): Promise<string | null> {
+  requireConvexUrl();
+  return await fetchQuery(api.orders.getPaymentProofUrl, {
+    ...input,
+    paymentSecret: requirePaymentSecret(),
+  });
+}
+
+export async function finalizePaymentProof(input: {
+  orderId: string;
+  storageId: Id<"_storage">;
+  verificationStatus: "uploaded" | "pending_review" | "verified" | "rejected";
+  txid?: string;
+  reference?: string;
+  timestamp?: string;
+  verificationNote: string;
+}): Promise<Id<"orders"> | null> {
+  requireConvexUrl();
+  return await fetchMutation(api.orders.finalizePaymentProof, {
     ...input,
     paymentSecret: requirePaymentSecret(),
   });

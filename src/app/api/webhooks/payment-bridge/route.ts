@@ -1,6 +1,6 @@
 import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
-import { updateMoonPayOrder } from "@/lib/orders/convex";
+import { updateOrderFromPaymentBridge } from "@/lib/orders/convex";
 import { sendOrderPaidEmails } from "@/lib/orders/paid-email";
 
 export const runtime = "nodejs";
@@ -8,6 +8,8 @@ export const runtime = "nodejs";
 type BridgeWebhookBody = {
   orderId?: unknown;
   status?: unknown;
+  paymentMethod?: unknown;
+  transactionId?: unknown;
   moonpayId?: unknown;
 };
 
@@ -45,6 +47,10 @@ export async function POST(request: Request): Promise<NextResponse> {
   if (
     typeof body.orderId !== "string" ||
     (body.status !== "paid" && body.status !== "failed") ||
+    (body.paymentMethod !== undefined &&
+      body.paymentMethod !== "stripe" &&
+      body.paymentMethod !== "moonpay") ||
+    (body.transactionId !== undefined && typeof body.transactionId !== "string") ||
     (body.moonpayId !== undefined && typeof body.moonpayId !== "string")
   ) {
     return NextResponse.json({ ok: false, error: "Invalid webhook body" }, {
@@ -53,10 +59,18 @@ export async function POST(request: Request): Promise<NextResponse> {
   }
 
   try {
-    const orderId = await updateMoonPayOrder({
+    const paymentMethod =
+      body.paymentMethod === "stripe" ? "stripe" : "moonpay";
+    const orderId = await updateOrderFromPaymentBridge({
       orderId: body.orderId,
       status: body.status,
-      moonpayTransactionId: body.moonpayId,
+      paymentMethod,
+      transactionId:
+        typeof body.transactionId === "string"
+          ? body.transactionId
+          : typeof body.moonpayId === "string"
+            ? body.moonpayId
+            : undefined,
     });
     if (!orderId) {
       return NextResponse.json({ ok: false, error: "Order not found" }, {

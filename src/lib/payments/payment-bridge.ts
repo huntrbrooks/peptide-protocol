@@ -5,6 +5,7 @@ export type PaymentBridgePayload = {
   orderId: string;
   amountAudCents: number;
   currency: "aud";
+  paymentMethod: "stripe" | "moonpay";
   email: string;
   items: Array<{ name: string; quantity: number }>;
   exp: number;
@@ -23,12 +24,14 @@ export function createPaymentBridgeToken(input: {
   amountAudCents: number;
   email: string;
   lines: OrderLine[];
+  paymentMethod: "stripe" | "moonpay";
   expiresInSeconds?: number;
 }): string {
   const payload: PaymentBridgePayload = {
     orderId: input.orderId,
     amountAudCents: input.amountAudCents,
     currency: "aud",
+    paymentMethod: input.paymentMethod,
     email: input.email,
     items: input.lines.map(({ name, quantity }) => ({ name, quantity })),
     exp: Math.floor(Date.now() / 1000) + (input.expiresInSeconds ?? 45 * 60),

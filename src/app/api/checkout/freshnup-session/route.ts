@@ -11,17 +11,25 @@ export async function POST(request: Request): Promise<NextResponse> {
       throw new Error("PAYMENT_BRIDGE_SECRET is not configured.");
     }
 
-    const checkout = parseCheckoutDetails(await request.json());
+    const body = (await request.json()) as Record<string, unknown>;
+    if (body.paymentMethod !== "stripe") {
+      return NextResponse.json(
+        { ok: false, error: "Select the Stripe payment option." },
+        { status: 400 },
+      );
+    }
+    const checkout = parseCheckoutDetails(body);
     const amountAudCents = Math.round(checkout.subtotalAud * 100);
     const orderId = await createConvexOrder({
       ...checkout,
-      paymentMethod: "moonpay",
+      paymentMethod: "stripe",
     });
     const token = createPaymentBridgeToken({
       orderId,
       amountAudCents,
       email: checkout.email,
       lines: checkout.lines,
+      paymentMethod: "stripe",
     });
     const freshnupPaymentUrl = (
       process.env.FRESHNUP_PAYMENT_URL ?? "https://www.freshnup.global/pay"
@@ -29,6 +37,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     const payUrl = new URL(freshnupPaymentUrl);
     payUrl.searchParams.set("orderId", orderId);
     payUrl.searchParams.set("token", token);
+    payUrl.searchParams.set("paymentMethod", "stripe");
 
     return NextResponse.json({ ok: true, orderId, payUrl: payUrl.toString() });
   } catch (error) {

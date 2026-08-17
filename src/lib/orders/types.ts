@@ -18,9 +18,15 @@ export type PaymentMethod =
   | "bank"
   | "whatsapp";
 
-export type CryptoCurrency = "eth" | "usdt" | "btc";
+export type CryptoCurrency = "usdc";
 
-export type CryptoChain = "ethereum" | "bitcoin";
+export type CryptoChain = "ethereum" | "solana";
+
+export type ProofVerificationStatus =
+  | "uploaded"
+  | "pending_review"
+  | "verified"
+  | "rejected";
 
 export type OrderLine = {
   slug: string;

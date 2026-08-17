@@ -55,12 +55,12 @@ Set on the `peptide-protocol` project (CLI: `vercel env add … production`):
 | `RESEND_FROM_EMAIL` | Sender address on a verified Resend domain |
 | `ORDERS_NOTIFY_EMAIL` | Merchant operations recipient (or use `RESEND_TO_OPS`) |
 | `SHIPPING_FROM_*` | Real merchant name and postal return-address fields used on labels |
-| `CRYPTO_ETH_ADDRESS` | Ethereum settlement wallet |
-| `CRYPTO_USDT_ADDRESS` / `CRYPTO_BTC_ADDRESS` | Optional; unset currencies are hidden |
-| `ETH_RPC_URL` | Optional Ethereum mainnet RPC; enables automatic ETH/USDT checks |
-| `CRYPTO_USDT_CONTRACT` | Optional override; defaults to Ethereum mainnet USDT |
-| `NEXT_PUBLIC_BANK_TRANSFER_ENABLED` | Keep `false` until PayID/bank instructions are operational |
-| `OPENROUTER_API_KEY` | Stack Finder (optional) |
+| `PAYMENT_ETHEREUM_USDC_ADDRESS` / `PAYMENT_SOLANA_USDC_ADDRESS` | Merchant USDC receive addresses; server-only |
+| `ETH_RPC_URL` / `SOLANA_RPC_URL` | Mainnet RPCs required for automatic USDC confirmation |
+| `ETHEREUM_USDC_CONTRACT` / `SOLANA_USDC_MINT` | Optional mainnet USDC identifier overrides |
+| `BANK_ACCOUNT_NAME` / `BANK_BSB` / `BANK_ACCOUNT_NUMBER` | Bank transfer destination; server-only |
+| `OPENROUTER_API_KEY` | Required for payment screenshot verification |
+| `OPENROUTER_VISION_MODEL` | Optional; defaults to `anthropic/claude-sonnet-5` |
 
 Deploy:
 
@@ -117,7 +117,7 @@ This secret gates payment mutations so only the Next.js Stripe/crypto routes can
 
 ## Payments
 
-`/checkout` uses Freshnup-hosted MoonPay as the primary payment path. Embedded Stripe and direct self-custody crypto remain alternate tabs, and WhatsApp remains a help link.
+`/checkout` sends Stripe card checkout through the Freshnup hosted payment bridge. Direct USDC and bank transfer use persisted screenshot proof; MoonPay remains visible but disabled as **Coming soon**.
 
 Orders persist in **Convex**. The success page subscribes with `useQuery`, so webhook and chain-verification updates appear live.
 
@@ -134,12 +134,12 @@ Before enabling production sends:
 3. Replace the example return address in `.env.example` with the real dispatch address in Vercel; the example values are not suitable for live labels.
 4. Redeploy after changing Vercel environment variables.
 
-### Freshnup MoonPay bridge
+### Freshnup payment bridge
 
 1. `POST /api/checkout/freshnup-session` validates products and prices against the server catalogue, creates a pending Convex order, and signs a 45-minute HMAC token containing the order ID, AUD cents, email, and item summary.
-2. The browser opens `https://www.freshnup.global/pay`, where Freshnup verifies the token and builds the signed MoonPay URL server-side.
-3. MoonPay redirects the customer to `https://www.theprotocolau.com/checkout/success?orderId=…`.
-4. MoonPay calls Freshnup's verified webhook. Freshnup then calls `POST /api/webhooks/payment-bridge` with `PAYMENT_BRIDGE_SECRET`; The Protocol updates the Convex order through the separately secret-gated Convex mutation.
+2. The browser opens `https://www.freshnup.global/pay?paymentMethod=stripe`, where Freshnup verifies the token and starts hosted Stripe checkout with its existing `STRIPE_*` environment.
+3. Freshnup returns the customer to `https://www.theprotocolau.com/checkout/success?orderId=…`.
+4. Freshnup calls `POST /api/webhooks/payment-bridge` with `PAYMENT_BRIDGE_SECRET`, `paymentMethod: "stripe"`, and the verified processor result. The Protocol updates the Convex order through the separately secret-gated mutation.
 
 Set the same `PAYMENT_BRIDGE_SECRET` on both Vercel projects. Keep
 `ORDERS_WEBHOOK_SECRET` on The Protocol and its Convex deployment only.
@@ -149,20 +149,18 @@ In MoonPay, whitelist both `freshnup.global` and `www.freshnup.global`, and regi
 
 ### Card flow
 
-1. `POST /api/checkout/create-payment-intent` validates the cart against server catalogue prices, creates a pending Convex order, then creates an AUD Stripe PaymentIntent.
-2. Stripe Payment Element confirms the payment on `/checkout`; eligible Apple Pay / Google Pay methods are determined by Stripe, device, browser, and Dashboard configuration.
-3. `POST /api/webhooks/stripe` verifies the Stripe signature and marks the matching order paid on `payment_intent.succeeded`.
-4. The browser return page is informational; it never marks an order paid.
+1. `POST /api/checkout/freshnup-session` validates the cart, creates a pending Stripe order, and signs the method, order, amount, email, and line summary.
+2. Freshnup verifies the token and creates the hosted Stripe checkout using its configured Stripe account.
+3. Only a verified bridge callback marks the matching order paid. The browser return page is informational and never marks an order paid.
 
 ### Crypto flow
 
-1. `POST /api/checkout/create-crypto-order` obtains a CoinGecko AUD quote and adds a 2% volatility buffer.
-2. Checkout displays the exact amount and configured merchant wallet. Unset BTC/USDT addresses are hidden.
-3. The customer sends from their own wallet and submits the TXID to `POST /api/checkout/verify-crypto`.
-4. BTC is checked through Blockstream. ETH and Ethereum USDT are checked through `ETH_RPC_URL` when configured (12 confirmations). If a verifier is unavailable or the transaction is not fully confirmed, the order moves to `pending_verification` for staff review instead of being falsely marked paid.
-5. A TXID can only be attached to one order.
-
-The default ETH wallet in `.env.example` is `0x22ca069363df8cf72c1d900e001c218e1fb62025`. Confirm ownership and network before production. USDT support is Ethereum ERC-20; do not send TRC-20 USDT to this rail.
+1. `POST /api/checkout/create-crypto-order` obtains a USDC/AUD CoinGecko quote and adds a 2% quote buffer.
+2. Checkout displays the exact USDC amount, selected network, and merchant receive address.
+3. The customer uploads a PNG/JPEG/WebP receipt directly to Convex storage using an order-bound HMAC proof token.
+4. OpenRouter vision extracts the amount, token, destination, transaction hash, reference, timestamp, and receipt plausibility.
+5. Ethereum ERC-20 logs or finalized Solana token balances independently verify destination and amount. Only confirmed matching crypto is marked paid; unavailable/unconfirmed checks remain `pending_review`.
+6. A transaction hash can only be attached to one order. Bank receipts use the same upload and AI extraction path but always remain `pending_review` because settlement cannot be proven publicly.
 
 ### Local notes
 

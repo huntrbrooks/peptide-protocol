@@ -5,7 +5,7 @@ import { CheckoutForm } from "./CheckoutForm";
 export const metadata: Metadata = {
   title: "Secure checkout",
   description:
-    "Secure MoonPay, card, and self-custody crypto checkout for The Protocol research materials. Research use only.",
+    "Secure card, USDC, and bank transfer checkout for The Protocol research materials. Research use only.",
   robots: { index: false, follow: false },
 };
 
@@ -19,12 +19,10 @@ export default function CheckoutPage() {
         Secure checkout
       </h1>
       <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted">
-        Pay securely through MoonPay on Fresh&apos;n Up, or choose direct
-        crypto or Stripe as an alternate. {site.researchDisclaimer}
+        Pay by Stripe through Fresh&apos;n Up, USDC, or bank transfer. MoonPay
+        is coming soon. {site.researchDisclaimer}
       </p>
-      <CheckoutForm
-        bankEnabled={process.env.NEXT_PUBLIC_BANK_TRANSFER_ENABLED === "true"}
-      />
+      <CheckoutForm />
     </div>
   );
 }

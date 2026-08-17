@@ -1,8 +1,14 @@
 import type { CryptoChain, CryptoCurrency } from "@/lib/orders/types";
+import { getSettlementOptions } from "@/lib/payments/settlement";
 
 const CRYPTO_BUFFER = 1.02;
 const ETH_CONFIRMATIONS = 12;
-const DEFAULT_USDT_CONTRACT = "0xdac17f958d2ee523a2206206994597c13d831ec7";
+const DEFAULT_ETHEREUM_USDC_CONTRACT =
+  "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
+const DEFAULT_SOLANA_USDC_MINT =
+  "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
+const ERC20_TRANSFER_TOPIC =
+  "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
 
 export type CryptoOption = {
   currency: CryptoCurrency;
@@ -15,58 +21,27 @@ type ConfiguredCryptoOption = CryptoOption & {
 };
 
 export function getConfiguredCryptoOptions(): ConfiguredCryptoOption[] {
-  const options: ConfiguredCryptoOption[] = [];
-  const ethAddress = process.env.CRYPTO_ETH_ADDRESS?.trim();
-  const usdtAddress = process.env.CRYPTO_USDT_ADDRESS?.trim();
-  const btcAddress = process.env.CRYPTO_BTC_ADDRESS?.trim();
-
-  if (ethAddress) {
-    options.push({
-      currency: "eth",
-      chain: "ethereum",
-      label: "ETH (Ethereum)",
-      walletAddress: ethAddress,
-    });
-  }
-  if (usdtAddress) {
-    options.push({
-      currency: "usdt",
-      chain: "ethereum",
-      label: "USDT (Ethereum ERC-20)",
-      walletAddress: usdtAddress,
-    });
-  }
-  if (btcAddress) {
-    options.push({
-      currency: "btc",
-      chain: "bitcoin",
-      label: "BTC (Bitcoin)",
-      walletAddress: btcAddress,
-    });
-  }
-  return options;
+  return getSettlementOptions().crypto;
 }
 
-export function getCryptoOption(currency: CryptoCurrency): ConfiguredCryptoOption {
+export function getCryptoOption(chain: CryptoChain): ConfiguredCryptoOption {
   const option = getConfiguredCryptoOptions().find(
-    (candidate) => candidate.currency === currency,
+    (candidate) => candidate.chain === chain,
   );
   if (!option) {
-    throw new Error(`${currency.toUpperCase()} payments are not configured.`);
+    throw new Error(`${chain} USDC payments are not configured.`);
   }
   return option;
 }
 
 export async function createCryptoQuote(
   subtotalAud: number,
-  currency: CryptoCurrency,
 ): Promise<{
   expectedAmount: number;
   priceAud: number;
   bufferPercent: number;
 }> {
-  const coinId =
-    currency === "eth" ? "ethereum" : currency === "btc" ? "bitcoin" : "tether";
+  const coinId = "usd-coin";
   const response = await fetch(
     `https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=aud`,
     {
@@ -86,9 +61,8 @@ export async function createCryptoQuote(
   if (typeof priceAud !== "number" || !Number.isFinite(priceAud) || priceAud <= 0) {
     throw new Error("Crypto quote response was invalid. Please try again.");
   }
-  const decimals = currency === "usdt" ? 2 : 8;
   const expectedAmount = Number(
-    ((subtotalAud * CRYPTO_BUFFER) / priceAud).toFixed(decimals),
+    ((subtotalAud * CRYPTO_BUFFER) / priceAud).toFixed(2),
   );
   return { expectedAmount, priceAud, bufferPercent: 2 };
 }
@@ -100,6 +74,7 @@ type VerificationResult = {
 
 type VerifyInput = {
   currency: CryptoCurrency;
+  chain: CryptoChain;
   expectedAmount: number;
   walletAddress: string;
   txid: string;
@@ -148,42 +123,36 @@ async function verifyEthereum(input: VerifyInput): Promise<VerificationResult> {
     };
   }
   try {
-    const transaction = await ethereumRpc<{
-      to?: string;
-      value?: string;
-      input?: string;
-    }>("eth_getTransactionByHash", [input.txid]);
     const receipt = await ethereumRpc<{
       status?: string;
       blockNumber?: string;
+      logs?: Array<{
+        address?: string;
+        topics?: string[];
+        data?: string;
+      }>;
     }>("eth_getTransactionReceipt", [input.txid]);
-    if (!transaction || !receipt || receipt.status !== "0x1" || !receipt.blockNumber) {
+    if (!receipt || receipt.status !== "0x1" || !receipt.blockNumber) {
       return {
         verified: false,
         note: "Transaction is not yet confirmed successfully; queued for review.",
       };
     }
 
-    let valueMatches = false;
-    if (input.currency === "eth") {
-      const expectedWei = toBaseUnits(input.expectedAmount, 18);
-      valueMatches =
-        transaction.to?.toLowerCase() === input.walletAddress.toLowerCase() &&
-        BigInt(transaction.value ?? "0x0") >= expectedWei;
-    } else {
-      const contract = (
-        process.env.CRYPTO_USDT_CONTRACT ?? DEFAULT_USDT_CONTRACT
-      ).toLowerCase();
-      const callData = transaction.input?.toLowerCase() ?? "";
-      const recipient = callData.length >= 74 ? `0x${callData.slice(34, 74)}` : "";
-      const amountHex = callData.length >= 138 ? callData.slice(74, 138) : "0";
-      const expectedUnits = toBaseUnits(input.expectedAmount, 6);
-      valueMatches =
-        transaction.to?.toLowerCase() === contract &&
-        callData.startsWith("0xa9059cbb") &&
-        recipient === input.walletAddress.toLowerCase() &&
-        BigInt(`0x${amountHex}`) >= expectedUnits;
-    }
+    const contract = (
+      process.env.ETHEREUM_USDC_CONTRACT ?? DEFAULT_ETHEREUM_USDC_CONTRACT
+    ).toLowerCase();
+    const recipientTopic = input.walletAddress.toLowerCase().replace(/^0x/, "");
+    const expectedUnits = toBaseUnits(input.expectedAmount, 6);
+    const valueMatches = (receipt.logs ?? []).some((log) => {
+      const topics = log.topics ?? [];
+      return (
+        log.address?.toLowerCase() === contract &&
+        topics[0]?.toLowerCase() === ERC20_TRANSFER_TOPIC &&
+        topics[2]?.toLowerCase().endsWith(recipientTopic) === true &&
+        BigInt(log.data ?? "0x0") >= expectedUnits
+      );
+    });
     if (!valueMatches) {
       return {
         verified: false,
@@ -220,43 +189,92 @@ async function verifyEthereum(input: VerifyInput): Promise<VerificationResult> {
   }
 }
 
-async function verifyBitcoin(input: VerifyInput): Promise<VerificationResult> {
-  try {
-    const response = await fetch(
-      `https://blockstream.info/api/tx/${encodeURIComponent(input.txid)}`,
-      {
-        cache: "no-store",
-        signal: AbortSignal.timeout(10_000),
-      },
-    );
-    if (!response.ok) {
-      return {
-        verified: false,
-        note: "Bitcoin transaction was not found yet; queued for review.",
-      };
-    }
-    const transaction = (await response.json()) as {
-      status?: { confirmed?: boolean };
-      vout?: Array<{
-        scriptpubkey_address?: string;
-        value?: number;
-      }>;
+type SolanaTokenBalance = {
+  accountIndex?: number;
+  mint?: string;
+  owner?: string;
+  uiTokenAmount?: { amount?: string; decimals?: number };
+};
+
+async function solanaRpc<T>(
+  method: string,
+  params: unknown[],
+): Promise<T | null> {
+  const rpcUrl = process.env.SOLANA_RPC_URL?.trim();
+  if (!rpcUrl) return null;
+  const response = await fetch(rpcUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }),
+    cache: "no-store",
+    signal: AbortSignal.timeout(10_000),
+  });
+  if (!response.ok) throw new Error("Solana RPC request failed");
+  const payload = (await response.json()) as {
+    result?: T | null;
+    error?: { message?: string };
+  };
+  if (payload.error) throw new Error(payload.error.message ?? "Solana RPC error");
+  return payload.result ?? null;
+}
+
+async function verifySolana(input: VerifyInput): Promise<VerificationResult> {
+  if (!process.env.SOLANA_RPC_URL?.trim()) {
+    return {
+      verified: false,
+      note: "Solana RPC is not configured; queued for manual verification.",
     };
-    const expectedSats = Math.ceil(input.expectedAmount * 1e8);
-    const paidSats = (transaction.vout ?? [])
-      .filter((output) => output.scriptpubkey_address === input.walletAddress)
-      .reduce((total, output) => total + (output.value ?? 0), 0);
-    if (!transaction.status?.confirmed || paidSats < expectedSats) {
+  }
+  try {
+    const transaction = await solanaRpc<{
+      meta?: {
+        err?: unknown;
+        preTokenBalances?: SolanaTokenBalance[];
+        postTokenBalances?: SolanaTokenBalance[];
+      };
+    }>("getTransaction", [
+      input.txid,
+      {
+        commitment: "finalized",
+        encoding: "jsonParsed",
+        maxSupportedTransactionVersion: 0,
+      },
+    ]);
+    if (!transaction || transaction.meta?.err) {
       return {
         verified: false,
-        note: "Bitcoin payment is unconfirmed or below the quoted amount; queued for review.",
+        note: "Solana transaction is not finalized successfully; queued for review.",
       };
     }
-    return { verified: true, note: "Verified in a confirmed Bitcoin block." };
+
+    const mint = process.env.SOLANA_USDC_MINT?.trim() || DEFAULT_SOLANA_USDC_MINT;
+    const balancesForOwner = (balances: SolanaTokenBalance[] | undefined) =>
+      (balances ?? []).filter(
+        (balance) =>
+          balance.owner === input.walletAddress &&
+          balance.mint === mint &&
+          balance.uiTokenAmount?.decimals === 6,
+      );
+    const sum = (balances: SolanaTokenBalance[]) =>
+      balances.reduce(
+        (total, balance) =>
+          total + BigInt(balance.uiTokenAmount?.amount ?? "0"),
+        BigInt(0),
+      );
+    const received =
+      sum(balancesForOwner(transaction.meta?.postTokenBalances)) -
+      sum(balancesForOwner(transaction.meta?.preTokenBalances));
+    if (received < toBaseUnits(input.expectedAmount, 6)) {
+      return {
+        verified: false,
+        note: "Solana USDC destination or amount did not match; queued for review.",
+      };
+    }
+    return { verified: true, note: "Verified as finalized on Solana." };
   } catch {
     return {
       verified: false,
-      note: "Automatic Bitcoin verification was unavailable; queued for review.",
+      note: "Automatic Solana verification was unavailable; queued for review.",
     };
   }
 }
@@ -264,10 +282,14 @@ async function verifyBitcoin(input: VerifyInput): Promise<VerificationResult> {
 export async function verifyCryptoTransaction(
   input: VerifyInput,
 ): Promise<VerificationResult> {
-  if (!/^(0x[a-fA-F0-9]{64}|[a-fA-F0-9]{64})$/.test(input.txid)) {
+  const validTxid =
+    input.chain === "ethereum"
+      ? /^0x[a-fA-F0-9]{64}$/.test(input.txid)
+      : /^[1-9A-HJ-NP-Za-km-z]{64,88}$/.test(input.txid);
+  if (!validTxid) {
     throw new Error("Enter a valid transaction ID.");
   }
-  return input.currency === "btc"
-    ? await verifyBitcoin(input)
+  return input.chain === "solana"
+    ? await verifySolana(input)
     : await verifyEthereum(input);
 }

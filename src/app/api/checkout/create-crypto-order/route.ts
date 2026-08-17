@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { parseCheckoutDetails } from "@/lib/orders/checkout";
 import { createConvexOrder } from "@/lib/orders/convex";
-import type { CryptoCurrency } from "@/lib/orders/types";
+import type { CryptoChain } from "@/lib/orders/types";
+import { createOrderProofToken } from "@/lib/payments/order-proof";
 import {
   createCryptoQuote,
   getCryptoOption,
@@ -9,22 +10,22 @@ import {
 
 export const runtime = "nodejs";
 
-function isCryptoCurrency(value: unknown): value is CryptoCurrency {
-  return value === "eth" || value === "usdt" || value === "btc";
+function isCryptoChain(value: unknown): value is CryptoChain {
+  return value === "ethereum" || value === "solana";
 }
 
 export async function POST(request: Request): Promise<NextResponse> {
   try {
     const body = (await request.json()) as Record<string, unknown>;
-    if (!isCryptoCurrency(body.currency)) {
+    if (!isCryptoChain(body.chain)) {
       return NextResponse.json(
         { ok: false, error: "Select a supported cryptocurrency." },
         { status: 400 },
       );
     }
     const checkout = parseCheckoutDetails(body);
-    const option = getCryptoOption(body.currency);
-    const quote = await createCryptoQuote(checkout.subtotalAud, body.currency);
+    const option = getCryptoOption(body.chain);
+    const quote = await createCryptoQuote(checkout.subtotalAud);
     const orderId = await createConvexOrder({
       ...checkout,
       paymentMethod: "crypto",
@@ -42,6 +43,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       expectedAmount: quote.expectedAmount,
       walletAddress: option.walletAddress,
       bufferPercent: quote.bufferPercent,
+      proofToken: createOrderProofToken(String(orderId), "crypto"),
     });
   } catch (error) {
     console.error("[checkout] create crypto order failed", error);

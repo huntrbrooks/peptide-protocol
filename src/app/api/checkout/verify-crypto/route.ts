@@ -30,7 +30,8 @@ export async function POST(request: Request): Promise<NextResponse> {
     if (
       !order ||
       order.paymentMethod !== "crypto" ||
-      !order.cryptoCurrency ||
+      order.cryptoCurrency !== "usdc" ||
+      (order.cryptoChain !== "ethereum" && order.cryptoChain !== "solana") ||
       !order.cryptoExpectedAmount ||
       !order.cryptoWalletAddress
     ) {
@@ -41,6 +42,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     }
     const result = await verifyCryptoTransaction({
       currency: order.cryptoCurrency,
+      chain: order.cryptoChain,
       expectedAmount: order.cryptoExpectedAmount,
       walletAddress: order.cryptoWalletAddress,
       txid: body.txid.trim(),

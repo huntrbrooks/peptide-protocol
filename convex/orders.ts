@@ -38,6 +38,7 @@ const paymentMethodValidator = v.union(
 );
 
 const cryptoCurrencyValidator = v.union(
+  v.literal("usdc"),
   v.literal("eth"),
   v.literal("usdt"),
   v.literal("btc"),
@@ -45,7 +46,15 @@ const cryptoCurrencyValidator = v.union(
 
 const cryptoChainValidator = v.union(
   v.literal("ethereum"),
+  v.literal("solana"),
   v.literal("bitcoin"),
+);
+
+const proofVerificationStatusValidator = v.union(
+  v.literal("uploaded"),
+  v.literal("pending_review"),
+  v.literal("verified"),
+  v.literal("rejected"),
 );
 
 const publicOrderValidator = v.object({
@@ -64,6 +73,13 @@ const publicOrderValidator = v.object({
   cryptoTxid: v.union(v.string(), v.null()),
   cryptoVerifiedAt: v.union(v.number(), v.null()),
   cryptoVerificationNote: v.union(v.string(), v.null()),
+  proofStorageId: v.union(v.id("_storage"), v.null()),
+  proofVerificationStatus: v.union(
+    proofVerificationStatusValidator,
+    v.null(),
+  ),
+  proofReference: v.union(v.string(), v.null()),
+  proofTimestamp: v.union(v.string(), v.null()),
   lines: v.array(
     v.object({
       name: v.string(),
@@ -172,6 +188,10 @@ export const get = query({
       cryptoTxid: order.cryptoTxid ?? null,
       cryptoVerifiedAt: order.cryptoVerifiedAt ?? null,
       cryptoVerificationNote: order.cryptoVerificationNote ?? null,
+      proofStorageId: order.proofStorageId ?? null,
+      proofVerificationStatus: order.proofVerificationStatus ?? null,
+      proofReference: order.proofReference ?? null,
+      proofTimestamp: order.proofTimestamp ?? null,
       lines: order.lines.map((line) => ({
         name: line.name,
         quantity: line.quantity,
@@ -297,6 +317,167 @@ export const updateMoonPayFromBridge = mutation({
       });
     }
     return await applyStatus(ctx, orderId, args.status);
+  },
+});
+
+export const updateFromPaymentBridge = mutation({
+  args: {
+    orderId: v.string(),
+    paymentMethod: v.union(v.literal("stripe"), v.literal("moonpay")),
+    status: v.union(v.literal("paid"), v.literal("failed")),
+    transactionId: v.optional(v.string()),
+    paymentSecret: v.string(),
+  },
+  returns: v.union(v.id("orders"), v.null()),
+  handler: async (ctx, args) => {
+    requirePaymentSecret(args.paymentSecret);
+    const orderId = ctx.db.normalizeId("orders", args.orderId);
+    if (!orderId) return null;
+    const order = await ctx.db.get("orders", orderId);
+    if (!order || order.paymentMethod !== args.paymentMethod) return null;
+
+    if (args.paymentMethod === "stripe") {
+      if (
+        order.stripePaymentIntentId &&
+        args.transactionId &&
+        order.stripePaymentIntentId !== args.transactionId
+      ) {
+        throw new Error("Stripe transaction does not match this order");
+      }
+      await ctx.db.patch("orders", orderId, {
+        stripePaymentIntentId:
+          args.transactionId ?? order.stripePaymentIntentId,
+        stripePaymentStatus: args.status,
+        updatedAt: Date.now(),
+      });
+    } else if (args.transactionId) {
+      if (
+        order.moonpayTransactionId &&
+        order.moonpayTransactionId !== args.transactionId
+      ) {
+        throw new Error("MoonPay transaction does not match this order");
+      }
+      await ctx.db.patch("orders", orderId, {
+        moonpayTransactionId: args.transactionId,
+        updatedAt: Date.now(),
+      });
+    }
+    return await applyStatus(ctx, orderId, args.status);
+  },
+});
+
+export const generateProofUploadUrl = mutation({
+  args: { paymentSecret: v.string() },
+  returns: v.string(),
+  handler: async (ctx, args) => {
+    requirePaymentSecret(args.paymentSecret);
+    return await ctx.storage.generateUploadUrl();
+  },
+});
+
+export const attachPaymentProof = mutation({
+  args: {
+    orderId: v.string(),
+    storageId: v.id("_storage"),
+    paymentSecret: v.string(),
+  },
+  returns: v.union(v.id("orders"), v.null()),
+  handler: async (ctx, args) => {
+    requirePaymentSecret(args.paymentSecret);
+    const orderId = ctx.db.normalizeId("orders", args.orderId);
+    if (!orderId) return null;
+    const order = await ctx.db.get("orders", orderId);
+    if (
+      !order ||
+      (order.paymentMethod !== "crypto" && order.paymentMethod !== "bank") ||
+      (order.status !== "pending" && order.status !== "pending_verification")
+    ) {
+      return null;
+    }
+    if (order.proofStorageId && order.proofStorageId !== args.storageId) {
+      await ctx.storage.delete(order.proofStorageId);
+    }
+    await ctx.db.patch("orders", orderId, {
+      proofStorageId: args.storageId,
+      proofVerificationStatus: "uploaded",
+      updatedAt: Date.now(),
+    });
+    return orderId;
+  },
+});
+
+export const getPaymentProofUrl = query({
+  args: {
+    orderId: v.string(),
+    storageId: v.id("_storage"),
+    paymentSecret: v.string(),
+  },
+  returns: v.union(v.string(), v.null()),
+  handler: async (ctx, args) => {
+    requirePaymentSecret(args.paymentSecret);
+    const orderId = ctx.db.normalizeId("orders", args.orderId);
+    if (!orderId) return null;
+    const order = await ctx.db.get("orders", orderId);
+    if (!order || order.proofStorageId !== args.storageId) return null;
+    return await ctx.storage.getUrl(args.storageId);
+  },
+});
+
+export const finalizePaymentProof = mutation({
+  args: {
+    orderId: v.string(),
+    storageId: v.id("_storage"),
+    verificationStatus: proofVerificationStatusValidator,
+    txid: v.optional(v.string()),
+    reference: v.optional(v.string()),
+    timestamp: v.optional(v.string()),
+    verificationNote: v.string(),
+    paymentSecret: v.string(),
+  },
+  returns: v.union(v.id("orders"), v.null()),
+  handler: async (ctx, args) => {
+    requirePaymentSecret(args.paymentSecret);
+    const orderId = ctx.db.normalizeId("orders", args.orderId);
+    if (!orderId) return null;
+    const order = await ctx.db.get("orders", orderId);
+    if (
+      !order ||
+      order.proofStorageId !== args.storageId ||
+      (order.paymentMethod !== "crypto" && order.paymentMethod !== "bank")
+    ) {
+      return null;
+    }
+    if (args.verificationStatus === "verified" && order.paymentMethod !== "crypto") {
+      throw new Error("Bank transfer proofs require manual settlement review");
+    }
+
+    const normalizedTxid = args.txid?.trim().toLowerCase();
+    if (normalizedTxid) {
+      const duplicate = await ctx.db
+        .query("orders")
+        .withIndex("by_crypto_txid", (q) => q.eq("cryptoTxid", normalizedTxid))
+        .unique();
+      if (duplicate && duplicate._id !== orderId) {
+        throw new Error("This transaction has already been submitted");
+      }
+    }
+
+    const now = Date.now();
+    const paid = args.verificationStatus === "verified";
+    await ctx.db.patch("orders", orderId, {
+      status: paid
+        ? "paid"
+        : "pending_verification",
+      proofVerificationStatus: args.verificationStatus,
+      proofReference: args.reference,
+      proofTimestamp: args.timestamp,
+      cryptoTxid: normalizedTxid,
+      cryptoVerifiedAt: paid ? now : undefined,
+      cryptoVerificationNote: args.verificationNote,
+      updatedAt: now,
+      paidAt: paid ? now : order.paidAt,
+    });
+    return orderId;
   },
 });
 

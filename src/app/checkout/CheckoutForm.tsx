@@ -11,8 +11,7 @@ import {
 } from "@/lib/cart/storage";
 import type { CartLine } from "@/lib/cart/types";
 import { whatsappOrderUrl } from "@/lib/orders/whatsapp";
-import type { CryptoCurrency } from "@/lib/orders/types";
-import { StripePaymentForm } from "./StripePaymentForm";
+import type { CryptoChain, CryptoCurrency } from "@/lib/orders/types";
 
 type PaymentTab = "moonpay" | "crypto" | "card" | "bank";
 
@@ -26,8 +25,9 @@ type LineView = {
 
 type CryptoOption = {
   currency: CryptoCurrency;
-  chain: "ethereum" | "bitcoin";
+  chain: CryptoChain;
   label: string;
+  walletAddress: string;
 };
 
 type CryptoOrder = {
@@ -37,6 +37,20 @@ type CryptoOrder = {
   expectedAmount: number;
   walletAddress: string;
   bufferPercent: number;
+  proofToken: string;
+};
+
+type BankOrder = {
+  orderId: string;
+  amountAud: number;
+  proofToken: string;
+  bank: BankDetails;
+};
+
+type BankDetails = {
+  accountName: string;
+  bsb: string;
+  accountNumber: string;
 };
 
 function buildLines(items: CartLine[]): LineView[] {
@@ -59,7 +73,7 @@ function buildLines(items: CartLine[]): LineView[] {
 const inputClass =
   "w-full rounded-sm border border-line bg-paper px-3 py-2.5 text-sm text-ink outline-none transition focus:border-accent";
 
-export function CheckoutForm({ bankEnabled }: { bankEnabled: boolean }) {
+export function CheckoutForm() {
   const cart = useSyncExternalStore(
     subscribeCart,
     getCartSnapshot,
@@ -70,7 +84,7 @@ export function CheckoutForm({ bankEnabled }: { bankEnabled: boolean }) {
   const chatHref = whatsappOrderUrl(
     lines.map((line) => ({ name: line.name, quantity: line.quantity })),
   );
-  const [tab, setTab] = useState<PaymentTab>("moonpay");
+  const [tab, setTab] = useState<PaymentTab>("card");
   const [details, setDetails] = useState({
     email: "",
     fullName: "",
@@ -84,28 +98,29 @@ export function CheckoutForm({ bankEnabled }: { bankEnabled: boolean }) {
   const [researchAck, setResearchAck] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [cardSession, setCardSession] = useState<{
-    orderId: string;
-    clientSecret: string;
-  } | null>(null);
   const [cryptoOptions, setCryptoOptions] = useState<CryptoOption[]>([]);
-  const [currency, setCurrency] = useState<CryptoCurrency>("eth");
+  const [cryptoChain, setCryptoChain] = useState<CryptoChain>("solana");
   const [cryptoOrder, setCryptoOrder] = useState<CryptoOrder | null>(null);
-  const [txid, setTxid] = useState("");
+  const [bankDetails, setBankDetails] = useState<BankDetails | null>(null);
+  const [bankOrder, setBankOrder] = useState<BankOrder | null>(null);
+  const [proofFile, setProofFile] = useState<File | null>(null);
   const [verificationMessage, setVerificationMessage] = useState<string | null>(
     null,
   );
-  const checkoutStarted = Boolean(cardSession || cryptoOrder);
+  const checkoutStarted = Boolean(cryptoOrder || bankOrder);
 
   useEffect(() => {
-    void fetch("/api/checkout/crypto-options")
+    void fetch("/api/checkout/payment-options")
       .then(async (response) => {
         const payload = (await response.json()) as {
           options?: CryptoOption[];
+          crypto?: CryptoOption[];
+          bank?: BankDetails;
         };
-        const options = payload.options ?? [];
+        const options = payload.crypto ?? payload.options ?? [];
         setCryptoOptions(options);
-        if (options[0]) setCurrency(options[0].currency);
+        setBankDetails(payload.bank ?? null);
+        if (options[0]) setCryptoChain(options[0].chain);
       })
       .catch(() => setCryptoOptions([]));
   }, []);
@@ -155,7 +170,7 @@ export function CheckoutForm({ bankEnabled }: { bankEnabled: boolean }) {
       const response = await fetch("/api/checkout/freshnup-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(checkoutBody()),
+        body: JSON.stringify({ ...checkoutBody(), paymentMethod: "stripe" }),
       });
       const payload = (await response.json()) as {
         payUrl?: string;
@@ -175,42 +190,6 @@ export function CheckoutForm({ bankEnabled }: { bankEnabled: boolean }) {
     }
   }
 
-  async function startCardPayment() {
-    const validationError = validateDetails();
-    if (validationError) {
-      setError(validationError);
-      return;
-    }
-    setBusy(true);
-    setError(null);
-    try {
-      const response = await fetch("/api/checkout/create-payment-intent", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(checkoutBody()),
-      });
-      const payload = (await response.json()) as {
-        ok?: boolean;
-        orderId?: string;
-        clientSecret?: string;
-        error?: string;
-      };
-      if (!response.ok || !payload.orderId || !payload.clientSecret) {
-        throw new Error(payload.error ?? "Unable to start card payment.");
-      }
-      setCardSession({
-        orderId: payload.orderId,
-        clientSecret: payload.clientSecret,
-      });
-    } catch (caught) {
-      setError(
-        caught instanceof Error ? caught.message : "Unable to start card payment.",
-      );
-    } finally {
-      setBusy(false);
-    }
-  }
-
   async function startCryptoPayment() {
     const validationError = validateDetails();
     if (validationError) {
@@ -223,7 +202,7 @@ export function CheckoutForm({ bankEnabled }: { bankEnabled: boolean }) {
       const response = await fetch("/api/checkout/create-crypto-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...checkoutBody(), currency }),
+        body: JSON.stringify({ ...checkoutBody(), chain: cryptoChain }),
       });
       const payload = (await response.json()) as CryptoOrder & {
         error?: string;
@@ -243,42 +222,116 @@ export function CheckoutForm({ bankEnabled }: { bankEnabled: boolean }) {
     }
   }
 
-  async function submitTxid() {
-    if (!cryptoOrder || !txid.trim()) {
-      setError("Enter the transaction ID after sending payment.");
+  async function startBankPayment() {
+    const validationError = validateDetails();
+    if (validationError) {
+      setError(validationError);
       return;
     }
     setBusy(true);
     setError(null);
     try {
-      const response = await fetch("/api/checkout/verify-crypto", {
+      const response = await fetch("/api/checkout/create-bank-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          orderId: cryptoOrder.orderId,
-          txid: txid.trim(),
-        }),
+        body: JSON.stringify(checkoutBody()),
       });
-      const payload = (await response.json()) as {
-        error?: string;
-        message?: string;
-      };
-      if (!response.ok) {
-        throw new Error(payload.error ?? "Unable to submit transaction.");
+      const payload = (await response.json()) as BankOrder & { error?: string };
+      if (!response.ok || !payload.orderId || !payload.proofToken) {
+        throw new Error(payload.error ?? "Unable to create bank order.");
       }
-      setVerificationMessage(
-        payload.message ?? "Transaction submitted for verification.",
-      );
-      window.setTimeout(() => {
-        window.location.assign(
-          `/checkout/success?orderId=${encodeURIComponent(cryptoOrder.orderId)}`,
-        );
-      }, 1200);
+      setBankOrder(payload);
     } catch (caught) {
       setError(
         caught instanceof Error
           ? caught.message
-          : "Unable to submit transaction.",
+          : "Unable to create bank order.",
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function submitPaymentProof() {
+    const order = tab === "crypto" ? cryptoOrder : bankOrder;
+    if (!order || !proofFile) {
+      setError("Upload a screenshot of the successful transfer.");
+      return;
+    }
+    if (!["image/jpeg", "image/png", "image/webp"].includes(proofFile.type)) {
+      setError("Upload a PNG, JPEG, or WebP screenshot.");
+      return;
+    }
+    if (proofFile.size > 8 * 1024 * 1024) {
+      setError("Upload a screenshot under 8 MB.");
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    try {
+      const uploadResponse = await fetch(
+        "/api/checkout/payment-proof-upload",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            orderId: order.orderId,
+            proofToken: order.proofToken,
+            contentType: proofFile.type,
+          }),
+        },
+      );
+      const uploadPayload = (await uploadResponse.json()) as {
+        uploadUrl?: string;
+        error?: string;
+      };
+      if (!uploadResponse.ok || !uploadPayload.uploadUrl) {
+        throw new Error(uploadPayload.error ?? "Unable to upload payment proof.");
+      }
+      const storageResponse = await fetch(uploadPayload.uploadUrl, {
+        method: "POST",
+        headers: { "Content-Type": proofFile.type },
+        body: proofFile,
+      });
+      const storagePayload = (await storageResponse.json()) as {
+        storageId?: string;
+      };
+      if (!storageResponse.ok || !storagePayload.storageId) {
+        throw new Error("Unable to store payment proof.");
+      }
+      const verifyResponse = await fetch(
+        "/api/checkout/verify-payment-proof",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            orderId: order.orderId,
+            proofToken: order.proofToken,
+            storageId: storagePayload.storageId,
+          }),
+        },
+      );
+      const verifyPayload = (await verifyResponse.json()) as {
+        error?: string;
+        message?: string;
+        status?: string;
+      };
+      if (!verifyResponse.ok) {
+        throw new Error(verifyPayload.error ?? "Unable to verify payment proof.");
+      }
+      setVerificationMessage(
+        verifyPayload.message ?? "Payment proof received.",
+      );
+      window.setTimeout(() => {
+        window.location.assign(
+          `/checkout/success?orderId=${encodeURIComponent(order.orderId)}`,
+        );
+      }, 1400);
+    } catch (caught) {
+      setError(
+        caught instanceof Error
+          ? caught.message
+          : "Unable to verify payment proof.",
       );
     } finally {
       setBusy(false);
@@ -416,7 +469,8 @@ export function CheckoutForm({ bankEnabled }: { bankEnabled: boolean }) {
           <div className="mt-5 grid grid-cols-2 border border-line text-sm sm:grid-cols-4">
             {(["moonpay", "crypto", "card", "bank"] as const).map((method) => {
               const disabled =
-                (method === "bank" && !bankEnabled) ||
+                method === "moonpay" ||
+                (method === "bank" && !bankDetails) ||
                 (checkoutStarted && tab !== method);
               return (
                 <button
@@ -434,7 +488,7 @@ export function CheckoutForm({ bankEnabled }: { bankEnabled: boolean }) {
                   } disabled:cursor-not-allowed disabled:opacity-40`}
                 >
                   {method === "moonpay"
-                    ? "Secure pay"
+                    ? "🔒 MoonPay — Coming soon"
                     : method === "card"
                       ? "Stripe"
                       : method}
@@ -446,9 +500,25 @@ export function CheckoutForm({ bankEnabled }: { bankEnabled: boolean }) {
           {tab === "moonpay" ? (
             <div className="mt-5">
               <p className="text-sm leading-relaxed text-muted">
-                Continue to Fresh&apos;n Up for secure MoonPay checkout. Your
-                order total remains in AUD and payment confirmation returns
-                here automatically.
+                MoonPay is temporarily unavailable while its payment flow is
+                validated.
+              </p>
+              <button
+                type="button"
+                disabled
+                aria-disabled="true"
+                className="mt-5 cursor-not-allowed rounded-sm border border-line bg-mist/40 px-5 py-3 text-sm text-muted"
+              >
+                <span aria-hidden="true">🔒</span> Coming soon
+              </button>
+            </div>
+          ) : null}
+
+          {tab === "card" ? (
+            <div className="mt-5">
+              <p className="text-sm leading-relaxed text-muted">
+                Continue to Fresh&apos;n Up for secure Stripe card checkout in
+                AUD. Payment confirmation returns here automatically.
               </p>
               <button
                 type="button"
@@ -456,29 +526,9 @@ export function CheckoutForm({ bankEnabled }: { bankEnabled: boolean }) {
                 disabled={busy || lines.length === 0}
                 className="btn-primary mt-5 rounded-sm bg-ink px-5 py-3 text-sm text-paper hover:bg-accent disabled:opacity-50"
               >
-                {busy ? "Preparing…" : "Pay securely"}
+                {busy ? "Preparing…" : "Pay securely with Stripe"}
               </button>
             </div>
-          ) : null}
-
-          {tab === "card" ? (
-            cardSession ? (
-              <StripePaymentForm {...cardSession} />
-            ) : (
-              <div className="mt-5">
-                <p className="text-sm leading-relaxed text-muted">
-                  Alternate card checkout in AUD through Stripe.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => void startCardPayment()}
-                  disabled={busy || lines.length === 0}
-                  className="btn-primary mt-5 rounded-sm bg-ink px-5 py-3 text-sm text-paper hover:bg-accent disabled:opacity-50"
-                >
-                  {busy ? "Preparing…" : "Continue to secure payment"}
-                </button>
-              </div>
-            )
           ) : null}
 
           {tab === "crypto" ? (
@@ -486,25 +536,25 @@ export function CheckoutForm({ bankEnabled }: { bankEnabled: boolean }) {
               {!cryptoOrder ? (
                 <>
                   <label className="grid gap-1.5 text-sm text-muted">
-                    Cryptocurrency
+                    USDC network
                     <select
-                      value={currency}
+                      value={cryptoChain}
                       onChange={(event) =>
-                        setCurrency(event.target.value as CryptoCurrency)
+                        setCryptoChain(event.target.value as CryptoChain)
                       }
                       className={inputClass}
                       disabled={cryptoOptions.length === 0}
                     >
                       {cryptoOptions.map((option) => (
-                        <option key={option.currency} value={option.currency}>
+                        <option key={option.chain} value={option.chain}>
                           {option.label}
                         </option>
                       ))}
                     </select>
                   </label>
                   <p className="mt-3 text-xs leading-relaxed text-muted">
-                    The live AUD quote includes a 2% volatility buffer. Only
-                    configured merchant wallets are shown.
+                    USDC only. The live AUD conversion includes a 2% quote
+                    buffer. Choose the exact network shown.
                   </p>
                   <button
                     type="button"
@@ -525,10 +575,10 @@ export function CheckoutForm({ bankEnabled }: { bankEnabled: boolean }) {
                   <p className="text-muted">
                     Send exactly{" "}
                     <strong className="text-ink">
-                      {cryptoOrder.expectedAmount}{" "}
-                      {cryptoOrder.currency.toUpperCase()}
+                      {cryptoOrder.expectedAmount} USDC
                     </strong>{" "}
-                    on {cryptoOrder.chain}.
+                    on {cryptoOrder.chain}. Sending another token or network
+                    can permanently lose funds.
                   </p>
                   <div>
                     <p className="text-xs uppercase tracking-wide text-muted">
@@ -537,28 +587,41 @@ export function CheckoutForm({ bankEnabled }: { bankEnabled: boolean }) {
                     <p className="mt-1 break-all border border-line bg-mist/30 p-3 font-mono text-xs text-ink">
                       {cryptoOrder.walletAddress}
                     </p>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        void navigator.clipboard.writeText(
+                          cryptoOrder.walletAddress,
+                        )
+                      }
+                      className="mt-2 text-xs text-accent underline"
+                    >
+                      Copy address
+                    </button>
                   </div>
                   <label className="grid gap-1.5 text-sm text-muted">
-                    Transaction ID (TXID)
+                    Successful transfer screenshot
                     <input
-                      value={txid}
-                      onChange={(event) => setTxid(event.target.value)}
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp"
+                      onChange={(event) =>
+                        setProofFile(event.target.files?.[0] ?? null)
+                      }
                       className={inputClass}
-                      placeholder="Paste after sending"
                     />
                   </label>
                   <button
                     type="button"
-                    onClick={() => void submitTxid()}
-                    disabled={busy}
+                    onClick={() => void submitPaymentProof()}
+                    disabled={busy || !proofFile}
                     className="btn-primary rounded-sm bg-ink px-5 py-3 text-sm text-paper hover:bg-accent disabled:opacity-50"
                   >
-                    {busy ? "Checking transaction…" : "Submit transaction"}
+                    {busy ? "Verifying payment…" : "Upload and verify payment"}
                   </button>
                   <p className="text-xs leading-relaxed text-muted">
-                    Verification usually confirms in minutes. If automatic chain
-                    verification is unavailable, the order remains pending for
-                    staff review.
+                    The screenshot is read for payment details, then the
+                    transaction is independently confirmed on-chain. Only a
+                    confirmed matching transfer completes the order.
                   </p>
                   {verificationMessage ? (
                     <p className="text-sm text-ink">{verificationMessage}</p>
@@ -568,10 +631,87 @@ export function CheckoutForm({ bankEnabled }: { bankEnabled: boolean }) {
             </div>
           ) : null}
 
-          {tab === "bank" && bankEnabled ? (
+          {tab === "bank" && bankDetails ? (
             <div className="mt-5 text-sm leading-relaxed text-muted">
-              PayID/bank transfer is in assisted rollout. Contact support for
-              bank details and include your order contents.
+              {!bankOrder ? (
+                <>
+                  <p>
+                    Create the order to receive the transfer reference and
+                    upload a successful-payment screenshot.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => void startBankPayment()}
+                    disabled={busy || lines.length === 0}
+                    className="btn-primary mt-5 rounded-sm bg-ink px-5 py-3 text-sm text-paper hover:bg-accent disabled:opacity-50"
+                  >
+                    {busy ? "Preparing…" : "Get bank transfer details"}
+                  </button>
+                </>
+              ) : (
+                <div className="grid gap-4">
+                  <p>
+                    Send exactly{" "}
+                    <strong className="text-ink">
+                      {formatPrice(bankOrder.amountAud)}
+                    </strong>{" "}
+                    and use order {bankOrder.orderId} as the reference.
+                  </p>
+                  <dl className="grid gap-2 border border-line bg-mist/30 p-4">
+                    <div>
+                      <dt className="text-xs uppercase tracking-wide">Account name</dt>
+                      <dd className="text-ink">{bankOrder.bank.accountName}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-xs uppercase tracking-wide">BSB</dt>
+                      <dd className="font-mono text-ink">{bankOrder.bank.bsb}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-xs uppercase tracking-wide">Account number</dt>
+                      <dd className="font-mono text-ink">
+                        {bankOrder.bank.accountNumber}
+                      </dd>
+                    </div>
+                  </dl>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      void navigator.clipboard.writeText(
+                        `${bankOrder.bank.bsb} ${bankOrder.bank.accountNumber}`,
+                      )
+                    }
+                    className="w-fit text-xs text-accent underline"
+                  >
+                    Copy bank details
+                  </button>
+                  <label className="grid gap-1.5">
+                    Successful transfer screenshot
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp"
+                      onChange={(event) =>
+                        setProofFile(event.target.files?.[0] ?? null)
+                      }
+                      className={inputClass}
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => void submitPaymentProof()}
+                    disabled={busy || !proofFile}
+                    className="btn-primary rounded-sm bg-ink px-5 py-3 text-sm text-paper hover:bg-accent disabled:opacity-50"
+                  >
+                    {busy ? "Checking receipt…" : "Upload payment receipt"}
+                  </button>
+                  <p className="text-xs">
+                    Matching receipts are saved as pending review. Bank orders
+                    are not auto-completed until settlement is confirmed.
+                  </p>
+                  {verificationMessage ? (
+                    <p className="text-sm text-ink">{verificationMessage}</p>
+                  ) : null}
+                </div>
+              )}
             </div>
           ) : null}
 

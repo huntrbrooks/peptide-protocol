@@ -35,6 +35,13 @@ const orderShipping = v.object({
   country: v.string(),
 });
 
+const proofVerificationStatus = v.union(
+  v.literal("uploaded"),
+  v.literal("pending_review"),
+  v.literal("verified"),
+  v.literal("rejected"),
+);
+
 export default defineSchema({
   orders: defineTable({
     status: orderStatus,
@@ -49,16 +56,29 @@ export default defineSchema({
     stripePaymentIntentId: v.optional(v.string()),
     stripePaymentStatus: v.optional(v.string()),
     cryptoCurrency: v.optional(
-      v.union(v.literal("eth"), v.literal("usdt"), v.literal("btc")),
+      v.union(
+        v.literal("usdc"),
+        v.literal("eth"),
+        v.literal("usdt"),
+        v.literal("btc"),
+      ),
     ),
     cryptoChain: v.optional(
-      v.union(v.literal("ethereum"), v.literal("bitcoin")),
+      v.union(
+        v.literal("ethereum"),
+        v.literal("solana"),
+        v.literal("bitcoin"),
+      ),
     ),
     cryptoExpectedAmount: v.optional(v.number()),
     cryptoWalletAddress: v.optional(v.string()),
     cryptoTxid: v.optional(v.string()),
     cryptoVerifiedAt: v.optional(v.number()),
     cryptoVerificationNote: v.optional(v.string()),
+    proofStorageId: v.optional(v.id("_storage")),
+    proofVerificationStatus: v.optional(proofVerificationStatus),
+    proofReference: v.optional(v.string()),
+    proofTimestamp: v.optional(v.string()),
     /** Legacy field retained so existing MoonPay-era documents still validate. */
     moonpayTransactionId: v.optional(v.string()),
     researchAck: v.literal(true),
