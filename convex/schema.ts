@@ -66,12 +66,31 @@ export default defineSchema({
     lastTouch: v.optional(v.string()),
     firstOrderRedeemedAt: v.optional(v.number()),
     welcomeEmailSentAt: v.optional(v.number()),
+    ltvAud: v.optional(v.number()),
+    orderCount: v.optional(v.number()),
+    firstPaidAt: v.optional(v.number()),
+    lastPaidAt: v.optional(v.number()),
+    rfmRecencyScore: v.optional(v.number()),
+    rfmFrequencyScore: v.optional(v.number()),
+    rfmMonetaryScore: v.optional(v.number()),
+    rfmSegment: v.optional(
+      v.union(
+        v.literal("Champions"),
+        v.literal("Loyal"),
+        v.literal("New"),
+        v.literal("At Risk"),
+        v.literal("Lost"),
+      ),
+    ),
+    churned180: v.optional(v.boolean()),
     createdAt: v.number(),
     updatedAt: v.optional(v.number()),
   })
     .index("by_email", ["email"])
     .index("by_code", ["code"])
-    .index("by_auth_user", ["authUserId"]),
+    .index("by_auth_user", ["authUserId"])
+    .index("by_created", ["createdAt"])
+    .index("by_rfm_segment", ["rfmSegment"]),
   orders: defineTable({
     status: orderStatus,
     email: v.string(),
@@ -127,6 +146,7 @@ export default defineSchema({
     trackingNumber: v.optional(v.string()),
     internalNotes: v.optional(v.string()),
     purchaseTrackedAt: v.optional(v.number()),
+    refundTrackedAt: v.optional(v.number()),
     inventorySettledAt: v.optional(v.number()),
     inventoryReleasedAt: v.optional(v.number()),
     confirmationEmailClaimedAt: v.optional(v.number()),
@@ -136,6 +156,8 @@ export default defineSchema({
     .index("by_status", ["status"])
     .index("by_email", ["email"])
     .index("by_member", ["memberId"])
+    .index("by_created", ["createdAt"])
+    .index("by_paid_at", ["paidAt"])
     .index("by_stripe_payment_intent", ["stripePaymentIntentId"])
     .index("by_crypto_txid", ["cryptoTxid"]),
   staffRoles: defineTable({
@@ -159,6 +181,57 @@ export default defineSchema({
     source: v.string(),
     createdAt: v.number(),
   }).index("by_member", ["memberId"]),
+  addresses: defineTable({
+    memberId: v.id("members"),
+    label: v.string(),
+    fullName: v.string(),
+    line1: v.string(),
+    line2: v.optional(v.string()),
+    city: v.string(),
+    state: v.string(),
+    postcode: v.string(),
+    country: v.string(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("by_member", ["memberId"]),
+  lifecycleActivities: defineTable({
+    memberId: v.id("members"),
+    email: v.string(),
+    kind: v.union(
+      v.literal("abandoned_cart"),
+      v.literal("post_purchase"),
+      v.literal("win_back"),
+    ),
+    sourceKey: v.string(),
+    orderId: v.optional(v.id("orders")),
+    lines: v.array(orderLine),
+    occurredAt: v.number(),
+    nextSendAt: v.number(),
+    stage: v.number(),
+    claimedAt: v.optional(v.number()),
+    completedAt: v.optional(v.number()),
+    cancelledAt: v.optional(v.number()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_due", ["nextSendAt"])
+    .index("by_source_key", ["sourceKey"])
+    .index("by_member", ["memberId"]),
+  emailEvents: defineTable({
+    memberId: v.id("members"),
+    orderId: v.optional(v.id("orders")),
+    activityId: v.optional(v.id("lifecycleActivities")),
+    type: v.string(),
+    idempotencyKey: v.string(),
+    providerMessageId: v.optional(v.string()),
+    status: v.union(v.literal("sent"), v.literal("failed")),
+    error: v.optional(v.string()),
+    createdAt: v.number(),
+  })
+    .index("by_idempotency_key", ["idempotencyKey"])
+    .index("by_member", ["memberId"])
+    .index("by_status", ["status"])
+    .index("by_created", ["createdAt"]),
   inventory: defineTable({
     slug: v.string(),
     stockCode: v.string(),
@@ -180,4 +253,42 @@ export default defineSchema({
   })
     .index("by_staff", ["staffUserId"])
     .index("by_created", ["createdAt"]),
+  wishlists: defineTable({
+    memberId: v.id("members"),
+    productSlug: v.string(),
+    createdAt: v.number(),
+  })
+    .index("by_member", ["memberId"])
+    .index("by_member_product", ["memberId", "productSlug"]),
+  dailyStats: defineTable({
+    dateKey: v.string(),
+    periodStart: v.number(),
+    periodEnd: v.number(),
+    grossGmvAud: v.number(),
+    netGmvAud: v.number(),
+    orderCount: v.number(),
+    memberOrderCount: v.number(),
+    memberAttachPercent: v.number(),
+    rfmCounts: v.object({
+      champions: v.number(),
+      loyal: v.number(),
+      new: v.number(),
+      atRisk: v.number(),
+      lost: v.number(),
+    }),
+    createdAt: v.number(),
+  })
+    .index("by_date_key", ["dateKey"])
+    .index("by_created", ["createdAt"]),
+  rfmSegmentStats: defineTable({
+    segment: v.union(
+      v.literal("Champions"),
+      v.literal("Loyal"),
+      v.literal("New"),
+      v.literal("At Risk"),
+      v.literal("Lost"),
+    ),
+    count: v.number(),
+    updatedAt: v.number(),
+  }).index("by_segment", ["segment"]),
 });

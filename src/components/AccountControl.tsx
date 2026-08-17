@@ -2,6 +2,7 @@
 
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useConvexAuth, useQuery } from "convex/react";
+import Link from "next/link";
 import { useState } from "react";
 import { api } from "../../convex/_generated/api";
 import { resetAnalyticsIdentity, track } from "@/lib/analytics/track";
@@ -65,6 +66,9 @@ export function AccountControl() {
                   Code <strong>{membership.code}</strong> · {membership.percent}%
                 </p>
               ) : null}
+              <Link href="/account" onClick={() => setOpen(false)} className="mt-4 block text-accent underline">
+                View account
+              </Link>
               <button type="button" onClick={() => void logout()} className="mt-4 text-accent underline">
                 Log out
               </button>

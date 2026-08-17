@@ -1,6 +1,6 @@
 "use client";
 
-import { useConvexAuth, useQuery } from "convex/react";
+import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { api } from "../../../convex/_generated/api";
@@ -128,6 +128,7 @@ function CheckoutMembershipSync({
 }
 
 export function CheckoutForm() {
+  const recordCheckoutActivity = useMutation(api.lifecycle.recordCheckoutActivity);
   const cart = useSyncExternalStore(
     subscribeCart,
     getCartSnapshot,
@@ -190,6 +191,14 @@ export function CheckoutForm() {
       });
     }
   }, [lines, subtotal]);
+
+  useEffect(() => {
+    if (!email.includes("@") || lines.length === 0) return;
+    const timeout = window.setTimeout(() => {
+      void recordCheckoutActivity({ email, lines });
+    }, 750);
+    return () => window.clearTimeout(timeout);
+  }, [email, lines, recordCheckoutActivity]);
 
   useEffect(() => {
     if (quote.code) {

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ProductCard } from "@/components/ProductCard";
+import { ShopCatalogue } from "@/components/ShopCatalogue";
 import { categories } from "@/content/categories";
 import { products } from "@/content/products";
 import { pages } from "@/content/pages";
@@ -33,11 +33,7 @@ export default function ShopPage() {
         ))}
       </div>
 
-      <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {products.map((product) => (
-          <ProductCard key={product.slug} product={product} />
-        ))}
-      </div>
+      <ShopCatalogue products={products} />
     </div>
   );
 }

@@ -44,3 +44,40 @@ export const capture = internalAction({
     return null;
   },
 });
+
+export const captureRefund = internalAction({
+  args: { orderId: v.id("orders") },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const event = await ctx.runQuery(internal.orders.getRefundEvent, {
+      orderId: args.orderId,
+    });
+    if (!event) return null;
+    const key = process.env.POSTHOG_API_KEY?.trim();
+    if (!key) return null;
+    const host = (process.env.POSTHOG_HOST ?? "https://us.i.posthog.com").replace(/\/$/, "");
+    const response = await fetch(`${host}/capture/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        api_key: key,
+        event: "refund",
+        properties: {
+          distinct_id: event.memberId ?? `order:${event.transactionId}`,
+          transaction_id: event.transactionId,
+          value: event.value,
+          currency: "AUD",
+          payment_type: event.paymentType,
+          member_id: event.memberId,
+        },
+      }),
+    });
+    if (!response.ok) {
+      throw new Error(`PostHog refund capture failed (${response.status})`);
+    }
+    await ctx.runMutation(internal.orders.markRefundTracked, {
+      orderId: args.orderId,
+    });
+    return null;
+  },
+});

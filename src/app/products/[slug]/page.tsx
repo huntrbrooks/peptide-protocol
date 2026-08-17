@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { AddToCartButton } from "@/components/AddToCartButton";
 import { ProductAnalytics } from "@/components/ProductAnalytics";
 import { ProductStockStatus } from "@/components/ProductStockStatus";
+import { WishlistButton } from "@/components/WishlistButton";
 import { DosingCalculator } from "@/components/dosing-calculator/DosingCalculator";
 import { FaqList } from "@/components/FaqList";
 import {
@@ -92,6 +93,14 @@ export default async function ProductPage({ params }: Props) {
           ) : null}
           <div className="mt-6">
             <AddToCartButton product={product} />
+          </div>
+          <div className="mt-3 flex items-center gap-3 text-sm text-muted">
+            <WishlistButton
+              productSlug={product.slug}
+              productName={product.name}
+              priceAud={product.priceAud}
+            />
+            Save for later
           </div>
 
           {kit ? (

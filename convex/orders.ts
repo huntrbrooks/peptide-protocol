@@ -13,6 +13,7 @@ import {
 import { internalMutation, internalQuery, mutation, query } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 import type { MutationCtx } from "./_generated/server";
+import { recomputeMemberRfm } from "./rfm";
 
 const orderLineValidator = v.object({
   slug: v.string(),
@@ -291,19 +292,37 @@ export async function applyStatus(
     paidAt: status === "paid" ? now : order.paidAt,
   });
   if (status === "paid") {
-    const paidOrder = await ctx.db.get("orders", orderId);
-    if (paidOrder) {
-      await settleInventory(ctx, paidOrder);
-      await redeemFirstOrderIfNeeded(ctx, paidOrder);
-    }
-    if (order.paymentMethod !== "moonpay" && order.paymentMethod !== "whatsapp") {
-      await ctx.scheduler.runAfter(0, internal.purchaseAnalytics.capture, { orderId });
-    }
+    await applyPaidSideEffects(ctx, orderId, now);
   } else {
     const stoppedOrder = await ctx.db.get("orders", orderId);
     if (stoppedOrder) await releaseInventory(ctx, stoppedOrder);
   }
   return orderId;
+}
+
+async function applyPaidSideEffects(
+  ctx: MutationCtx,
+  orderId: Id<"orders">,
+  now: number,
+): Promise<void> {
+  const paidOrder = await ctx.db.get("orders", orderId);
+  if (!paidOrder) return;
+  await settleInventory(ctx, paidOrder);
+  await redeemFirstOrderIfNeeded(ctx, paidOrder);
+  if (paidOrder.memberId) {
+    await recomputeMemberRfm(ctx, paidOrder.memberId, now);
+    await ctx.scheduler.runAfter(0, internal.klaviyo.syncMember, {
+      memberId: paidOrder.memberId,
+    });
+  }
+  if (
+    paidOrder.paymentMethod !== "moonpay" &&
+    paidOrder.paymentMethod !== "whatsapp"
+  ) {
+    await ctx.scheduler.runAfter(0, internal.purchaseAnalytics.capture, { orderId });
+  }
+  await ctx.scheduler.runAfter(0, internal.lifecycle.enqueuePostPurchase, { orderId });
+  await ctx.scheduler.runAfter(0, internal.klaviyo.syncPlacedOrder, { orderId });
 }
 
 export const attachStripeIntent = mutation({
@@ -560,12 +579,7 @@ export const finalizePaymentProof = mutation({
       paidAt: paid ? now : order.paidAt,
     });
     if (paid) {
-      const paidOrder = await ctx.db.get("orders", orderId);
-      if (paidOrder) {
-        await settleInventory(ctx, paidOrder);
-        await redeemFirstOrderIfNeeded(ctx, paidOrder);
-      }
-      await ctx.scheduler.runAfter(0, internal.purchaseAnalytics.capture, { orderId });
+      await applyPaidSideEffects(ctx, orderId, now);
     }
     return orderId;
   },
@@ -610,12 +624,7 @@ export const submitCryptoVerification = mutation({
       paidAt: args.verified ? now : order.paidAt,
     });
     if (args.verified) {
-      const paidOrder = await ctx.db.get("orders", orderId);
-      if (paidOrder) {
-        await settleInventory(ctx, paidOrder);
-        await redeemFirstOrderIfNeeded(ctx, paidOrder);
-      }
-      await ctx.scheduler.runAfter(0, internal.purchaseAnalytics.capture, { orderId });
+      await applyPaidSideEffects(ctx, orderId, now);
     }
     return orderId;
   },
@@ -809,6 +818,51 @@ export const markPurchaseTracked = internalMutation({
     const order = await ctx.db.get("orders", args.orderId);
     if (order && order.purchaseTrackedAt === undefined) {
       await ctx.db.patch("orders", args.orderId, { purchaseTrackedAt: Date.now() });
+    }
+    return null;
+  },
+});
+
+export const getRefundEvent = internalQuery({
+  args: { orderId: v.id("orders") },
+  returns: v.union(
+    v.object({
+      transactionId: v.string(),
+      value: v.number(),
+      memberId: v.union(v.string(), v.null()),
+      paymentType: v.string(),
+    }),
+    v.null(),
+  ),
+  handler: async (ctx, args) => {
+    const order = await ctx.db.get("orders", args.orderId);
+    if (
+      !order ||
+      order.status !== "refunded" ||
+      order.refundAud === undefined ||
+      order.refundTrackedAt !== undefined
+    ) {
+      return null;
+    }
+    return {
+      transactionId: String(order._id),
+      value: order.refundAud,
+      memberId: order.memberId ? String(order.memberId) : null,
+      paymentType: order.paymentMethod ?? "unknown",
+    };
+  },
+});
+
+export const markRefundTracked = internalMutation({
+  args: { orderId: v.id("orders") },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const order = await ctx.db.get("orders", args.orderId);
+    if (
+      order?.status === "refunded" &&
+      order.refundTrackedAt === undefined
+    ) {
+      await ctx.db.patch("orders", order._id, { refundTrackedAt: Date.now() });
     }
     return null;
   },

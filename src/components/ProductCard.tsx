@@ -6,31 +6,33 @@ import type { Product } from "@/content/types";
 import { formatPrice } from "@/content/products";
 import { track } from "@/lib/analytics/track";
 import { useInventoryInStock } from "@/lib/inventory/useAvailability";
+import { WishlistButton } from "@/components/WishlistButton";
 
 export function ProductCard({ product }: { product: Product }) {
   const inStock = useInventoryInStock(product.slug, product.inStock ?? true);
 
   return (
-    <Link
-      href={`/products/${product.slug}`}
-      onClick={() =>
-        track("select_item", {
-          item_list_id: "catalogue",
-          items: [{ item_id: product.slug, item_name: product.name, price: product.priceAud }],
-        })
-      }
-      className="card-lift group flex flex-col overflow-hidden border border-line bg-paper"
-    >
-      <div className="relative aspect-[4/5] overflow-hidden bg-mist">
-        <Image
-          src={product.image}
-          alt={product.name}
-          fill
-          className="object-cover transition duration-500 group-hover:scale-[1.03]"
-          sizes="(max-width: 768px) 100vw, 33vw"
-        />
-      </div>
-      <div className="flex flex-1 flex-col gap-2 p-4">
+    <article className="card-lift group relative flex flex-col overflow-hidden border border-line bg-paper">
+      <Link
+        href={`/products/${product.slug}`}
+        onClick={() =>
+          track("select_item", {
+            item_list_id: "catalogue",
+            items: [{ item_id: product.slug, item_name: product.name, price: product.priceAud }],
+          })
+        }
+        className="flex flex-1 flex-col"
+      >
+        <div className="relative aspect-[4/5] overflow-hidden bg-mist">
+          <Image
+            src={product.image}
+            alt={product.name}
+            fill
+            className="object-cover transition duration-500 group-hover:scale-[1.03]"
+            sizes="(max-width: 768px) 100vw, 33vw"
+          />
+        </div>
+        <div className="flex flex-1 flex-col gap-2 p-4">
         <p className="text-xs uppercase tracking-[0.14em] text-muted">
           {product.strength}
         </p>
@@ -74,7 +76,14 @@ export function ProductCard({ product }: { product: Product }) {
             View
           </span>
         </div>
-      </div>
-    </Link>
+        </div>
+      </Link>
+      <WishlistButton
+        productSlug={product.slug}
+        productName={product.name}
+        priceAud={product.priceAud}
+        className="absolute right-3 top-3 z-10 bg-paper/95"
+      />
+    </article>
   );
 }

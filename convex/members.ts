@@ -25,6 +25,33 @@ const quoteValidator = v.object({
   firstOrder: v.boolean(),
 });
 
+const addressFieldsValidator = {
+  label: v.string(),
+  fullName: v.string(),
+  line1: v.string(),
+  line2: v.optional(v.string()),
+  city: v.string(),
+  state: v.string(),
+  postcode: v.string(),
+  country: v.string(),
+};
+
+async function getAuthenticatedMember(
+  ctx: QueryCtx | MutationCtx,
+): Promise<Doc<"members"> | null> {
+  const userId = await getAuthUserId(ctx);
+  if (!userId) return null;
+  const byAuth = await ctx.db
+    .query("members")
+    .withIndex("by_auth_user", (q) => q.eq("authUserId", userId))
+    .unique();
+  if (byAuth) return byAuth;
+  const user = await ctx.db.get("users", userId);
+  const email =
+    typeof user?.email === "string" ? normalizeMemberEmail(user.email) : "";
+  return email ? await findMemberByEmail(ctx, email) : null;
+}
+
 async function findMemberByEmail(
   ctx: QueryCtx | MutationCtx,
   email: string,
@@ -168,6 +195,11 @@ export const captureEmail = mutation({
           memberId: existing._id,
         });
       }
+      if (args.marketingConsent) {
+        await ctx.scheduler.runAfter(0, internal.klaviyo.syncMember, {
+          memberId: existing._id,
+        });
+      }
       return { memberId: existing._id, code: existing.code, isNew: false };
     }
 
@@ -197,6 +229,11 @@ export const captureEmail = mutation({
     await ctx.scheduler.runAfter(0, internal.welcomeEmail.sendWelcome, {
       memberId,
     });
+    if (args.marketingConsent) {
+      await ctx.scheduler.runAfter(0, internal.klaviyo.syncMember, {
+        memberId,
+      });
+    }
     return { memberId, code: member.code, isNew: true };
   },
 });
@@ -235,6 +272,222 @@ export const getMyMembership = query({
       code: member.code,
       percent: quoted.percent,
       firstOrder: quoted.firstOrder,
+    };
+  },
+});
+
+export const getMyAccount = query({
+  args: {},
+  returns: v.union(
+    v.object({
+      email: v.string(),
+      code: v.string(),
+      percent: v.number(),
+      firstOrder: v.boolean(),
+      marketingConsent: v.union(
+        v.literal("pending"),
+        v.literal("opted_in"),
+        v.literal("opted_out"),
+      ),
+      orders: v.array(v.object({
+        _id: v.id("orders"),
+        status: v.string(),
+        subtotalAud: v.number(),
+        discountAud: v.number(),
+        paymentMethod: v.string(),
+        createdAt: v.number(),
+        trackingNumber: v.union(v.string(), v.null()),
+        lines: v.array(v.object({
+          slug: v.string(),
+          name: v.string(),
+          quantity: v.number(),
+          lineTotalAud: v.number(),
+        })),
+      })),
+      addresses: v.array(v.object({
+        _id: v.id("addresses"),
+        label: v.string(),
+        fullName: v.string(),
+        line1: v.string(),
+        line2: v.union(v.string(), v.null()),
+        city: v.string(),
+        state: v.string(),
+        postcode: v.string(),
+        country: v.string(),
+      })),
+    }),
+    v.null(),
+  ),
+  handler: async (ctx) => {
+    const member = await getAuthenticatedMember(ctx);
+    if (!member) return null;
+    const [memberOrders, emailOrders, addresses] = await Promise.all([
+      ctx.db
+        .query("orders")
+        .withIndex("by_member", (q) => q.eq("memberId", member._id))
+        .collect(),
+      ctx.db
+        .query("orders")
+        .withIndex("by_email", (q) => q.eq("email", member.email))
+        .collect(),
+      ctx.db
+        .query("addresses")
+        .withIndex("by_member", (q) => q.eq("memberId", member._id))
+        .collect(),
+    ]);
+    const uniqueOrders = new Map(
+      [...memberOrders, ...emailOrders].map((order) => [String(order._id), order]),
+    );
+    const quoted = await percentForMember(ctx, member);
+    return {
+      email: member.email,
+      code: member.code,
+      percent: quoted.percent,
+      firstOrder: quoted.firstOrder,
+      marketingConsent: member.marketingConsent ?? "pending",
+      orders: [...uniqueOrders.values()]
+        .sort((a, b) => b.createdAt - a.createdAt)
+        .map((order) => ({
+          _id: order._id,
+          status: order.status,
+          subtotalAud: order.subtotalAud,
+          discountAud: order.discountAud ?? 0,
+          paymentMethod: order.paymentMethod ?? "unknown",
+          createdAt: order.createdAt,
+          trackingNumber: order.trackingNumber ?? null,
+          lines: order.lines.map((line) => ({
+            slug: line.slug,
+            name: line.name,
+            quantity: line.quantity,
+            lineTotalAud: line.lineTotalAud,
+          })),
+        })),
+      addresses: addresses.map((address) => ({
+        _id: address._id,
+        label: address.label,
+        fullName: address.fullName,
+        line1: address.line1,
+        line2: address.line2 ?? null,
+        city: address.city,
+        state: address.state,
+        postcode: address.postcode,
+        country: address.country,
+      })),
+    };
+  },
+});
+
+export const updateMarketingConsent = mutation({
+  args: { optedIn: v.boolean() },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const member = await getAuthenticatedMember(ctx);
+    if (!member) throw new Error("Not authenticated");
+    const now = Date.now();
+    const state = args.optedIn ? "opted_in" : "opted_out";
+    await ctx.db.patch("members", member._id, {
+      marketingConsent: state,
+      marketingConsentAt: now,
+      updatedAt: now,
+    });
+    await ctx.db.insert("consentLedger", {
+      memberId: member._id,
+      category: "marketing",
+      state,
+      source: "account",
+      createdAt: now,
+    });
+    if (args.optedIn) {
+      await ctx.scheduler.runAfter(0, internal.klaviyo.syncMember, {
+        memberId: member._id,
+      });
+    }
+    return null;
+  },
+});
+
+export const saveAddress = mutation({
+  args: {
+    addressId: v.optional(v.id("addresses")),
+    ...addressFieldsValidator,
+  },
+  returns: v.id("addresses"),
+  handler: async (ctx, args) => {
+    const member = await getAuthenticatedMember(ctx);
+    if (!member) throw new Error("Not authenticated");
+    const values = {
+      label: args.label.trim(),
+      fullName: args.fullName.trim(),
+      line1: args.line1.trim(),
+      line2: args.line2?.trim() || undefined,
+      city: args.city.trim(),
+      state: args.state.trim(),
+      postcode: args.postcode.trim(),
+      country: args.country.trim().toUpperCase(),
+    };
+    if (!values.label || !values.fullName || !values.line1 || !values.city ||
+        !values.state || !values.postcode || !values.country) {
+      throw new Error("Complete all required address fields");
+    }
+    const now = Date.now();
+    if (args.addressId) {
+      const existing = await ctx.db.get("addresses", args.addressId);
+      if (!existing || existing.memberId !== member._id) {
+        throw new Error("Address not found");
+      }
+      await ctx.db.patch("addresses", existing._id, { ...values, updatedAt: now });
+      return existing._id;
+    }
+    return await ctx.db.insert("addresses", {
+      memberId: member._id,
+      ...values,
+      createdAt: now,
+      updatedAt: now,
+    });
+  },
+});
+
+export const deleteAddress = mutation({
+  args: { addressId: v.id("addresses") },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const member = await getAuthenticatedMember(ctx);
+    if (!member) throw new Error("Not authenticated");
+    const address = await ctx.db.get("addresses", args.addressId);
+    if (!address || address.memberId !== member._id) {
+      throw new Error("Address not found");
+    }
+    await ctx.db.delete("addresses", address._id);
+    return null;
+  },
+});
+
+export const getCurrentIdentity = query({
+  args: {},
+  returns: v.union(
+    v.object({
+      distinctId: v.string(),
+      email: v.string(),
+    }),
+    v.null(),
+  ),
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+
+    const member = await ctx.db
+      .query("members")
+      .withIndex("by_auth_user", (q) => q.eq("authUserId", userId))
+      .unique();
+    const user = await ctx.db.get("users", userId);
+    const email =
+      typeof user?.email === "string"
+        ? normalizeMemberEmail(user.email)
+        : member?.email ?? "";
+
+    return {
+      distinctId: String(member?._id ?? userId),
+      email,
     };
   },
 });
