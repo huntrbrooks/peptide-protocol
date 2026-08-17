@@ -26,14 +26,25 @@
     "retatrutide-60mg": "EhvJt9drOVwmDAPhgX2S",
     "bacteriostatic-water": "4b3isxsNmEdIY8OLZoJv"
   },
+  "kitsGeneratedAt": "2026-08-18",
+  "kitSettings": {
+    "resolutionTier": "2k",
+    "quality": "high",
+    "aspectRatio": "1:1",
+    "outputFormat": "png",
+    "deliveredPixels": "1360x1360",
+    "note": "2K high used because 4K high (212 × 8) exceeded remaining OpenArt credits."
+  },
+  "kitBackup": "public/images/products/_backup-pre-kit-uniform-2026-08-18/",
+  "kitWork": "public/images/products/_work-kit-uniform-2026-08-18/",
   "kits": {
-    "bpc-157-kit": "UhQJ6delNXpcK9pZzkfu",
-    "cjc-1295-no-dac-kit": "f7P6FXY6sJfSR8tmye5k",
-    "ipamorelin-kit": "wl4vqqfoh6lCwaHoR9Cd",
-    "tb-500-kit": "UYNMApF4i9akxavecdru",
-    "pt-141-kit": "5ugkwupVzbDoCW6iP3u6",
-    "ghk-cu-50mg-kit": "348kqBeMa6BcHXWu0qKC",
-    "retatrutide-20mg-kit": "Lv57y1tMfoSUsgO1TiyJ",
-    "retatrutide-60mg-kit": "S5ObKc3zJoW5cNoLf29Z"
+    "bpc-157-kit": "FIizpthx9zZ2NKbX4fAJ",
+    "ipamorelin-kit": "izzgRVaqPwQpu20Rxnwr",
+    "cjc-1295-no-dac-kit": "mS75uuZ31CJu3Ye0f95x",
+    "tb-500-kit": "2GA2TnzK5TIWvKBKE16O",
+    "pt-141-kit": "nTVB6WL71IVRqR7kwM0x",
+    "ghk-cu-50mg-kit": "s7TDlAQIDQY6MHl17oCy",
+    "retatrutide-20mg-kit": "y12XpQtyXge5EElIj4pz",
+    "retatrutide-60mg-kit": "Z1x1YFjuQFbJoxuJUp5g"
   }
 }
