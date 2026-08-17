@@ -99,6 +99,23 @@ body {
   }
 }
 
+/* Age checkpoint: hide on first paint when a prior confirmation cookie exists */
+html[data-age-ok="1"] .age-gate {
+  display: none;
+}
+
+.age-gate-panel {
+  border-radius: 2px;
+}
+
+.age-gate-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: var(--accent);
+}
+
 /* Static announcement bar */
 .announcement-banner {
   /* AU logistics: express-yellow hairline under the ink banner */

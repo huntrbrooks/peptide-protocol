@@ -20,6 +20,22 @@ export const site = {
   announcementBanner: [
     "Dispatch before 2pm AEST · Tracked Express Post Australia-wide",
   ],
+  /** First-visit age + research-use checkpoint — edit here to update live chrome */
+  ageGate: {
+    eyebrow: "Research use only",
+    heading: "Confirm your age",
+    enterLabel: "I'm 18 or older — enter",
+    under18Prefix: "Under 18?",
+    leaveLabel: "Leave this site",
+    leaveHref: "https://www.google.com.au",
+    termsLabel: "Terms of Sale",
+    termsHref: "/terms",
+    disclaimerLabel: "Research Use Disclaimer",
+    disclaimerHref: "/disclaimer",
+    legalPaths: ["/terms", "/disclaimer", "/privacy"],
+    researchEmphasis: "laboratory and research use only",
+    ageEmphasis: "18 or older",
+  },
   nav: [
     { label: "Shop", href: "/shop" },
     { label: "Quality", href: "/quality" },
