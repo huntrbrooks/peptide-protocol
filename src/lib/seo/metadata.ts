@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import type { PageContent } from "@/content/types";
 import { absoluteUrl } from "./urls";
 
+const DEFAULT_OG_IMAGE = "/og-image.jpg";
+
 export function publicPageMetadata(opts: {
   title: string;
   description: string;
@@ -12,16 +14,15 @@ export function publicPageMetadata(opts: {
   imageHeight?: number;
 }): Metadata {
   const url = absoluteUrl(opts.path);
-  const images = opts.image
-    ? [
-        {
-          url: opts.image,
-          width: opts.imageWidth ?? 1200,
-          height: opts.imageHeight ?? 630,
-          alt: opts.imageAlt ?? opts.title,
-        },
-      ]
-    : undefined;
+  const imagePath = opts.image ?? DEFAULT_OG_IMAGE;
+  const images = [
+    {
+      url: absoluteUrl(imagePath),
+      width: opts.imageWidth ?? 1200,
+      height: opts.imageHeight ?? 630,
+      alt: opts.imageAlt ?? opts.title,
+    },
+  ];
   return {
     title: { absolute: opts.title },
     description: opts.description,
@@ -31,18 +32,15 @@ export function publicPageMetadata(opts: {
       description: opts.description,
       url,
       type: "website",
-      ...(images ? { images } : {}),
+      locale: "en_AU",
+      images,
     },
-    ...(images
-      ? {
-          twitter: {
-            card: "summary_large_image" as const,
-            title: opts.title,
-            description: opts.description,
-            images: images.map((image) => image.url),
-          },
-        }
-      : {}),
+    twitter: {
+      card: "summary_large_image" as const,
+      title: opts.title,
+      description: opts.description,
+      images: images.map((image) => image.url),
+    },
   };
 }
 

@@ -49,12 +49,21 @@ export const metadata: Metadata = {
     type: "website",
     title: home.metaTitle,
     description: home.metaDescription,
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "The Protocol — research peptides, Australia",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     site: site.handle,
     title: home.metaTitle,
     description: home.metaDescription,
+    images: ["/og-image.jpg"],
   },
 };
 

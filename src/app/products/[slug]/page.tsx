@@ -16,6 +16,7 @@ import {
   products,
 } from "@/content/products";
 import { site } from "@/content/site";
+import { buildProductJsonLd, serializeJsonLd } from "@/lib/seo/jsonLd";
 import { publicPageMetadata } from "@/lib/seo/metadata";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -45,9 +46,14 @@ export default async function ProductPage({ params }: Props) {
   const kit = getKitForSingle(product.slug);
   const single = getSingleForKit(product.slug);
   const inStock = product.inStock ?? true;
+  const productJsonLd = buildProductJsonLd(product);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(productJsonLd) }}
+      />
       <ProductAnalytics
         slug={product.slug}
         name={product.name}

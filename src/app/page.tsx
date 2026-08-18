@@ -5,6 +5,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { categories } from "@/content/categories";
 import { products } from "@/content/products";
 import { home, site } from "@/content/site";
+import { organizationSameAs, serializeJsonLd } from "@/lib/seo/jsonLd";
 import { publicPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata: Metadata = publicPageMetadata({
@@ -14,6 +15,8 @@ export const metadata: Metadata = publicPageMetadata({
   image: "/og-image.jpg",
   imageAlt: "The Protocol — research peptides, Australia",
 });
+
+const sameAs = organizationSameAs();
 
 const structuredData = {
   "@context": "https://schema.org",
@@ -25,6 +28,7 @@ const structuredData = {
       url: site.url,
       email: site.email,
       logo: `${site.url}/images/brand/the-protocol-logo.png`,
+      ...(sameAs.length > 0 ? { sameAs } : {}),
     },
     {
       "@type": "WebSite",
@@ -44,7 +48,7 @@ export default function HomePage() {
     <div>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(structuredData) }}
       />
       <section className="relative overflow-hidden">
         <div className="absolute inset-0">

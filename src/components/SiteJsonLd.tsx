@@ -1,4 +1,7 @@
 import { home, site } from "@/content/site";
+import { organizationSameAs, serializeJsonLd } from "@/lib/seo/jsonLd";
+
+const sameAs = organizationSameAs();
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -10,6 +13,7 @@ const jsonLd = {
       url: site.url,
       email: site.email,
       description: site.tagline,
+      ...(sameAs.length > 0 ? { sameAs } : {}),
     },
     {
       "@type": "WebSite",
@@ -28,7 +32,7 @@ export function SiteJsonLd() {
     <script
       type="application/ld+json"
       dangerouslySetInnerHTML={{
-        __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        __html: serializeJsonLd(jsonLd),
       }}
     />
   );
