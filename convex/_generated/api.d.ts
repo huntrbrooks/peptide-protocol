@@ -24,6 +24,7 @@ import type * as lib_memberDiscount from "../lib/memberDiscount.js";
 import type * as lib_rfmScoring from "../lib/rfmScoring.js";
 import type * as lib_security from "../lib/security.js";
 import type * as lib_staff from "../lib/staff.js";
+import type * as lib_stockList from "../lib/stockList.js";
 import type * as lifecycle from "../lifecycle.js";
 import type * as lifecycleEmail from "../lifecycleEmail.js";
 import type * as memberVerification from "../memberVerification.js";
@@ -59,6 +60,7 @@ declare const fullApi: ApiFromModules<{
   "lib/rfmScoring": typeof lib_rfmScoring;
   "lib/security": typeof lib_security;
   "lib/staff": typeof lib_staff;
+  "lib/stockList": typeof lib_stockList;
   lifecycle: typeof lifecycle;
   lifecycleEmail: typeof lifecycleEmail;
   memberVerification: typeof memberVerification;

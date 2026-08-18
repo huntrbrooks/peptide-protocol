@@ -1,20 +1,61 @@
 import { v } from "convex/values";
 import type { Doc } from "./_generated/dataModel";
-import type { MutationCtx } from "./_generated/server";
-import { mutation } from "./_generated/server";
+import type { MutationCtx, QueryCtx } from "./_generated/server";
+import { internalMutation, mutation, query } from "./_generated/server";
 import { requireStaff, writeAudit } from "./lib/staff";
-import { enforceRateLimit } from "./lib/security";
+import {
+  availableForSlug,
+  KIT_PARENT,
+  OPENING_STOCK,
+  expandInventoryLines,
+  type StockEntry,
+} from "./lib/stockList";
 
 const inventoryRow = v.object({
   slug: v.string(),
   available: v.number(),
 });
 
+async function upsertStock(
+  ctx: MutationCtx,
+  products: StockEntry[],
+): Promise<number> {
+  let updated = 0;
+  for (const product of products) {
+    if (!Number.isInteger(product.onHand) || product.onHand < 0) {
+      throw new Error(`Invalid on-hand quantity for ${product.slug}`);
+    }
+    const existing = await ctx.db
+      .query("inventory")
+      .withIndex("by_slug", (q) => q.eq("slug", product.slug))
+      .unique();
+    if (existing) {
+      await ctx.db.patch("inventory", existing._id, {
+        stockCode: product.stockCode,
+        onHand: product.onHand,
+        lowStockThreshold: Math.max(0, product.lowStockThreshold),
+        updatedAt: Date.now(),
+      });
+    } else {
+      await ctx.db.insert("inventory", {
+        slug: product.slug,
+        stockCode: product.stockCode,
+        onHand: product.onHand,
+        reserved: 0,
+        lowStockThreshold: Math.max(0, product.lowStockThreshold),
+        updatedAt: Date.now(),
+      });
+    }
+    updated += 1;
+  }
+  return updated;
+}
+
 export async function reserveInventory(
   ctx: MutationCtx,
   lines: Array<{ slug: string; quantity: number }>,
 ): Promise<void> {
-  for (const line of lines) {
+  for (const line of expandInventoryLines(lines)) {
     const row = await ctx.db
       .query("inventory")
       .withIndex("by_slug", (q) => q.eq("slug", line.slug))
@@ -37,7 +78,7 @@ export async function settleInventory(
   order: Doc<"orders">,
 ): Promise<void> {
   if (order.inventorySettledAt !== undefined) return;
-  for (const line of order.lines) {
+  for (const line of expandInventoryLines(order.lines)) {
     const row = await ctx.db
       .query("inventory")
       .withIndex("by_slug", (q) => q.eq("slug", line.slug))
@@ -57,7 +98,7 @@ export async function releaseInventory(
   order: Doc<"orders">,
 ): Promise<void> {
   if (order.inventorySettledAt !== undefined || order.inventoryReleasedAt !== undefined) return;
-  for (const line of order.lines) {
+  for (const line of expandInventoryLines(order.lines)) {
     const row = await ctx.db
       .query("inventory")
       .withIndex("by_slug", (q) => q.eq("slug", line.slug))
@@ -71,28 +112,51 @@ export async function releaseInventory(
   await ctx.db.patch("orders", order._id, { inventoryReleasedAt: Date.now() });
 }
 
+async function readAvailability(
+  ctx: QueryCtx | MutationCtx,
+  slugs: string[],
+): Promise<Array<{ slug: string; available: number }>> {
+  if (slugs.length === 0 || slugs.length > 50) {
+    throw new Error("Request between 1 and 50 catalogue items");
+  }
+  const rows = [];
+  for (const slug of slugs) {
+    const lookupSlug = KIT_PARENT[slug] ?? slug;
+    const row = await ctx.db
+      .query("inventory")
+      .withIndex("by_slug", (q) => q.eq("slug", lookupSlug))
+      .unique();
+    if (row) {
+      rows.push({
+        slug,
+        available: availableForSlug(slug, row.onHand - row.reserved),
+      });
+    }
+  }
+  return rows;
+}
+
 export const availability = mutation({
   args: { slugs: v.array(v.string()) },
   returns: v.array(inventoryRow),
   handler: async (ctx, args) => {
-    if (args.slugs.length === 0 || args.slugs.length > 50) {
-      throw new Error("Request between 1 and 50 catalogue items");
-    }
-    await enforceRateLimit(ctx, "inventory:availability", 300, 60_000);
-    const rows = [];
-    for (const slug of args.slugs) {
-      const row = await ctx.db
-        .query("inventory")
-        .withIndex("by_slug", (q) => q.eq("slug", slug))
-        .unique();
-      if (row) {
-        rows.push({
-          slug: row.slug,
-          available: Math.max(0, row.onHand - row.reserved),
-        });
-      }
-    }
-    return rows;
+    return await readAvailability(ctx, args.slugs);
+  },
+});
+
+export const listAvailability = query({
+  args: { slugs: v.array(v.string()) },
+  returns: v.array(inventoryRow),
+  handler: async (ctx, args) => {
+    return await readAvailability(ctx, args.slugs);
+  },
+});
+
+export const applyOpeningStock = internalMutation({
+  args: {},
+  returns: v.number(),
+  handler: async (ctx) => {
+    return await upsertStock(ctx, OPENING_STOCK);
   },
 });
 
@@ -108,22 +172,27 @@ export const seed = mutation({
   returns: v.number(),
   handler: async (ctx, args) => {
     const staff = await requireStaff(ctx, ["owner", "ops"]);
-    let created = 0;
-    for (const product of args.products) {
-      const existing = await ctx.db
-        .query("inventory")
-        .withIndex("by_slug", (q) => q.eq("slug", product.slug))
-        .unique();
-      if (existing) continue;
-      await ctx.db.insert("inventory", {
-        ...product,
-        reserved: 0,
-        updatedAt: Date.now(),
-      });
-      created += 1;
-    }
-    await writeAudit(ctx, staff, "inventory.seed", "inventory", "catalogue", `${created} rows`);
-    return created;
+    const updated = await upsertStock(ctx, args.products);
+    await writeAudit(ctx, staff, "inventory.seed", "inventory", "catalogue", `${updated} rows`);
+    return updated;
+  },
+});
+
+export const applyWarehouseStock = mutation({
+  args: {},
+  returns: v.number(),
+  handler: async (ctx) => {
+    const staff = await requireStaff(ctx, ["owner", "ops"]);
+    const updated = await upsertStock(ctx, OPENING_STOCK);
+    await writeAudit(
+      ctx,
+      staff,
+      "inventory.apply_warehouse_stock",
+      "inventory",
+      "catalogue",
+      `${updated} rows`,
+    );
+    return updated;
   },
 });
 

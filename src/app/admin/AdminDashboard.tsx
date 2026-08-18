@@ -4,7 +4,6 @@ import { useMutation, usePaginatedQuery, useQuery } from "convex/react";
 import { useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
-import { products } from "@/content/products";
 import { formatPrice } from "@/content/products";
 
 function dayStartSydney(): number {
@@ -50,7 +49,7 @@ export default function AdminPage() {
   const markShipped = useMutation(api.admin.markShipped);
   const markDelivered = useMutation(api.admin.markDelivered);
   const recordRefund = useMutation(api.admin.recordRefund);
-  const seedInventory = useMutation(api.inventory.seed);
+  const applyWarehouseStock = useMutation(api.inventory.applyWarehouseStock);
   const [rfmSegment, setRfmSegment] = useState<RfmSegment | "All">("All");
   const memberDirectory = useQuery(
     api.admin.memberDirectory,
@@ -115,20 +114,12 @@ export default function AdminPage() {
           className="border border-line px-4 py-2 text-sm text-ink hover:border-accent"
           onClick={() =>
             void runAction(
-              () =>
-                seedInventory({
-                  products: products.map((product) => ({
-                    slug: product.slug,
-                    stockCode: product.stockCode ?? product.slug,
-                    onHand: 10,
-                    lowStockThreshold: 3,
-                  })),
-                }),
-              "Inventory seed complete.",
+              () => applyWarehouseStock({}),
+              "Warehouse stock applied.",
             )
           }
         >
-          Seed missing inventory
+          Apply warehouse stock
         </button>
       </div>
 
