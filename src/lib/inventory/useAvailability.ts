@@ -1,18 +1,29 @@
 "use client";
 
-import { useQuery_experimental } from "convex/react";
+import { useMutation } from "convex/react";
+import { useEffect, useState } from "react";
 import { api } from "../../../convex/_generated/api";
 
 export function useInventoryInStock(slug: string, fallback: boolean): boolean {
-  const result = useQuery_experimental({
-    query: api.inventory.availability,
-    args: process.env.NEXT_PUBLIC_CONVEX_URL ? { slugs: [slug] } : "skip",
-  });
+  const availability = useMutation(api.inventory.availability);
+  const [inStock, setInStock] = useState(
+    process.env.NEXT_PUBLIC_CONVEX_URL ? false : fallback,
+  );
 
-  if (result.status !== "success") {
-    return fallback;
-  }
+  useEffect(() => {
+    if (!process.env.NEXT_PUBLIC_CONVEX_URL) return;
+    let active = true;
+    void availability({ slugs: [slug] })
+      .then((rows) => {
+        if (active) setInStock((rows[0]?.available ?? 0) > 0);
+      })
+      .catch(() => {
+        if (active) setInStock(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [availability, slug]);
 
-  const row = result.data[0];
-  return row ? row.available > 0 : fallback;
+  return inStock;
 }

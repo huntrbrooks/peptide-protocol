@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import { DosingCalculator } from "@/components/dosing-calculator/DosingCalculator";
 import { dosingCalculatorMeta } from "@/content/dosingCalculator";
 import { products } from "@/content/products";
+import { publicPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
-  title: { absolute: dosingCalculatorMeta.metaTitle },
+export const metadata: Metadata = publicPageMetadata({
+  title: dosingCalculatorMeta.metaTitle,
   description: dosingCalculatorMeta.metaDescription,
-};
+  path: "/dosing-calculator",
+});
 
 type Props = {
   searchParams: Promise<{ product?: string | string[] }>;

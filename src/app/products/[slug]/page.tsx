@@ -16,6 +16,7 @@ import {
   products,
 } from "@/content/products";
 import { site } from "@/content/site";
+import { publicPageMetadata } from "@/lib/seo/metadata";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -27,10 +28,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const product = getProductBySlug(slug);
   if (!product) return {};
-  return {
-    title: { absolute: product.metaTitle },
+  return publicPageMetadata({
+    title: product.metaTitle,
     description: product.metaDescription,
-  };
+    path: `/products/${product.slug}`,
+    image: product.image,
+    imageAlt: product.name,
+  });
 }
 
 export default async function ProductPage({ params }: Props) {

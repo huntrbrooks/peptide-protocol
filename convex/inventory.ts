@@ -1,15 +1,12 @@
 import { v } from "convex/values";
 import type { Doc } from "./_generated/dataModel";
 import type { MutationCtx } from "./_generated/server";
-import { mutation, query } from "./_generated/server";
+import { mutation } from "./_generated/server";
 import { requireStaff, writeAudit } from "./lib/staff";
+import { enforceRateLimit } from "./lib/security";
 
 const inventoryRow = v.object({
   slug: v.string(),
-  stockCode: v.string(),
-  onHand: v.number(),
-  reserved: v.number(),
-  lowStockThreshold: v.number(),
   available: v.number(),
 });
 
@@ -22,8 +19,9 @@ export async function reserveInventory(
       .query("inventory")
       .withIndex("by_slug", (q) => q.eq("slug", line.slug))
       .unique();
-    // Existing catalogue remains sellable during the one-time inventory migration.
-    if (!row) continue;
+    if (!row) {
+      throw new Error(`${line.slug} is unavailable`);
+    }
     if (row.onHand - row.reserved < line.quantity) {
       throw new Error(`${line.slug} is out of stock`);
     }
@@ -73,10 +71,14 @@ export async function releaseInventory(
   await ctx.db.patch("orders", order._id, { inventoryReleasedAt: Date.now() });
 }
 
-export const availability = query({
+export const availability = mutation({
   args: { slugs: v.array(v.string()) },
   returns: v.array(inventoryRow),
   handler: async (ctx, args) => {
+    if (args.slugs.length === 0 || args.slugs.length > 50) {
+      throw new Error("Request between 1 and 50 catalogue items");
+    }
+    await enforceRateLimit(ctx, "inventory:availability", 300, 60_000);
     const rows = [];
     for (const slug of args.slugs) {
       const row = await ctx.db
@@ -86,10 +88,6 @@ export const availability = query({
       if (row) {
         rows.push({
           slug: row.slug,
-          stockCode: row.stockCode,
-          onHand: row.onHand,
-          reserved: row.reserved,
-          lowStockThreshold: row.lowStockThreshold,
           available: Math.max(0, row.onHand - row.reserved),
         });
       }

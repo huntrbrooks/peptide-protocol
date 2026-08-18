@@ -1,4 +1,5 @@
 import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { IBM_Plex_Sans, Fraunces } from "next/font/google";
@@ -11,7 +12,8 @@ import { Footer } from "@/components/Footer";
 import { MemberCapture } from "@/components/MemberCapture";
 import { AnalyticsProvider } from "@/components/AnalyticsProvider";
 import { CookieConsent } from "@/components/CookieConsent";
-import { site } from "@/content/site";
+import { SiteJsonLd } from "@/components/SiteJsonLd";
+import { home, site } from "@/content/site";
 import { AGE_GATE_COOKIE_NAME } from "@/lib/ageGate/storage";
 import "./globals.css";
 
@@ -45,6 +47,14 @@ export const metadata: Metadata = {
     siteName: site.name,
     locale: "en_AU",
     type: "website",
+    title: home.metaTitle,
+    description: home.metaDescription,
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: site.handle,
+    title: home.metaTitle,
+    description: home.metaDescription,
   },
 };
 
@@ -60,16 +70,23 @@ export default function RootLayout({
       className={`${body.variable} ${display.variable} h-full`}
     >
       <body className="flex min-h-full flex-col antialiased">
+        <SiteJsonLd />
         <ConvexAuthNextjsServerProvider>
           <Script id="age-gate-boot" strategy="beforeInteractive">
             {`try{if(document.cookie.split(";").some(function(c){return c.trim().indexOf("${AGE_GATE_COOKIE_NAME}=1")===0})){document.documentElement.setAttribute("data-age-ok","1")}}catch(e){}`}
           </Script>
           <ConvexClientProvider>
+            <a
+              href="#main-content"
+              className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-100 focus:rounded-sm focus:border focus:border-line focus:bg-paper focus:px-4 focus:py-3 focus:text-sm focus:text-ink"
+            >
+              Skip to content
+            </a>
             <div className="sticky top-0 z-50">
               <AnnouncementBanner />
               <Header />
             </div>
-            <main className="flex-1">{children}</main>
+            <main id="main-content" className="flex-1">{children}</main>
             <Footer />
             <AgeGate />
             <MemberCapture />
@@ -77,6 +94,7 @@ export default function RootLayout({
             <Suspense fallback={null}>
               <AnalyticsProvider />
             </Suspense>
+            <Analytics />
           </ConvexClientProvider>
         </ConvexAuthNextjsServerProvider>
       </body>

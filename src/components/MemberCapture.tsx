@@ -83,6 +83,7 @@ function MemberCaptureLive() {
   const [step, setStep] = useState<1 | 2>(1);
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
+  const [existingEmail, setExistingEmail] = useState(false);
   const [password, setPassword] = useState("");
   const [marketingConsent, setMarketingConsent] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -192,14 +193,18 @@ function MemberCaptureLive() {
         marketingConsent,
         attribution: window.location.search.slice(0, 500) || undefined,
       });
-      setCode(result.code);
-      setEmail(email.trim().toLowerCase());
-      persistMemberCaptureRecord({
-        email: email.trim().toLowerCase(),
-        code: result.code,
-      });
+      const normalizedEmail = email.trim().toLowerCase();
+      setEmail(normalizedEmail);
+      setExistingEmail(!result.isNew);
+      if (result.isNew) {
+        setCode(result.code);
+        persistMemberCaptureRecord({
+          email: normalizedEmail,
+          code: result.code,
+        });
+        identify(String(result.memberId), normalizedEmail);
+      }
       setStep(2);
-      identify(String(result.memberId), email.trim().toLowerCase());
       track("generate_lead", {
         lead_source: "member_popup",
         is_new: result.isNew,
@@ -230,7 +235,11 @@ function MemberCaptureLive() {
       formData.set("flow", "signUp");
       await signIn("password", formData);
       track("sign_up", { method: "password" });
-      finishWithCode(email, code);
+      if (existingEmail) {
+        setOpen(false);
+      } else {
+        finishWithCode(email, code);
+      }
     } catch (caught) {
       setError(
         caught instanceof Error
@@ -361,6 +370,51 @@ function MemberCaptureLive() {
             </button>
           </form>
         ) : (
+          existingEmail ? (
+            <form onSubmit={(event) => void onCreateAccount(event)}>
+              <p
+                id={descriptionId}
+                className="mt-4 text-sm leading-relaxed text-muted"
+              >
+                This email is already registered. Log in if you already have an
+                account, or create one below and use the verification link sent
+                to your inbox.
+              </p>
+              <label className="mt-6 grid gap-1.5 text-left text-sm text-muted">
+                {copy.passwordLabel}
+                <input
+                  type="password"
+                  autoComplete="new-password"
+                  minLength={8}
+                  required
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  className="w-full rounded-sm border border-line bg-paper px-3 py-2.5 text-sm text-ink outline-none transition focus:border-accent"
+                />
+              </label>
+              <button
+                type="submit"
+                disabled={busy}
+                className="btn-primary mt-5 w-full rounded-sm bg-ink px-5 py-3.5 text-sm font-medium text-paper hover:bg-accent disabled:opacity-50"
+              >
+                {busy ? "Creating…" : "Create account and verify email"}
+              </button>
+              <Link
+                href="/account"
+                onClick={dismiss}
+                className="mt-4 inline-block text-sm font-medium text-accent underline underline-offset-2"
+              >
+                Log in
+              </Link>
+              <button
+                type="button"
+                onClick={dismiss}
+                className="mt-4 block w-full text-sm font-medium text-accent underline underline-offset-2"
+              >
+                Close
+              </button>
+            </form>
+          ) : (
           <form onSubmit={(event) => void onCreateAccount(event)}>
             <p
               id={descriptionId}
@@ -396,6 +450,7 @@ function MemberCaptureLive() {
               {copy.skipLabel}
             </button>
           </form>
+          )
         )}
         {error ? (
           <p className="mt-4 text-sm text-red-700" role="alert">

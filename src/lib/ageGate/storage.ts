@@ -20,7 +20,11 @@ export function hasAgeGateCookie(cookieHeader: string): boolean {
 }
 
 export function buildAgeGateCookie(): string {
-  return `${AGE_GATE_COOKIE_NAME}=1; Path=/; Max-Age=${AGE_GATE_COOKIE_MAX_AGE}; SameSite=Lax`;
+  const secure =
+    typeof window !== "undefined" && window.location.protocol === "https:"
+      ? "; Secure"
+      : "";
+  return `${AGE_GATE_COOKIE_NAME}=1; Path=/; Max-Age=${AGE_GATE_COOKIE_MAX_AGE}; SameSite=Lax${secure}`;
 }
 
 export function subscribeAgeGate(listener: () => void): () => void {

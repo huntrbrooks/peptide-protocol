@@ -4,13 +4,11 @@ import { ShopCatalogue } from "@/components/ShopCatalogue";
 import { categories } from "@/content/categories";
 import { products } from "@/content/products";
 import { pages } from "@/content/pages";
+import { contentPageMetadata } from "@/lib/seo/metadata";
 
 const page = pages.shop!;
 
-export const metadata: Metadata = {
-  title: { absolute: page.metaTitle },
-  description: page.metaDescription,
-};
+export const metadata: Metadata = contentPageMetadata(page);
 
 export default function ShopPage() {
   return (

@@ -1,3 +1,6 @@
+import "server-only";
+
+import { randomBytes } from "node:crypto";
 import { fetchMutation, fetchQuery } from "convex/nextjs";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
@@ -38,27 +41,31 @@ export async function createConvexOrder(input: {
   cryptoChain?: CryptoChain;
   cryptoExpectedAmount?: number;
   cryptoWalletAddress?: string;
-}): Promise<Id<"orders">> {
+}): Promise<{ orderId: Id<"orders">; statusToken: string }> {
   requireConvexUrl();
-  return await fetchMutation(api.orders.createPending, {
+  const statusToken = randomBytes(32).toString("base64url");
+  const orderId = await fetchMutation(api.orders.createPending, {
     email: input.email,
     shipping: input.shipping,
-    lines: input.lines,
-    subtotalAud: input.subtotalAud,
+    lines: input.lines.map(({ slug, quantity }) => ({ slug, quantity })),
     paymentMethod: input.paymentMethod,
     researchAck: true,
+    paymentSecret: requirePaymentSecret(),
+    statusToken,
     discountCode: input.discountCode,
     cryptoCurrency: input.cryptoCurrency,
     cryptoChain: input.cryptoChain,
     cryptoExpectedAmount: input.cryptoExpectedAmount,
     cryptoWalletAddress: input.cryptoWalletAddress,
   });
+  return { orderId, statusToken };
 }
 
-export async function getConvexOrder(orderId: string) {
+export async function getConvexOrder(orderId: string, statusToken?: string) {
   requireConvexUrl();
   return await fetchQuery(api.orders.get, {
     orderId: orderId as Id<"orders">,
+    statusToken,
   });
 }
 

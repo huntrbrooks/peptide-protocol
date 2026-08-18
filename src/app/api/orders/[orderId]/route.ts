@@ -13,7 +13,7 @@ type RouteContext = {
  * Returns a minimal projection — no shipping address dump.
  */
 export async function GET(
-  _request: Request,
+  request: Request,
   context: RouteContext,
 ): Promise<NextResponse> {
   const { orderId } = await context.params;
@@ -24,7 +24,8 @@ export async function GET(
   }
 
   try {
-    const order = await getConvexOrder(orderId);
+    const statusToken = new URL(request.url).searchParams.get("statusToken");
+    const order = await getConvexOrder(orderId, statusToken ?? undefined);
     if (!order) {
       return NextResponse.json({ ok: false, error: "Order not found" }, {
         status: 404,

@@ -2,11 +2,13 @@ import { NextResponse } from "next/server";
 import { resolveCheckoutTotals } from "@/lib/orders/checkout";
 import { createConvexOrder } from "@/lib/orders/convex";
 import { createPaymentBridgeToken } from "@/lib/payments/payment-bridge";
+import { enforceRouteRateLimit } from "@/lib/security/rateLimit";
 
 export const runtime = "nodejs";
 
 export async function POST(request: Request): Promise<NextResponse> {
   try {
+    await enforceRouteRateLimit(request, "checkout", 10, 10 * 60_000);
     if (!process.env.PAYMENT_BRIDGE_SECRET?.trim()) {
       throw new Error("PAYMENT_BRIDGE_SECRET is not configured.");
     }
@@ -20,7 +22,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     }
     const checkout = await resolveCheckoutTotals(body);
     const amountAudCents = Math.round(checkout.subtotalAud * 100);
-    const orderId = await createConvexOrder({
+    const { orderId, statusToken } = await createConvexOrder({
       ...checkout,
       paymentMethod: "stripe",
     });
@@ -39,7 +41,12 @@ export async function POST(request: Request): Promise<NextResponse> {
     payUrl.searchParams.set("token", token);
     payUrl.searchParams.set("paymentMethod", "stripe");
 
-    return NextResponse.json({ ok: true, orderId, payUrl: payUrl.toString() });
+    return NextResponse.json({
+      ok: true,
+      orderId,
+      statusToken,
+      payUrl: payUrl.toString(),
+    });
   } catch (error) {
     console.error("[checkout] Freshnup session creation failed", error);
     const message =

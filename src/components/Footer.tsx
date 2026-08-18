@@ -18,6 +18,7 @@ export function Footer() {
                 alt="The Protocol"
                 width={1024}
                 height={407}
+                sizes="176px"
                 className="h-auto w-44 brightness-0 invert"
               />
             </Link>

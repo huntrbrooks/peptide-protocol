@@ -7,6 +7,7 @@ import {
   createCryptoQuote,
   getCryptoOption,
 } from "@/lib/payments/crypto";
+import { enforceRouteRateLimit } from "@/lib/security/rateLimit";
 
 export const runtime = "nodejs";
 
@@ -16,6 +17,7 @@ function isCryptoChain(value: unknown): value is CryptoChain {
 
 export async function POST(request: Request): Promise<NextResponse> {
   try {
+    await enforceRouteRateLimit(request, "checkout", 10, 10 * 60_000);
     const body = (await request.json()) as Record<string, unknown>;
     if (!isCryptoChain(body.chain)) {
       return NextResponse.json(
@@ -26,7 +28,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     const checkout = await resolveCheckoutTotals(body);
     const option = getCryptoOption(body.chain);
     const quote = await createCryptoQuote(checkout.subtotalAud);
-    const orderId = await createConvexOrder({
+    const { orderId, statusToken } = await createConvexOrder({
       ...checkout,
       paymentMethod: "crypto",
       cryptoCurrency: option.currency,
@@ -38,6 +40,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     return NextResponse.json({
       ok: true,
       orderId,
+      statusToken,
       currency: option.currency,
       chain: option.chain,
       expectedAmount: quote.expectedAmount,

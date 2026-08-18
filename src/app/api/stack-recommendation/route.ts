@@ -11,6 +11,7 @@ import {
   parseStackRecommendation,
 } from "@/lib/stackFinder/prompt";
 import type { StackRecommendationResponse } from "@/lib/stackFinder/types";
+import { enforceRouteRateLimit } from "@/lib/security/rateLimit";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -32,6 +33,7 @@ function isAnswers(value: unknown): value is Answers {
 
 export async function POST(request: Request): Promise<NextResponse<StackRecommendationResponse>> {
   try {
+    await enforceRouteRateLimit(request, "stack-recommendation", 5, 10 * 60_000);
     const body = (await request.json()) as { answers?: unknown };
     if (!isAnswers(body.answers)) {
       return NextResponse.json(
@@ -134,15 +136,18 @@ export async function POST(request: Request): Promise<NextResponse<StackRecommen
     return NextResponse.json({ ok: true, recommendation });
   } catch (error) {
     console.error("stack-recommendation failure", error);
+    const rateLimited =
+      error instanceof Error && error.message.includes("Too many requests");
     return NextResponse.json(
       {
         ok: false,
-        error:
-          error instanceof Error
+        error: rateLimited
+          ? "Too many requests. Please try again shortly."
+          : error instanceof Error
             ? error.message
             : "Unexpected error generating recommendation.",
       },
-      { status: 500 },
+      { status: rateLimited ? 429 : 500 },
     );
   }
 }

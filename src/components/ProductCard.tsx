@@ -29,7 +29,7 @@ export function ProductCard({ product }: { product: Product }) {
             alt={product.name}
             fill
             className="object-cover transition duration-500 group-hover:scale-[1.03]"
-            sizes="(max-width: 768px) 100vw, 33vw"
+            sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 360px"
           />
         </div>
         <div className="flex flex-1 flex-col gap-2 p-4">
@@ -72,7 +72,7 @@ export function ProductCard({ product }: { product: Product }) {
               {inStock ? "In stock" : "Out of stock"}
             </p>
           </div>
-          <span className="text-sm text-accent opacity-0 transition group-hover:opacity-100">
+          <span className="text-sm text-accent transition md:opacity-0 md:group-hover:opacity-100">
             View
           </span>
         </div>

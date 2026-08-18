@@ -9,12 +9,13 @@ export const metadata: Metadata = {
 };
 
 type PageProps = {
-  searchParams: Promise<{ orderId?: string }>;
+  searchParams: Promise<{ orderId?: string; statusToken?: string }>;
 };
 
 export default async function CheckoutSuccessPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const orderId = params.orderId?.trim() || null;
+  const statusToken = params.statusToken?.trim() || null;
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-14 sm:px-6">
@@ -29,7 +30,7 @@ export default async function CheckoutSuccessPage({ searchParams }: PageProps) {
         verification, not the browser return alone.
       </p>
 
-      <OrderStatus orderId={orderId} />
+      <OrderStatus orderId={orderId} statusToken={statusToken} />
 
       <p className="mt-8 text-sm text-muted">
         <Link href="/shop" className="text-accent underline">

@@ -1,6 +1,6 @@
 import { getProductBySlug } from "@/content/products";
 import { applyMemberDiscount, normalizeMemberCode } from "@/lib/membership/discount";
-import { fetchQuery } from "convex/nextjs";
+import { fetchMutation, fetchQuery } from "convex/nextjs";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import type { OrderLine, OrderShipping } from "./types";
@@ -148,20 +148,18 @@ export async function resolveCheckoutTotals(
       "NEXT_PUBLIC_CONVEX_URL is not set. Run `npx convex dev` to link a project.",
     );
   }
-  let availability: Array<{ slug: string; available: number }> = [];
-  try {
-    availability = await fetchQuery(api.inventory.availability, {
-      slugs: checkout.lines.map((line) => line.slug),
-    });
-  } catch {
-    availability = [];
-  }
+  const availability = await fetchMutation(api.inventory.availability, {
+    slugs: checkout.lines.map((line) => line.slug),
+  });
   const availableBySlug = new Map(
     availability.map((row) => [row.slug, row.available]),
   );
   for (const line of checkout.lines) {
     const available = availableBySlug.get(line.slug);
-    if (available !== undefined && available < line.quantity) {
+    if (available === undefined) {
+      throw new Error(`${line.name} is unavailable.`);
+    }
+    if (available < line.quantity) {
       throw new Error(`${line.name} is out of stock.`);
     }
   }

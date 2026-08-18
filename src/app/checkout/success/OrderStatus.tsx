@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useQuery } from "convex/react";
+import { useSyncExternalStore } from "react";
 import { api } from "../../../../convex/_generated/api";
 import type { Id } from "../../../../convex/_generated/dataModel";
 import { formatPrice } from "@/content/products";
@@ -11,7 +12,13 @@ function looksLikeConvexId(value: string): boolean {
   return /^[a-z0-9]+$/i.test(value) && value.length >= 16;
 }
 
-export function OrderStatus({ orderId }: { orderId: string | null }) {
+export function OrderStatus({
+  orderId,
+  statusToken,
+}: {
+  orderId: string | null;
+  statusToken: string | null;
+}) {
   if (!process.env.NEXT_PUBLIC_CONVEX_URL) {
     return (
       <p className="mt-6 text-sm text-muted" role="alert">
@@ -22,10 +29,25 @@ export function OrderStatus({ orderId }: { orderId: string | null }) {
     );
   }
 
-  return <OrderStatusLive orderId={orderId} />;
+  return <OrderStatusLive orderId={orderId} initialStatusToken={statusToken} />;
 }
 
-function OrderStatusLive({ orderId }: { orderId: string | null }) {
+function OrderStatusLive({
+  orderId,
+  initialStatusToken,
+}: {
+  orderId: string | null;
+  initialStatusToken: string | null;
+}) {
+  const statusToken = useSyncExternalStore(
+    () => () => undefined,
+    () =>
+      initialStatusToken ??
+      (orderId
+        ? window.sessionStorage.getItem(`order-status:${orderId}`)
+        : null),
+    () => initialStatusToken,
+  );
   const validId =
     orderId && looksLikeConvexId(orderId)
       ? (orderId as Id<"orders">)
@@ -33,7 +55,9 @@ function OrderStatusLive({ orderId }: { orderId: string | null }) {
 
   const order = useQuery(
     api.orders.get,
-    validId ? { orderId: validId } : "skip",
+    validId
+      ? { orderId: validId, statusToken: statusToken ?? undefined }
+      : "skip",
   );
 
   if (!orderId) {

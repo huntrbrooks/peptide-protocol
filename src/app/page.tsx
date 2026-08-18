@@ -5,10 +5,36 @@ import { ProductCard } from "@/components/ProductCard";
 import { categories } from "@/content/categories";
 import { products } from "@/content/products";
 import { home, site } from "@/content/site";
+import { publicPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
-  title: { absolute: home.metaTitle },
+export const metadata: Metadata = publicPageMetadata({
+  title: home.metaTitle,
   description: home.metaDescription,
+  path: "/",
+  image: "/og-image.jpg",
+  imageAlt: "The Protocol — research peptides, Australia",
+});
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${site.url}/#organization`,
+      name: site.name,
+      url: site.url,
+      email: site.email,
+      logo: `${site.url}/images/brand/the-protocol-logo.png`,
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${site.url}/#website`,
+      name: site.name,
+      url: site.url,
+      publisher: { "@id": `${site.url}/#organization` },
+      inLanguage: "en-AU",
+    },
+  ],
 };
 
 export default function HomePage() {
@@ -16,10 +42,14 @@ export default function HomePage() {
 
   return (
     <div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
       <section className="relative overflow-hidden">
         <div className="absolute inset-0">
           <Image
-            src="/images/hero-au-industrial.png"
+            src="/images/hero-au-industrial.webp"
             alt="The Protocol research laboratory and dispatch aesthetic"
             fill
             priority
@@ -36,10 +66,10 @@ export default function HomePage() {
             <Image
               src="/images/products/retatrutide-20mg-hero.webp"
               alt="Retatrutide 20 MG"
-              width={2048}
-              height={2048}
-              priority
-              unoptimized
+              width={720}
+              height={720}
+              loading="eager"
+              sizes="(max-width: 639px) 429px, (max-width: 1023px) 546px, 663px"
               className="h-auto w-full"
             />
           </div>
@@ -79,6 +109,7 @@ export default function HomePage() {
                 alt="Australia Post Express Post"
                 width={1024}
                 height={194}
+                sizes="170px"
                 className="h-7 w-auto sm:h-8"
               />
               {site.trustBar
@@ -155,7 +186,7 @@ export default function HomePage() {
                   alt={category.name}
                   fill
                   className="object-cover opacity-50 transition duration-500 group-hover:scale-105 group-hover:opacity-60"
-                  sizes="(max-width: 768px) 100vw, 33vw"
+                  sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 360px"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/40 to-transparent" />
                 <div className="relative flex h-full flex-col justify-end p-5">

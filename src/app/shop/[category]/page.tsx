@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ProductCard } from "@/components/ProductCard";
 import { categories, getCategoryBySlug } from "@/content/categories";
 import { getProductsByCategory } from "@/content/products";
+import { publicPageMetadata } from "@/lib/seo/metadata";
 
 type Props = { params: Promise<{ category: string }> };
 
@@ -14,10 +15,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { category: slug } = await params;
   const category = getCategoryBySlug(slug);
   if (!category) return {};
-  return {
-    title: { absolute: category.metaTitle },
+  return publicPageMetadata({
+    title: category.metaTitle,
     description: category.metaDescription,
-  };
+    path: `/shop/${category.slug}`,
+    image: category.image,
+    imageAlt: category.name,
+  });
 }
 
 export default async function CategoryPage({ params }: Props) {

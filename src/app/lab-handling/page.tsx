@@ -1,13 +1,11 @@
 import type { Metadata } from "next";
 import { ContentPage } from "@/components/ContentPage";
 import { pages } from "@/content/pages";
+import { contentPageMetadata } from "@/lib/seo/metadata";
 
 const page = pages["lab-handling"]!;
 
-export const metadata: Metadata = {
-  title: { absolute: page.metaTitle },
-  description: page.metaDescription,
-};
+export const metadata: Metadata = contentPageMetadata(page);
 
 export default function LabHandlingPage() {
   return <ContentPage page={page} />;

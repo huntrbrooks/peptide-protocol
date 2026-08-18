@@ -48,6 +48,7 @@ export function Header() {
             width={1024}
             height={407}
             priority
+            sizes="(max-width: 639px) 144px, 176px"
             className="h-auto w-36 sm:w-44"
           />
         </Link>
@@ -67,7 +68,7 @@ export function Header() {
           <CartLink />
           <button
             type="button"
-            className="inline-flex h-10 w-10 items-center justify-center rounded-sm border border-line transition hover:border-accent hover:text-accent"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-sm border border-line transition hover:border-accent hover:text-accent"
             aria-label="Toggle menu"
             onClick={() => setOpen((v) => !v)}
           >
@@ -82,13 +83,13 @@ export function Header() {
       </div>
 
       {open ? (
-        <div className="animate-fade border-t border-line bg-paper px-4 py-4 md:hidden">
-          <div className="flex flex-col gap-3">
+        <div className="animate-fade border-t border-line bg-paper px-4 py-2 md:hidden">
+          <div className="flex flex-col">
             {site.nav.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="text-base text-ink transition hover:text-accent"
+                className="flex min-h-11 items-center text-base text-ink transition hover:text-accent"
                 onClick={() => setOpen(false)}
               >
                 {item.label}

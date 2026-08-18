@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import {
   generateProofUploadUrl,
-  getConvexOrder,
+  getConvexPaymentOrder,
 } from "@/lib/orders/convex";
 import { verifyOrderProofToken } from "@/lib/payments/order-proof";
 
@@ -27,7 +27,7 @@ export async function POST(request: Request): Promise<NextResponse> {
         { status: 400 },
       );
     }
-    const order = await getConvexOrder(body.orderId);
+    const order = await getConvexPaymentOrder(body.orderId);
     if (
       !order ||
       (order.paymentMethod !== "crypto" && order.paymentMethod !== "bank") ||

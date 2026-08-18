@@ -149,6 +149,7 @@ export default defineSchema({
     refundTrackedAt: v.optional(v.number()),
     inventorySettledAt: v.optional(v.number()),
     inventoryReleasedAt: v.optional(v.number()),
+    statusToken: v.optional(v.string()),
     confirmationEmailClaimedAt: v.optional(v.number()),
     confirmationEmailClaimToken: v.optional(v.string()),
     confirmationEmailSentAt: v.optional(v.number()),
@@ -242,6 +243,20 @@ export default defineSchema({
   })
     .index("by_slug", ["slug"])
     .index("by_stock_code", ["stockCode"]),
+  memberLinkVerifications: defineTable({
+    memberId: v.id("members"),
+    userId: v.id("users"),
+    token: v.string(),
+    expiresAt: v.number(),
+    createdAt: v.number(),
+  })
+    .index("by_token", ["token"])
+    .index("by_user", ["userId"]),
+  rateLimits: defineTable({
+    key: v.string(),
+    count: v.number(),
+    windowStartedAt: v.number(),
+  }).index("by_key", ["key"]),
   auditLogs: defineTable({
     staffUserId: v.id("users"),
     staffEmail: v.string(),

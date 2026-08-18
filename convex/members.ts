@@ -17,6 +17,7 @@ import {
   normalizeMemberCode,
   normalizeMemberEmail,
 } from "./lib/memberDiscount";
+import { enforceRateLimit, requireOrdersSecret } from "./lib/security";
 
 const quoteValidator = v.object({
   percent: v.number(),
@@ -45,11 +46,7 @@ async function getAuthenticatedMember(
     .query("members")
     .withIndex("by_auth_user", (q) => q.eq("authUserId", userId))
     .unique();
-  if (byAuth) return byAuth;
-  const user = await ctx.db.get("users", userId);
-  const email =
-    typeof user?.email === "string" ? normalizeMemberEmail(user.email) : "";
-  return email ? await findMemberByEmail(ctx, email) : null;
+  return byAuth;
 }
 
 async function findMemberByEmail(
@@ -154,53 +151,56 @@ async function allocateUniqueCode(ctx: MutationCtx): Promise<string> {
   throw new Error("Unable to allocate a member code");
 }
 
+export async function createMemberForAuth(
+  ctx: MutationCtx,
+  email: string,
+  userId: Id<"users">,
+): Promise<Doc<"members"> | null> {
+  const existing = await findMemberByEmail(ctx, email);
+  if (existing) return existing;
+  const now = Date.now();
+  const memberId = await ctx.db.insert("members", {
+    email,
+    authUserId: userId,
+    code: await allocateUniqueCode(ctx),
+    marketingConsent: "pending",
+    createdAt: now,
+    updatedAt: now,
+  });
+  await ctx.scheduler.runAfter(0, internal.welcomeEmail.sendWelcome, { memberId });
+  return await ctx.db.get("members", memberId);
+}
+
 export const captureEmail = mutation({
   args: {
     email: v.string(),
     marketingConsent: v.boolean(),
     attribution: v.optional(v.string()),
   },
-  returns: v.object({
-    memberId: v.id("members"),
-    code: v.string(),
-    isNew: v.boolean(),
-  }),
+  returns: v.union(
+    v.object({ isNew: v.literal(false) }),
+    v.object({
+      memberId: v.id("members"),
+      code: v.string(),
+      isNew: v.literal(true),
+    }),
+  ),
   handler: async (ctx, args) => {
     const email = normalizeMemberEmail(args.email);
     if (!isValidMemberEmail(email)) {
       throw new Error("Enter a valid email address");
     }
+    await enforceRateLimit(ctx, "member-capture:global", 100, 60_000);
+    await enforceRateLimit(ctx, `member-capture:${email}`, 3, 60 * 60_000);
 
     const existing = await findMemberByEmail(ctx, email);
     if (existing) {
-      const now = Date.now();
-      const consent = args.marketingConsent ? "opted_in" : "opted_out";
-      if (existing.marketingConsent !== consent) {
-        await ctx.db.patch("members", existing._id, {
-          marketingConsent: consent,
-          marketingConsentAt: now,
-          lastTouch: args.attribution,
-          updatedAt: now,
-        });
-        await ctx.db.insert("consentLedger", {
-          memberId: existing._id,
-          category: "marketing",
-          state: consent,
-          source: "member_capture",
-          createdAt: now,
-        });
-      }
       if (existing.welcomeEmailSentAt === undefined) {
         await ctx.scheduler.runAfter(0, internal.welcomeEmail.sendWelcome, {
           memberId: existing._id,
         });
       }
-      if (args.marketingConsent) {
-        await ctx.scheduler.runAfter(0, internal.klaviyo.syncMember, {
-          memberId: existing._id,
-        });
-      }
-      return { memberId: existing._id, code: existing.code, isNew: false };
+      return { isNew: false as const };
     }
 
     const now = Date.now();
@@ -234,7 +234,7 @@ export const captureEmail = mutation({
         memberId,
       });
     }
-    return { memberId, code: member.code, isNew: true };
+    return { memberId, code: member.code, isNew: true as const };
   },
 });
 
@@ -253,17 +253,10 @@ export const getMyMembership = query({
     const userId = await getAuthUserId(ctx);
     if (!userId) return null;
 
-    const byAuth = await ctx.db
+    const member = await ctx.db
       .query("members")
       .withIndex("by_auth_user", (q) => q.eq("authUserId", userId))
       .unique();
-    const user = byAuth ? null : await ctx.db.get("users", userId);
-    const email =
-      typeof user?.email === "string"
-        ? normalizeMemberEmail(user.email)
-        : "";
-    const member =
-      byAuth ?? (email ? await findMemberByEmail(ctx, email) : null);
     if (!member) return null;
 
     const quoted = await percentForMember(ctx, member);
@@ -500,6 +493,56 @@ export const quoteDiscount = query({
   returns: quoteValidator,
   handler: async (ctx, args) => {
     return await quoteDiscountForEmailAndCode(ctx, args.email, args.code);
+  },
+});
+
+export const getLinkVerification = internalQuery({
+  args: { verificationId: v.id("memberLinkVerifications") },
+  returns: v.union(
+    v.object({
+      email: v.string(),
+      token: v.string(),
+      expiresAt: v.number(),
+    }),
+    v.null(),
+  ),
+  handler: async (ctx, args) => {
+    const verification = await ctx.db.get(
+      "memberLinkVerifications",
+      args.verificationId,
+    );
+    if (!verification) return null;
+    const member = await ctx.db.get("members", verification.memberId);
+    if (!member) return null;
+    return {
+      email: member.email,
+      token: verification.token,
+      expiresAt: verification.expiresAt,
+    };
+  },
+});
+
+export const completeMemberLink = mutation({
+  args: {
+    token: v.string(),
+    paymentSecret: v.string(),
+  },
+  returns: v.boolean(),
+  handler: async (ctx, args) => {
+    requireOrdersSecret(args.paymentSecret);
+    const verification = await ctx.db
+      .query("memberLinkVerifications")
+      .withIndex("by_token", (q) => q.eq("token", args.token))
+      .unique();
+    if (!verification || verification.expiresAt < Date.now()) return false;
+    const member = await ctx.db.get("members", verification.memberId);
+    if (!member || member.authUserId !== undefined) return false;
+    await ctx.db.patch("members", member._id, {
+      authUserId: verification.userId,
+      updatedAt: Date.now(),
+    });
+    await ctx.db.delete("memberLinkVerifications", verification._id);
+    return true;
   },
 });
 

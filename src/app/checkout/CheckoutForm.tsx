@@ -1,6 +1,6 @@
 "use client";
 
-import { useConvexAuth, useMutation, useQuery } from "convex/react";
+import { useConvexAuth, useQuery } from "convex/react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { api } from "../../../convex/_generated/api";
@@ -22,7 +22,7 @@ import { whatsappOrderUrl } from "@/lib/orders/whatsapp";
 import type { CryptoChain, CryptoCurrency } from "@/lib/orders/types";
 import { track } from "@/lib/analytics/track";
 
-type PaymentTab = "moonpay" | "crypto" | "card" | "bank";
+type PaymentTab = "crypto" | "card" | "bank";
 
 type LineView = {
   slug: string;
@@ -41,6 +41,7 @@ type CryptoOption = {
 
 type CryptoOrder = {
   orderId: string;
+  statusToken: string;
   currency: CryptoCurrency;
   chain: string;
   expectedAmount: number;
@@ -51,6 +52,7 @@ type CryptoOrder = {
 
 type BankOrder = {
   orderId: string;
+  statusToken: string;
   amountAud: number;
   proofToken: string;
   bank: BankDetails;
@@ -128,7 +130,6 @@ function CheckoutMembershipSync({
 }
 
 export function CheckoutForm() {
-  const recordCheckoutActivity = useMutation(api.lifecycle.recordCheckoutActivity);
   const cart = useSyncExternalStore(
     subscribeCart,
     getCartSnapshot,
@@ -191,14 +192,6 @@ export function CheckoutForm() {
       });
     }
   }, [lines, subtotal]);
-
-  useEffect(() => {
-    if (!email.includes("@") || lines.length === 0) return;
-    const timeout = window.setTimeout(() => {
-      void recordCheckoutActivity({ email, lines });
-    }, 750);
-    return () => window.clearTimeout(timeout);
-  }, [email, lines, recordCheckoutActivity]);
 
   useEffect(() => {
     if (quote.code) {
@@ -296,12 +289,23 @@ export function CheckoutForm() {
         body: JSON.stringify({ ...checkoutBody(), paymentMethod: "stripe" }),
       });
       const payload = (await response.json()) as {
+        orderId?: string;
+        statusToken?: string;
         payUrl?: string;
         error?: string;
       };
-      if (!response.ok || !payload.payUrl) {
+      if (
+        !response.ok ||
+        !payload.payUrl ||
+        !payload.orderId ||
+        !payload.statusToken
+      ) {
         throw new Error(payload.error ?? "Unable to start secure payment.");
       }
+      window.sessionStorage.setItem(
+        `order-status:${payload.orderId}`,
+        payload.statusToken,
+      );
       trackAppliedDiscount();
       window.location.assign(payload.payUrl);
     } catch (caught) {
@@ -455,7 +459,7 @@ export function CheckoutForm() {
       });
       window.setTimeout(() => {
         window.location.assign(
-          `/checkout/success?orderId=${encodeURIComponent(order.orderId)}`,
+          `/checkout/success?orderId=${encodeURIComponent(order.orderId)}&statusToken=${encodeURIComponent(order.statusToken)}`,
         );
       }, 1400);
     } catch (caught) {
@@ -627,10 +631,9 @@ export function CheckoutForm() {
 
         <section className="border border-line bg-paper p-6">
           <h2 className="font-display text-2xl text-ink">Payment</h2>
-          <div className="mt-5 grid grid-cols-2 border border-line text-sm sm:grid-cols-4">
-            {(["moonpay", "crypto", "card", "bank"] as const).map((method) => {
+          <div className="mt-5 grid grid-cols-3 border border-line text-sm">
+            {(["crypto", "card", "bank"] as const).map((method) => {
               const disabled =
-                method === "moonpay" ||
                 (method === "bank" && !bankDetails) ||
                 (checkoutStarted && tab !== method);
               return (
@@ -648,32 +651,13 @@ export function CheckoutForm() {
                       : "bg-paper text-muted hover:text-ink"
                   } disabled:cursor-not-allowed disabled:opacity-40`}
                 >
-                  {method === "moonpay"
-                    ? "🔒 MoonPay — Coming soon"
-                    : method === "card"
+                  {method === "card"
                       ? "Stripe"
                       : method}
                 </button>
               );
             })}
           </div>
-
-          {tab === "moonpay" ? (
-            <div className="mt-5">
-              <p className="text-sm leading-relaxed text-muted">
-                MoonPay is temporarily unavailable while its payment flow is
-                validated.
-              </p>
-              <button
-                type="button"
-                disabled
-                aria-disabled="true"
-                className="mt-5 cursor-not-allowed rounded-sm border border-line bg-mist/40 px-5 py-3 text-sm text-muted"
-              >
-                <span aria-hidden="true">🔒</span> Coming soon
-              </button>
-            </div>
-          ) : null}
 
           {tab === "card" ? (
             <div className="mt-5">

@@ -1,3 +1,4 @@
+import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import { applyMemberDiscount } from "./lib/memberDiscount";
@@ -14,6 +15,13 @@ import { internalMutation, internalQuery, mutation, query } from "./_generated/s
 import type { Id } from "./_generated/dataModel";
 import type { MutationCtx } from "./_generated/server";
 import { recomputeMemberRfm } from "./rfm";
+import { recordCheckoutActivityForOrder } from "./lifecycle";
+import { getCatalogueItem } from "./lib/catalogue";
+import {
+  constantTimeEqual,
+  enforceRateLimit,
+  requireOrdersSecret,
+} from "./lib/security";
 
 const orderLineValidator = v.object({
   slug: v.string(),
@@ -113,21 +121,20 @@ const paidEmailOrderValidator = v.object({
   paidAt: v.number(),
 });
 
-function requirePaymentSecret(secret: string): void {
-  const expected = process.env.ORDERS_WEBHOOK_SECRET;
-  if (!expected || secret !== expected) {
-    throw new Error("Unauthorized");
-  }
-}
+const pendingOrderLineValidator = v.object({
+  slug: v.string(),
+  quantity: v.number(),
+});
 
 export const createPending = mutation({
   args: {
     email: v.string(),
     shipping: orderShippingValidator,
-    lines: v.array(orderLineValidator),
-    subtotalAud: v.number(),
+    lines: v.array(pendingOrderLineValidator),
     paymentMethod: paymentMethodValidator,
     researchAck: v.literal(true),
+    paymentSecret: v.string(),
+    statusToken: v.string(),
     discountCode: v.optional(v.string()),
     cryptoCurrency: v.optional(cryptoCurrencyValidator),
     cryptoChain: v.optional(cryptoChainValidator),
@@ -136,14 +143,15 @@ export const createPending = mutation({
   },
   returns: v.id("orders"),
   handler: async (ctx, args) => {
+    requireOrdersSecret(args.paymentSecret);
     if (args.lines.length === 0) {
       throw new Error("Order must include at least one line item");
     }
-    if (args.subtotalAud <= 0) {
-      throw new Error("Order total must be greater than zero");
-    }
     if (!args.email.includes("@")) {
       throw new Error("A valid email is required");
+    }
+    if (args.statusToken.length < 32) {
+      throw new Error("Invalid order status token");
     }
     if (
       args.paymentMethod === "crypto" &&
@@ -157,9 +165,29 @@ export const createPending = mutation({
     }
 
     const email = args.email.trim().toLowerCase();
+    await enforceRateLimit(ctx, "checkout:global", 120, 60_000);
+    await enforceRateLimit(ctx, `checkout:${email}`, 8, 10 * 60_000);
+    const lines = args.lines.map((line) => {
+      if (!Number.isInteger(line.quantity) || line.quantity < 1 || line.quantity > 99) {
+        throw new Error("Cart item quantity is invalid");
+      }
+      const item = getCatalogueItem(line.slug);
+      if (!item) {
+        throw new Error(`Unknown product: ${line.slug}`);
+      }
+      const lineTotalAud =
+        Math.round(item.priceAud * line.quantity * 100) / 100;
+      return {
+        slug: line.slug,
+        name: item.name,
+        quantity: line.quantity,
+        unitPriceAud: item.priceAud,
+        lineTotalAud,
+      };
+    });
     const catalogueSubtotal =
       Math.round(
-        args.lines.reduce((sum, line) => sum + line.lineTotalAud, 0) * 100,
+        lines.reduce((sum, line) => sum + line.lineTotalAud, 0) * 100,
       ) / 100;
     const quote = await quoteDiscountForEmailAndCode(
       ctx,
@@ -167,17 +195,15 @@ export const createPending = mutation({
       args.discountCode,
     );
     const applied = applyMemberDiscount(catalogueSubtotal, quote.percent);
-    if (Math.abs(args.subtotalAud - applied.subtotalAud) > 0.009) {
-      throw new Error("Checkout total is out of date. Refresh and try again.");
-    }
 
     const now = Date.now();
-    await reserveInventory(ctx, args.lines);
+    await reserveInventory(ctx, lines);
+    await recordCheckoutActivityForOrder(ctx, { email, lines });
     return await ctx.db.insert("orders", {
       status: "pending",
       email,
       shipping: args.shipping,
-      lines: args.lines,
+      lines,
       subtotalAud: applied.subtotalAud,
       subtotalBeforeDiscountAud: catalogueSubtotal,
       discountCode: quote.code ?? undefined,
@@ -192,6 +218,7 @@ export const createPending = mutation({
       cryptoExpectedAmount: args.cryptoExpectedAmount,
       cryptoWalletAddress: args.cryptoWalletAddress,
       researchAck: true,
+      statusToken: args.statusToken,
       createdAt: now,
       updatedAt: now,
     });
@@ -199,11 +226,23 @@ export const createPending = mutation({
 });
 
 export const get = query({
-  args: { orderId: v.id("orders") },
+  args: {
+    orderId: v.id("orders"),
+    statusToken: v.optional(v.string()),
+  },
   returns: v.union(publicOrderValidator, v.null()),
   handler: async (ctx, args) => {
     const order = await ctx.db.get("orders", args.orderId);
     if (!order) return null;
+    const userId = await getAuthUserId(ctx);
+    const user = userId ? await ctx.db.get("users", userId) : null;
+    const ownerEmail =
+      typeof user?.email === "string" ? user.email.trim().toLowerCase() : null;
+    const hasToken =
+      typeof args.statusToken === "string" &&
+      typeof order.statusToken === "string" &&
+      constantTimeEqual(args.statusToken, order.statusToken);
+    if (!hasToken && ownerEmail !== order.email) return null;
 
     return {
       _id: order._id,
@@ -251,7 +290,7 @@ export const getForPayment = query({
     v.null(),
   ),
   handler: async (ctx, args) => {
-    requirePaymentSecret(args.paymentSecret);
+    requireOrdersSecret(args.paymentSecret);
     const orderId = ctx.db.normalizeId("orders", args.orderId);
     if (!orderId) return null;
     const order = await ctx.db.get("orders", orderId);
@@ -334,7 +373,7 @@ export const attachStripeIntent = mutation({
   },
   returns: v.union(v.id("orders"), v.null()),
   handler: async (ctx, args) => {
-    requirePaymentSecret(args.paymentSecret);
+    requireOrdersSecret(args.paymentSecret);
     const orderId = ctx.db.normalizeId("orders", args.orderId);
     if (!orderId) return null;
     const order = await ctx.db.get("orders", orderId);
@@ -365,7 +404,7 @@ export const updateStripeFromWebhook = mutation({
   },
   returns: v.union(v.id("orders"), v.null()),
   handler: async (ctx, args) => {
-    requirePaymentSecret(args.paymentSecret);
+    requireOrdersSecret(args.paymentSecret);
     const orderId = ctx.db.normalizeId("orders", args.orderId);
     if (!orderId) return null;
     const order = await ctx.db.get("orders", orderId);
@@ -397,7 +436,7 @@ export const updateMoonPayFromBridge = mutation({
   },
   returns: v.union(v.id("orders"), v.null()),
   handler: async (ctx, args) => {
-    requirePaymentSecret(args.paymentSecret);
+    requireOrdersSecret(args.paymentSecret);
     const orderId = ctx.db.normalizeId("orders", args.orderId);
     if (!orderId) return null;
 
@@ -431,7 +470,7 @@ export const updateFromPaymentBridge = mutation({
   },
   returns: v.union(v.id("orders"), v.null()),
   handler: async (ctx, args) => {
-    requirePaymentSecret(args.paymentSecret);
+    requireOrdersSecret(args.paymentSecret);
     const orderId = ctx.db.normalizeId("orders", args.orderId);
     if (!orderId) return null;
     const order = await ctx.db.get("orders", orderId);
@@ -471,7 +510,7 @@ export const generateProofUploadUrl = mutation({
   args: { paymentSecret: v.string() },
   returns: v.string(),
   handler: async (ctx, args) => {
-    requirePaymentSecret(args.paymentSecret);
+    requireOrdersSecret(args.paymentSecret);
     return await ctx.storage.generateUploadUrl();
   },
 });
@@ -484,7 +523,7 @@ export const attachPaymentProof = mutation({
   },
   returns: v.union(v.id("orders"), v.null()),
   handler: async (ctx, args) => {
-    requirePaymentSecret(args.paymentSecret);
+    requireOrdersSecret(args.paymentSecret);
     const orderId = ctx.db.normalizeId("orders", args.orderId);
     if (!orderId) return null;
     const order = await ctx.db.get("orders", orderId);
@@ -515,7 +554,7 @@ export const getPaymentProofUrl = query({
   },
   returns: v.union(v.string(), v.null()),
   handler: async (ctx, args) => {
-    requirePaymentSecret(args.paymentSecret);
+    requireOrdersSecret(args.paymentSecret);
     const orderId = ctx.db.normalizeId("orders", args.orderId);
     if (!orderId) return null;
     const order = await ctx.db.get("orders", orderId);
@@ -537,7 +576,7 @@ export const finalizePaymentProof = mutation({
   },
   returns: v.union(v.id("orders"), v.null()),
   handler: async (ctx, args) => {
-    requirePaymentSecret(args.paymentSecret);
+    requireOrdersSecret(args.paymentSecret);
     const orderId = ctx.db.normalizeId("orders", args.orderId);
     if (!orderId) return null;
     const order = await ctx.db.get("orders", orderId);
@@ -595,7 +634,7 @@ export const submitCryptoVerification = mutation({
   },
   returns: v.union(v.id("orders"), v.null()),
   handler: async (ctx, args) => {
-    requirePaymentSecret(args.paymentSecret);
+    requireOrdersSecret(args.paymentSecret);
     const orderId = ctx.db.normalizeId("orders", args.orderId);
     if (!orderId) return null;
     const order = await ctx.db.get("orders", orderId);
@@ -638,7 +677,7 @@ export const claimPaidEmail = mutation({
   },
   returns: v.union(paidEmailOrderValidator, v.null()),
   handler: async (ctx, args) => {
-    requirePaymentSecret(args.paymentSecret);
+    requireOrdersSecret(args.paymentSecret);
     const orderId = ctx.db.normalizeId("orders", args.orderId);
     if (!orderId) return null;
 
@@ -679,7 +718,7 @@ export const completePaidEmail = mutation({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    requirePaymentSecret(args.paymentSecret);
+    requireOrdersSecret(args.paymentSecret);
     const orderId = ctx.db.normalizeId("orders", args.orderId);
     if (!orderId) return null;
 
@@ -735,7 +774,7 @@ export const claimPurchaseEvent = mutation({
     v.null(),
   ),
   handler: async (ctx, args) => {
-    requirePaymentSecret(args.paymentSecret);
+    requireOrdersSecret(args.paymentSecret);
     const orderId = ctx.db.normalizeId("orders", args.orderId);
     if (!orderId) return null;
     const order = await ctx.db.get("orders", orderId);

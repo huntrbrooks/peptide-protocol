@@ -5,7 +5,6 @@ import type { MutationCtx } from "./_generated/server";
 import {
   internalMutation,
   internalQuery,
-  mutation,
 } from "./_generated/server";
 import { normalizeMemberEmail } from "./lib/memberDiscount";
 
@@ -64,54 +63,64 @@ async function insertActivity(
   });
 }
 
-export const recordCheckoutActivity = mutation({
+export async function recordCheckoutActivityForOrder(
+  ctx: MutationCtx,
+  args: {
+    email: string;
+    lines: Doc<"orders">["lines"];
+  },
+): Promise<void> {
+  if (args.lines.length === 0 || args.lines.length > 50) return;
+  const email = normalizeMemberEmail(args.email);
+  const member = await ctx.db
+    .query("members")
+    .withIndex("by_email", (q) => q.eq("email", email))
+    .unique();
+  if (!member || member.marketingConsent !== "opted_in") return;
+  const now = Date.now();
+  const activities = await ctx.db
+    .query("lifecycleActivities")
+    .withIndex("by_member", (q) => q.eq("memberId", member._id))
+    .collect();
+  const active = activities.find(
+    (activity) =>
+      activity.kind === "abandoned_cart" &&
+      activity.completedAt === undefined &&
+      activity.cancelledAt === undefined,
+  );
+  if (active) {
+    await ctx.db.patch("lifecycleActivities", active._id, {
+      lines: args.lines,
+      occurredAt: now,
+      nextSendAt: now + HOUR,
+      stage: 1,
+      claimedAt: undefined,
+      updatedAt: now,
+    });
+    return;
+  }
+  await ctx.db.insert("lifecycleActivities", {
+    memberId: member._id,
+    email,
+    kind: "abandoned_cart",
+    sourceKey: `abandoned/${member._id}/${now}`,
+    lines: args.lines,
+    occurredAt: now,
+    nextSendAt: now + HOUR,
+    stage: 1,
+    createdAt: now,
+    updatedAt: now,
+  });
+}
+
+export const recordCheckoutActivity = internalMutation({
   args: {
     email: v.string(),
     lines: v.array(lineValidator),
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    if (args.lines.length === 0 || args.lines.length > 50) return null;
-    const email = normalizeMemberEmail(args.email);
-    const member = await ctx.db
-      .query("members")
-      .withIndex("by_email", (q) => q.eq("email", email))
-      .unique();
-    if (!member || member.marketingConsent !== "opted_in") return null;
-    const now = Date.now();
-    const activities = await ctx.db
-      .query("lifecycleActivities")
-      .withIndex("by_member", (q) => q.eq("memberId", member._id))
-      .collect();
-    const active = activities.find(
-      (activity) =>
-        activity.kind === "abandoned_cart" &&
-        activity.completedAt === undefined &&
-        activity.cancelledAt === undefined,
-    );
-    if (active) {
-      await ctx.db.patch("lifecycleActivities", active._id, {
-        lines: args.lines,
-        occurredAt: now,
-        nextSendAt: now + HOUR,
-        stage: 1,
-        claimedAt: undefined,
-        updatedAt: now,
-      });
-      return null;
-    }
-    await ctx.db.insert("lifecycleActivities", {
-      memberId: member._id,
-      email,
-      kind: "abandoned_cart",
-      sourceKey: `abandoned/${member._id}/${now}`,
-      lines: args.lines,
-      occurredAt: now,
-      nextSendAt: now + HOUR,
-      stage: 1,
-      createdAt: now,
-      updatedAt: now,
-    });
+    await recordCheckoutActivityForOrder(ctx, args);
     return null;
   },
 });
