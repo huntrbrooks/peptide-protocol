@@ -143,9 +143,7 @@ export async function POST(request: Request): Promise<NextResponse<StackRecommen
         ok: false,
         error: rateLimited
           ? "Too many requests. Please try again shortly."
-          : error instanceof Error
-            ? error.message
-            : "Unexpected error generating recommendation.",
+          : "Unable to generate a recommendation. Please try again.",
       },
       { status: rateLimited ? 429 : 500 },
     );

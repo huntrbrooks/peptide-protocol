@@ -1,8 +1,22 @@
 import type { Metadata } from "next";
-import { DosingCalculator } from "@/components/dosing-calculator/DosingCalculator";
+import dynamic from "next/dynamic";
 import { dosingCalculatorMeta } from "@/content/dosingCalculator";
 import { products } from "@/content/products";
 import { publicPageMetadata } from "@/lib/seo/metadata";
+
+const DosingCalculator = dynamic(
+  () =>
+    import("@/components/dosing-calculator/DosingCalculator").then(
+      (mod) => mod.DosingCalculator,
+    ),
+  {
+    loading: () => (
+      <div className="border border-line bg-paper p-6 text-sm text-muted">
+        Loading calculator…
+      </div>
+    ),
+  },
+);
 
 export const metadata: Metadata = publicPageMetadata({
   title: dosingCalculatorMeta.metaTitle,

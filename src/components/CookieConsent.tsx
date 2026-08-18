@@ -14,6 +14,8 @@ import {
 } from "@/lib/ageGate/storage";
 import { track } from "@/lib/analytics/track";
 
+const SCROLL_THRESHOLD_PX = 40;
+
 function subscribeConsent(callback: () => void): () => void {
   window.addEventListener(CONSENT_EVENT, callback);
   window.addEventListener("storage", callback);
@@ -23,6 +25,25 @@ function subscribeConsent(callback: () => void): () => void {
   };
 }
 
+function isCtaTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof Element)) return false;
+  const control = target.closest("a, button");
+  if (!control) return false;
+  if (control instanceof HTMLAnchorElement) {
+    const href = control.getAttribute("href");
+    if (!href || href.startsWith("mailto:") || href.startsWith("tel:")) {
+      return false;
+    }
+    try {
+      return new URL(control.href, window.location.origin).origin ===
+        window.location.origin;
+    } catch {
+      return false;
+    }
+  }
+  return true;
+}
+
 export function CookieConsent() {
   const ageVerified = useSyncExternalStore(
     subscribeAgeGate,
@@ -30,6 +51,7 @@ export function CookieConsent() {
     getAgeGateServerSnapshot,
   );
   const [decided, setDecided] = useState(false);
+  const [engaged, setEngaged] = useState(false);
   const [analytics, setAnalytics] = useState(false);
   const [marketing, setMarketing] = useState(false);
   const [replay, setReplay] = useState(false);
@@ -40,7 +62,28 @@ export function CookieConsent() {
     return subscribeConsent(sync);
   }, []);
 
-  if (!ageVerified || decided) return null;
+  // Defer the banner until scroll or the first CTA so the age gate stays
+  // the only first-paint modal.
+  useEffect(() => {
+    if (!ageVerified || decided || engaged) return;
+
+    const onScroll = () => {
+      if (window.scrollY >= SCROLL_THRESHOLD_PX) setEngaged(true);
+    };
+    const onClick = (event: MouseEvent) => {
+      if (isCtaTarget(event.target)) setEngaged(true);
+    };
+
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    document.addEventListener("click", onClick, true);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      document.removeEventListener("click", onClick, true);
+    };
+  }, [ageVerified, decided, engaged]);
+
+  if (!ageVerified || !engaged || decided) return null;
 
   function persist(next: { analytics: boolean; marketing: boolean; replay: boolean }) {
     const consent = saveConsent(next);

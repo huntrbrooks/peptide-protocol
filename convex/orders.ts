@@ -1,7 +1,6 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
-import { applyMemberDiscount } from "./lib/memberDiscount";
 import {
   quoteDiscountForEmailAndCode,
   redeemFirstOrderIfNeeded,
@@ -193,8 +192,8 @@ export const createPending = mutation({
       ctx,
       email,
       args.discountCode,
+      catalogueSubtotal,
     );
-    const applied = applyMemberDiscount(catalogueSubtotal, quote.percent);
 
     const now = Date.now();
     await reserveInventory(ctx, lines);
@@ -204,11 +203,11 @@ export const createPending = mutation({
       email,
       shipping: args.shipping,
       lines,
-      subtotalAud: applied.subtotalAud,
+      subtotalAud: quote.subtotalAud,
       subtotalBeforeDiscountAud: catalogueSubtotal,
       discountCode: quote.code ?? undefined,
       discountPercent: quote.percent > 0 ? quote.percent : undefined,
-      discountAud: quote.percent > 0 ? applied.discountAud : undefined,
+      discountAud: quote.percent > 0 ? quote.discountAud : undefined,
       memberId: quote.memberId ?? undefined,
       currencyFiat: "aud",
       paymentMethod: args.paymentMethod,

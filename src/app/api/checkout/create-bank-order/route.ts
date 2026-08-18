@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { resolveCheckoutTotals } from "@/lib/orders/checkout";
+import { mapCheckoutError } from "@/lib/orders/checkoutErrors";
 import { createConvexOrder } from "@/lib/orders/convex";
 import { createOrderProofToken } from "@/lib/payments/order-proof";
 import { getSettlementOptions } from "@/lib/payments/settlement";
@@ -25,8 +26,13 @@ export async function POST(request: Request): Promise<NextResponse> {
     });
   } catch (error) {
     console.error("[checkout] create bank order failed", error);
-    const message =
-      error instanceof Error ? error.message : "Unable to create bank order.";
-    return NextResponse.json({ ok: false, error: message }, { status: 400 });
+    const mapped = mapCheckoutError(
+      error,
+      "Unable to create bank order. Please try again.",
+    );
+    return NextResponse.json(
+      { ok: false, error: mapped.error },
+      { status: mapped.status },
+    );
   }
 }

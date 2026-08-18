@@ -1,8 +1,22 @@
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import Link from "next/link";
-import { StackFinderQuiz } from "@/components/stack-finder/StackFinderQuiz";
 import { site } from "@/content/site";
 import { publicPageMetadata } from "@/lib/seo/metadata";
+
+const StackFinderQuiz = dynamic(
+  () =>
+    import("@/components/stack-finder/StackFinderQuiz").then(
+      (mod) => mod.StackFinderQuiz,
+    ),
+  {
+    loading: () => (
+      <div className="border border-line bg-paper p-6 text-sm text-muted">
+        Loading Stack Finder…
+      </div>
+    ),
+  },
+);
 
 export const metadata: Metadata = publicPageMetadata({
   title: "Find Your Ideal Peptide Stack | The Protocol",

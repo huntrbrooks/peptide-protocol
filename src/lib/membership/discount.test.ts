@@ -3,7 +3,7 @@ import {
   applyMemberDiscount,
   isValidMemberEmail,
   normalizeMemberCode,
-} from "./discount";
+} from "../../../convex/lib/memberDiscount";
 
 describe("applyMemberDiscount", () => {
   it("applies 15 percent to the nearest cent", () => {

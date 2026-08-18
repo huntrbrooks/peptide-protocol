@@ -6,7 +6,6 @@ import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 
 import { api } from "../../../convex/_generated/api";
 import { formatPrice, getProductBySlug } from "@/content/products";
 import { site } from "@/content/site";
-import { applyMemberDiscount } from "@/lib/membership/discount";
 import {
   getMemberCaptureServerSnapshot,
   getMemberCaptureSnapshot,
@@ -87,16 +86,20 @@ const inputClass =
 type MembershipQuote = {
   percent: number;
   code: string | null;
+  discountAud: number;
+  subtotalAud: number;
 };
 
 function CheckoutMembershipSync({
   email,
   code,
+  subtotalAud,
   onQuote,
   onPrefill,
 }: {
   email: string;
   code: string;
+  subtotalAud: number;
   onQuote: (quote: MembershipQuote) => void;
   onPrefill: (value: { email: string; code: string }) => void;
 }) {
@@ -107,8 +110,8 @@ function CheckoutMembershipSync({
   );
   const quote = useQuery(
     api.members.quoteDiscount,
-    email.includes("@") && code
-      ? { email, code }
+    email.includes("@")
+      ? { email, code: code || undefined, subtotalAud }
       : "skip",
   );
 
@@ -120,11 +123,21 @@ function CheckoutMembershipSync({
 
   useEffect(() => {
     if (quote) {
-      onQuote({ percent: quote.percent, code: quote.code });
+      onQuote({
+        percent: quote.percent,
+        code: quote.code,
+        discountAud: quote.discountAud,
+        subtotalAud: quote.subtotalAud,
+      });
     } else {
-      onQuote({ percent: 0, code: code || null });
+      onQuote({
+        percent: 0,
+        code: code || null,
+        discountAud: 0,
+        subtotalAud,
+      });
     }
-  }, [code, onQuote, quote]);
+  }, [code, onQuote, quote, subtotalAud]);
 
   return null;
 }
@@ -161,12 +174,17 @@ export function CheckoutForm() {
   const [quote, setQuote] = useState<MembershipQuote>({
     percent: 0,
     code: null,
+    discountAud: 0,
+    subtotalAud: 0,
   });
   const email = details.email || captured.record?.email || "";
   const memberCode = discountCode ?? captured.record?.code ?? "";
   const [researchAck, setResearchAck] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [paymentOptionsError, setPaymentOptionsError] = useState<string | null>(
+    null,
+  );
   const [cryptoOptions, setCryptoOptions] = useState<CryptoOption[]>([]);
   const [cryptoChain, setCryptoChain] = useState<CryptoChain>("solana");
   const [cryptoOrder, setCryptoOrder] = useState<CryptoOrder | null>(null);
@@ -215,19 +233,37 @@ export function CheckoutForm() {
     void fetch("/api/checkout/payment-options")
       .then(async (response) => {
         const payload = (await response.json()) as {
+          ok?: boolean;
           options?: CryptoOption[];
           crypto?: CryptoOption[];
           bank?: BankDetails;
+          error?: string;
         };
+        if (!response.ok || payload.ok === false) {
+          setCryptoOptions([]);
+          setBankDetails(null);
+          setPaymentOptionsError(
+            payload.error ?? "Payment options unavailable",
+          );
+          return;
+        }
         const options = payload.crypto ?? payload.options ?? [];
         setCryptoOptions(options);
         setBankDetails(payload.bank ?? null);
+        setPaymentOptionsError(null);
         if (options[0]) setCryptoChain(options[0].chain);
       })
-      .catch(() => setCryptoOptions([]));
+      .catch(() => {
+        setCryptoOptions([]);
+        setBankDetails(null);
+        setPaymentOptionsError("Payment options unavailable");
+      });
   }, []);
 
-  const charged = applyMemberDiscount(subtotal, quote.percent);
+  const charged = {
+    discountAud: quote.discountAud,
+    subtotalAud: quote.percent > 0 ? quote.subtotalAud : subtotal,
+  };
 
   function checkoutBody() {
     return {
@@ -480,6 +516,7 @@ export function CheckoutForm() {
           <CheckoutMembershipSync
             email={email}
             code={memberCode}
+            subtotalAud={subtotal}
             onQuote={setQuote}
             onPrefill={onPrefill}
           />
@@ -631,29 +668,37 @@ export function CheckoutForm() {
 
         <section className="border border-line bg-paper p-6">
           <h2 className="font-display text-2xl text-ink">Payment</h2>
+          {paymentOptionsError ? (
+            <p className="mt-5 text-sm text-red-700">{paymentOptionsError}</p>
+          ) : null}
           <div className="mt-5 grid grid-cols-3 border border-line text-sm">
-            {(["crypto", "card", "bank"] as const).map((method) => {
+            {(
+              [
+                { id: "crypto" as const, label: "Crypto" },
+                { id: "card" as const, label: "Stripe" },
+                { id: "bank" as const, label: "Bank" },
+              ] as const
+            ).map((method) => {
               const disabled =
-                (method === "bank" && !bankDetails) ||
-                (checkoutStarted && tab !== method);
+                (method.id === "bank" && !bankDetails) ||
+                (method.id === "crypto" && cryptoOptions.length === 0) ||
+                (checkoutStarted && tab !== method.id);
               return (
                 <button
-                  key={method}
+                  key={method.id}
                   type="button"
                   disabled={disabled}
                   onClick={() => {
-                    setTab(method);
+                    setTab(method.id);
                     setError(null);
                   }}
-                  className={`px-3 py-3 capitalize transition ${
-                    tab === method
+                  className={`px-3 py-3 transition ${
+                    tab === method.id
                       ? "bg-ink text-paper"
                       : "bg-paper text-muted hover:text-ink"
                   } disabled:cursor-not-allowed disabled:opacity-40`}
                 >
-                  {method === "card"
-                      ? "Stripe"
-                      : method}
+                  {method.label}
                 </button>
               );
             })}
@@ -662,6 +707,10 @@ export function CheckoutForm() {
           {tab === "card" ? (
             <div className="mt-5">
               <p className="text-sm leading-relaxed text-muted">
+                Card payments are processed securely by Fresh&apos;n Up via
+                Stripe.
+              </p>
+              <p className="mt-2 text-sm leading-relaxed text-muted">
                 Continue to Fresh&apos;n Up for secure Stripe card checkout in
                 AUD. Payment confirmation returns here automatically.
               </p>

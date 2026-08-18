@@ -1,5 +1,4 @@
 import { getProductBySlug } from "@/content/products";
-import { applyMemberDiscount, normalizeMemberCode } from "@/lib/membership/discount";
 import { fetchMutation, fetchQuery } from "convex/nextjs";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
@@ -127,7 +126,7 @@ export function parseCheckoutDetails(body: unknown): CheckoutDetails {
   }
 
   const discountCode = isNonEmptyString(input.discountCode)
-    ? normalizeMemberCode(input.discountCode)
+    ? input.discountCode.trim().toUpperCase().replace(/\s+/g, "")
     : undefined;
 
   return {
@@ -166,13 +165,13 @@ export async function resolveCheckoutTotals(
   const quote = await fetchQuery(api.members.quoteDiscount, {
     email: checkout.email,
     code: checkout.discountCode,
+    subtotalAud: checkout.subtotalAud,
   });
-  const applied = applyMemberDiscount(checkout.subtotalAud, quote.percent);
   return {
     ...checkout,
     subtotalBeforeDiscountAud: checkout.subtotalAud,
-    subtotalAud: applied.subtotalAud,
-    discountAud: applied.discountAud,
+    subtotalAud: quote.subtotalAud,
+    discountAud: quote.discountAud,
     discountPercent: quote.percent,
     discountCode: quote.code ?? undefined,
     memberId: quote.memberId ?? undefined,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useConvexAuth, useMutation, useQuery } from "convex/react";
+import { useConvexAuth, useMutation, usePaginatedQuery, useQuery } from "convex/react";
 import Link from "next/link";
 import { useState } from "react";
 import { api } from "../../../convex/_generated/api";
@@ -16,6 +16,15 @@ export default function AccountPage() {
   const account = useQuery(
     api.members.getMyAccount,
     isAuthenticated ? {} : "skip",
+  );
+  const {
+    results: orders,
+    status: ordersStatus,
+    loadMore,
+  } = usePaginatedQuery(
+    api.members.listMyOrders,
+    isAuthenticated ? {} : "skip",
+    { initialNumItems: 10 },
   );
   const updateConsent = useMutation(api.members.updateMarketingConsent);
   const saveAddress = useMutation(api.members.saveAddress);
@@ -84,7 +93,7 @@ export default function AccountPage() {
       <section className="mt-10">
         <h2 className="font-display text-2xl text-ink">Order history</h2>
         <div className="mt-5 grid gap-4">
-          {account.orders.map((order) => (
+          {orders.map((order) => (
             <article key={order._id} className="border border-line bg-paper p-5">
               <div className="flex flex-wrap justify-between gap-3">
                 <div>
@@ -112,7 +121,18 @@ export default function AccountPage() {
               </button>
             </article>
           ))}
-          {account.orders.length === 0 ? <p className="text-sm text-muted">No orders yet.</p> : null}
+          {orders.length === 0 && ordersStatus !== "LoadingFirstPage" ? (
+            <p className="text-sm text-muted">No orders yet.</p>
+          ) : null}
+          {ordersStatus === "CanLoadMore" ? (
+            <button
+              type="button"
+              className="border border-line px-4 py-2 text-sm text-ink hover:border-accent"
+              onClick={() => loadMore(10)}
+            >
+              Load more orders
+            </button>
+          ) : null}
         </div>
         {message ? (
           <p className="mt-4 text-sm text-ink">{message} <Link href="/checkout" className="text-accent underline">Open cart</Link></p>

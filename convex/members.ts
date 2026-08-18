@@ -1,4 +1,5 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
+import { paginationOptsValidator, paginationResultValidator } from "convex/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
@@ -13,6 +14,7 @@ import { generateMemberCode } from "./lib/memberCodes";
 import {
   FIRST_ORDER_PERCENT,
   MEMBER_RATE_PERCENT,
+  applyMemberDiscount,
   isValidMemberEmail,
   normalizeMemberCode,
   normalizeMemberEmail,
@@ -24,6 +26,8 @@ const quoteValidator = v.object({
   code: v.union(v.string(), v.null()),
   memberId: v.union(v.id("members"), v.null()),
   firstOrder: v.boolean(),
+  discountAud: v.number(),
+  subtotalAud: v.number(),
 });
 
 const addressFieldsValidator = {
@@ -102,29 +106,51 @@ export async function quoteDiscountForEmailAndCode(
   ctx: QueryCtx | MutationCtx,
   email: string,
   code: string | undefined,
+  subtotalAud = 0,
 ): Promise<{
   percent: number;
   code: string | null;
   memberId: Id<"members"> | null;
   firstOrder: boolean;
+  discountAud: number;
+  subtotalAud: number;
 }> {
   const normalizedEmail = normalizeMemberEmail(email);
   const normalizedCode = code ? normalizeMemberCode(code) : "";
   if (!isValidMemberEmail(normalizedEmail) || !normalizedCode) {
-    return { percent: 0, code: null, memberId: null, firstOrder: false };
+    const applied = applyMemberDiscount(subtotalAud, 0);
+    return {
+      percent: 0,
+      code: null,
+      memberId: null,
+      firstOrder: false,
+      discountAud: applied.discountAud,
+      subtotalAud: applied.subtotalAud,
+    };
   }
 
   const member = await findMemberByCode(ctx, normalizedCode);
   if (!member || member.email !== normalizedEmail) {
-    return { percent: 0, code: null, memberId: null, firstOrder: false };
+    const applied = applyMemberDiscount(subtotalAud, 0);
+    return {
+      percent: 0,
+      code: null,
+      memberId: null,
+      firstOrder: false,
+      discountAud: applied.discountAud,
+      subtotalAud: applied.subtotalAud,
+    };
   }
 
   const quoted = await percentForMember(ctx, member);
+  const applied = applyMemberDiscount(subtotalAud, quoted.percent);
   return {
     percent: quoted.percent,
     code: member.code,
     memberId: member._id,
     firstOrder: quoted.firstOrder,
+    discountAud: applied.discountAud,
+    subtotalAud: applied.subtotalAud,
   };
 }
 
@@ -282,21 +308,6 @@ export const getMyAccount = query({
         v.literal("opted_in"),
         v.literal("opted_out"),
       ),
-      orders: v.array(v.object({
-        _id: v.id("orders"),
-        status: v.string(),
-        subtotalAud: v.number(),
-        discountAud: v.number(),
-        paymentMethod: v.string(),
-        createdAt: v.number(),
-        trackingNumber: v.union(v.string(), v.null()),
-        lines: v.array(v.object({
-          slug: v.string(),
-          name: v.string(),
-          quantity: v.number(),
-          lineTotalAud: v.number(),
-        })),
-      })),
       addresses: v.array(v.object({
         _id: v.id("addresses"),
         label: v.string(),
@@ -314,23 +325,10 @@ export const getMyAccount = query({
   handler: async (ctx) => {
     const member = await getAuthenticatedMember(ctx);
     if (!member) return null;
-    const [memberOrders, emailOrders, addresses] = await Promise.all([
-      ctx.db
-        .query("orders")
-        .withIndex("by_member", (q) => q.eq("memberId", member._id))
-        .collect(),
-      ctx.db
-        .query("orders")
-        .withIndex("by_email", (q) => q.eq("email", member.email))
-        .collect(),
-      ctx.db
-        .query("addresses")
-        .withIndex("by_member", (q) => q.eq("memberId", member._id))
-        .collect(),
-    ]);
-    const uniqueOrders = new Map(
-      [...memberOrders, ...emailOrders].map((order) => [String(order._id), order]),
-    );
+    const addresses = await ctx.db
+      .query("addresses")
+      .withIndex("by_member", (q) => q.eq("memberId", member._id))
+      .take(50);
     const quoted = await percentForMember(ctx, member);
     return {
       email: member.email,
@@ -338,23 +336,6 @@ export const getMyAccount = query({
       percent: quoted.percent,
       firstOrder: quoted.firstOrder,
       marketingConsent: member.marketingConsent ?? "pending",
-      orders: [...uniqueOrders.values()]
-        .sort((a, b) => b.createdAt - a.createdAt)
-        .map((order) => ({
-          _id: order._id,
-          status: order.status,
-          subtotalAud: order.subtotalAud,
-          discountAud: order.discountAud ?? 0,
-          paymentMethod: order.paymentMethod ?? "unknown",
-          createdAt: order.createdAt,
-          trackingNumber: order.trackingNumber ?? null,
-          lines: order.lines.map((line) => ({
-            slug: line.slug,
-            name: line.name,
-            quantity: line.quantity,
-            lineTotalAud: line.lineTotalAud,
-          })),
-        })),
       addresses: addresses.map((address) => ({
         _id: address._id,
         label: address.label,
@@ -365,6 +346,60 @@ export const getMyAccount = query({
         state: address.state,
         postcode: address.postcode,
         country: address.country,
+      })),
+    };
+  },
+});
+
+const accountOrderValidator = v.object({
+  _id: v.id("orders"),
+  status: v.string(),
+  subtotalAud: v.number(),
+  discountAud: v.number(),
+  paymentMethod: v.string(),
+  createdAt: v.number(),
+  trackingNumber: v.union(v.string(), v.null()),
+  lines: v.array(v.object({
+    slug: v.string(),
+    name: v.string(),
+    quantity: v.number(),
+    lineTotalAud: v.number(),
+  })),
+});
+
+export const listMyOrders = query({
+  args: { paginationOpts: paginationOptsValidator },
+  returns: paginationResultValidator(accountOrderValidator),
+  handler: async (ctx, args) => {
+    const member = await getAuthenticatedMember(ctx);
+    if (!member) {
+      return {
+        page: [],
+        isDone: true,
+        continueCursor: "",
+      };
+    }
+    const result = await ctx.db
+      .query("orders")
+      .withIndex("by_member", (q) => q.eq("memberId", member._id))
+      .order("desc")
+      .paginate(args.paginationOpts);
+    return {
+      ...result,
+      page: result.page.map((order) => ({
+        _id: order._id,
+        status: order.status,
+        subtotalAud: order.subtotalAud,
+        discountAud: order.discountAud ?? 0,
+        paymentMethod: order.paymentMethod ?? "unknown",
+        createdAt: order.createdAt,
+        trackingNumber: order.trackingNumber ?? null,
+        lines: order.lines.map((line) => ({
+          slug: line.slug,
+          name: line.name,
+          quantity: line.quantity,
+          lineTotalAud: line.lineTotalAud,
+        })),
       })),
     };
   },
@@ -489,10 +524,16 @@ export const quoteDiscount = query({
   args: {
     email: v.string(),
     code: v.optional(v.string()),
+    subtotalAud: v.optional(v.number()),
   },
   returns: quoteValidator,
   handler: async (ctx, args) => {
-    return await quoteDiscountForEmailAndCode(ctx, args.email, args.code);
+    return await quoteDiscountForEmailAndCode(
+      ctx,
+      args.email,
+      args.code,
+      args.subtotalAud ?? 0,
+    );
   },
 });
 

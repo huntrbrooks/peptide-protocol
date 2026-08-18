@@ -257,6 +257,13 @@ export default defineSchema({
     count: v.number(),
     windowStartedAt: v.number(),
   }).index("by_key", ["key"]),
+  contactMessages: defineTable({
+    name: v.string(),
+    email: v.string(),
+    message: v.string(),
+    createdAt: v.number(),
+    sentAt: v.optional(v.number()),
+  }).index("by_created", ["createdAt"]),
   auditLogs: defineTable({
     staffUserId: v.id("users"),
     staffEmail: v.string(),

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { resolveCheckoutTotals } from "@/lib/orders/checkout";
+import { mapCheckoutError } from "@/lib/orders/checkoutErrors";
 import { createConvexOrder } from "@/lib/orders/convex";
 import type { CryptoChain } from "@/lib/orders/types";
 import { createOrderProofToken } from "@/lib/payments/order-proof";
@@ -50,11 +51,13 @@ export async function POST(request: Request): Promise<NextResponse> {
     });
   } catch (error) {
     console.error("[checkout] create crypto order failed", error);
-    const message =
-      error instanceof Error ? error.message : "Unable to create crypto order.";
+    const mapped = mapCheckoutError(
+      error,
+      "Unable to create crypto order. Please try again.",
+    );
     return NextResponse.json(
-      { ok: false, error: message },
-      { status: message.includes("configured") ? 503 : 400 },
+      { ok: false, error: mapped.error },
+      { status: mapped.status },
     );
   }
 }

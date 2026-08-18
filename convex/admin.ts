@@ -1,3 +1,4 @@
+import { paginationOptsValidator, paginationResultValidator } from "convex/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import { mutation, query } from "./_generated/server";
@@ -6,6 +7,8 @@ import { releaseInventory } from "./inventory";
 import { requireStaff, writeAudit } from "./lib/staff";
 import { recomputeMemberRfm } from "./rfm";
 
+const OVERVIEW_SCAN_LIMIT = 500;
+
 const queueOrder = v.object({
   _id: v.id("orders"),
   email: v.string(),
@@ -13,6 +16,19 @@ const queueOrder = v.object({
   subtotalAud: v.number(),
   createdAt: v.number(),
   proofVerificationStatus: v.string(),
+});
+
+const fulfillmentOrder = v.object({
+  _id: v.id("orders"),
+  email: v.string(),
+  status: v.union(
+    v.literal("paid"),
+    v.literal("packed"),
+    v.literal("shipped"),
+    v.literal("delivered"),
+  ),
+  subtotalAud: v.number(),
+  createdAt: v.number(),
 });
 
 export const overview = query({
@@ -31,21 +47,22 @@ export const overview = query({
     const today = await ctx.db
       .query("orders")
       .withIndex("by_paid_at", (q) => q.gte("paidAt", args.dayStart))
-      .collect();
+      .take(OVERVIEW_SCAN_LIMIT);
     const netGmv = today.reduce((sum, order) => sum + order.subtotalAud, 0);
     const pending = await ctx.db
       .query("orders")
       .withIndex("by_status", (q) => q.eq("status", "pending_verification"))
-      .collect();
+      .take(OVERVIEW_SCAN_LIMIT);
     const pastDueEmails = await ctx.db
       .query("orders")
       .withIndex("by_paid_at", (q) => q.lt("paidAt", args.dayStart))
-      .collect();
+      .order("desc")
+      .take(OVERVIEW_SCAN_LIMIT);
     const lifecycleEmailFailures = await ctx.db
       .query("emailEvents")
       .withIndex("by_status", (q) => q.eq("status", "failed"))
-      .collect();
-    const inventory = await ctx.db.query("inventory").collect();
+      .take(OVERVIEW_SCAN_LIMIT);
+    const inventory = await ctx.db.query("inventory").take(OVERVIEW_SCAN_LIMIT);
     return {
       netGmv,
       orders: today.length,
@@ -73,7 +90,7 @@ export const pendingProofs = query({
     const orders = await ctx.db
       .query("orders")
       .withIndex("by_status", (q) => q.eq("status", "pending_verification"))
-      .collect();
+      .take(OVERVIEW_SCAN_LIMIT);
     return orders
       .filter((order) => order.proofVerificationStatus === "pending_review")
       .map((order) => ({
@@ -88,34 +105,33 @@ export const pendingProofs = query({
 });
 
 export const fulfillmentQueue = query({
-  args: {},
-  returns: v.array(v.object({
-    _id: v.id("orders"),
-    email: v.string(),
+  args: {
     status: v.union(
       v.literal("paid"),
       v.literal("packed"),
       v.literal("shipped"),
       v.literal("delivered"),
     ),
-    subtotalAud: v.number(),
-    createdAt: v.number(),
-  })),
-  handler: async (ctx) => {
+    paginationOpts: paginationOptsValidator,
+  },
+  returns: paginationResultValidator(fulfillmentOrder),
+  handler: async (ctx, args) => {
     await requireStaff(ctx);
-    const [paid, packed, shipped, delivered] = await Promise.all([
-      ctx.db.query("orders").withIndex("by_status", (q) => q.eq("status", "paid")).collect(),
-      ctx.db.query("orders").withIndex("by_status", (q) => q.eq("status", "packed")).collect(),
-      ctx.db.query("orders").withIndex("by_status", (q) => q.eq("status", "shipped")).collect(),
-      ctx.db.query("orders").withIndex("by_status", (q) => q.eq("status", "delivered")).collect(),
-    ]);
-    return [...paid, ...packed, ...shipped, ...delivered].map((order) => ({
-      _id: order._id,
-      email: order.email,
-      status: order.status as "paid" | "packed" | "shipped" | "delivered",
-      subtotalAud: order.subtotalAud,
-      createdAt: order.createdAt,
-    }));
+    const result = await ctx.db
+      .query("orders")
+      .withIndex("by_status", (q) => q.eq("status", args.status))
+      .order("desc")
+      .paginate(args.paginationOpts);
+    return {
+      ...result,
+      page: result.page.map((order) => ({
+        _id: order._id,
+        email: order.email,
+        status: order.status as "paid" | "packed" | "shipped" | "delivered",
+        subtotalAud: order.subtotalAud,
+        createdAt: order.createdAt,
+      })),
+    };
   },
 });
 

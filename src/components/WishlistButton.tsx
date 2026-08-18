@@ -1,7 +1,9 @@
 "use client";
 
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
-import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { api } from "../../convex/_generated/api";
 import { track } from "@/lib/analytics/track";
 import {
@@ -32,6 +34,8 @@ export function WishlistButton({
   const remove = useMutation(api.wishlists.remove);
   const [localSlugs, setLocalSlugs] = useState<string[]>([]);
   const [syncFailed, setSyncFailed] = useState(false);
+  const [showAccountToast, setShowAccountToast] = useState(false);
+  const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const sync = () => setLocalSlugs(readWishlist());
@@ -39,50 +43,82 @@ export function WishlistButton({
     return subscribeWishlist(sync);
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    };
+  }, []);
+
   const saved =
     localSlugs.includes(productSlug) || serverSlugs?.includes(productSlug) === true;
 
   return (
-    <button
-      type="button"
-      aria-label={saved ? `Remove ${productName} from saved items` : `Save ${productName}`}
-      aria-pressed={saved}
-      title={syncFailed ? "Saved on this device; account sync is temporarily unavailable" : undefined}
-      className={`inline-flex h-10 w-10 items-center justify-center border border-line bg-paper text-ink transition hover:border-accent hover:text-accent ${className}`}
-      onClick={(event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        const nextSaved = !saved;
-        setWishlistItem(productSlug, nextSaved);
-        track(nextSaved ? "add_to_wishlist" : "remove_from_wishlist", {
-          currency: "AUD",
-          value: priceAud,
-          items: [{
-            item_id: productSlug,
-            item_name: productName,
-            price: priceAud,
-            quantity: 1,
-          }],
-        });
-        if (isAuthenticated) {
-          const request = nextSaved
-            ? add({ productSlug })
-            : remove({ productSlug });
-          setSyncFailed(false);
-          void request.catch(() => setSyncFailed(true));
-        }
-      }}
-    >
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 24 24"
-        className="h-5 w-5"
-        fill={saved ? "currentColor" : "none"}
-        stroke="currentColor"
-        strokeWidth="1.7"
+    <>
+      <button
+        type="button"
+        aria-label={saved ? `Remove ${productName} from saved items` : `Save ${productName}`}
+        aria-pressed={saved}
+        title={syncFailed ? "Saved on this device; account sync is temporarily unavailable" : undefined}
+        className={`inline-flex h-10 w-10 items-center justify-center border border-line bg-paper text-ink transition hover:border-accent hover:text-accent ${className}`}
+        onClick={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          const nextSaved = !saved;
+          setWishlistItem(productSlug, nextSaved);
+          track(nextSaved ? "add_to_wishlist" : "remove_from_wishlist", {
+            currency: "AUD",
+            value: priceAud,
+            items: [{
+              item_id: productSlug,
+              item_name: productName,
+              price: priceAud,
+              quantity: 1,
+            }],
+          });
+          if (isAuthenticated) {
+            const request = nextSaved
+              ? add({ productSlug })
+              : remove({ productSlug });
+            setSyncFailed(false);
+            void request.catch(() => setSyncFailed(true));
+          } else if (nextSaved) {
+            setShowAccountToast(true);
+            if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+            toastTimeoutRef.current = setTimeout(
+              () => setShowAccountToast(false),
+              5000,
+            );
+          }
+        }}
       >
-        <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z" />
-      </svg>
-    </button>
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 24 24"
+          className="h-5 w-5"
+          fill={saved ? "currentColor" : "none"}
+          stroke="currentColor"
+          strokeWidth="1.7"
+        >
+          <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z" />
+        </svg>
+      </button>
+      {showAccountToast
+        ? createPortal(
+            <div
+              role="status"
+              className="fixed inset-x-4 bottom-4 z-90 mx-auto flex w-fit max-w-full items-center gap-3 border border-line bg-paper px-4 py-3 text-sm text-ink shadow-2xl"
+            >
+              Create an account to save items across devices.
+              <Link
+                href="/account"
+                className="whitespace-nowrap font-medium text-accent underline underline-offset-2"
+              >
+                Create account
+              </Link>
+            </div>,
+            document.body,
+          )
+        : null}
+    </>
   );
 }

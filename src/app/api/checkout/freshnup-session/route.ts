@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { resolveCheckoutTotals } from "@/lib/orders/checkout";
+import { mapCheckoutError } from "@/lib/orders/checkoutErrors";
 import { createConvexOrder } from "@/lib/orders/convex";
 import { createPaymentBridgeToken } from "@/lib/payments/payment-bridge";
 import { enforceRouteRateLimit } from "@/lib/security/rateLimit";
@@ -49,22 +50,13 @@ export async function POST(request: Request): Promise<NextResponse> {
     });
   } catch (error) {
     console.error("[checkout] Freshnup session creation failed", error);
-    const message =
-      error instanceof Error ? error.message : "Unable to start payment.";
-    const isInputError =
-      message.includes("required") ||
-      message.includes("invalid") ||
-      message.includes("incomplete") ||
-      message.includes("Unknown product") ||
-      message.includes("greater than zero");
+    const mapped = mapCheckoutError(
+      error,
+      "Unable to start secure payment. Please try again.",
+    );
     return NextResponse.json(
-      {
-        ok: false,
-        error: isInputError
-          ? message
-          : "Unable to start secure payment. Please try again.",
-      },
-      { status: isInputError ? 400 : 500 },
+      { ok: false, error: mapped.error },
+      { status: mapped.status },
     );
   }
 }
